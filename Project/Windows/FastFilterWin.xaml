@@ -1,0 +1,12 @@
+﻿<Window x:Class="AbimTools.FastFilterWin"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Width="200" Height="100" ResizeMode="NoResize" WindowStyle="SingleBorderWindow" Background="WhiteSmoke" Topmost="True" Title="Выбор категории">
+
+    <Grid>
+        <ComboBox Name="CategoryComboBox" VerticalAlignment="Top" Margin="5" Background="White" HorizontalContentAlignment="Stretch"/>
+        <Button Content="Выбрать" VerticalAlignment="Bottom" Margin="5" Click="OnSelectButtonClick" Height="24"/>
+    </Grid>
+</Window>

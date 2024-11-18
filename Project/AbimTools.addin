@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>AbimTools</Name>
+    <Assembly>APRO/AbimTools/AbimTools.dll</Assembly>
+    <FullClassName>AbimTools.App</FullClassName>
+    <ClientId>280dbd16-4a77-43e0-a4b4-1df7e4a2eac0</ClientId>
+		<VendorId>Anton Rubinshtein</VendorId>
+    <VendorDescription>АБИМ-ПРО</VendorDescription>
+  </AddIn>
+</RevitAddIns>

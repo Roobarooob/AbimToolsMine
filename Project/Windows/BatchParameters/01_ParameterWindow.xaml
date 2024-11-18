@@ -1,0 +1,56 @@
+﻿<Window x:Class="AbimTools.ParameterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Добавить параметры" Height="600" Width="666" ResizeMode="NoResize" Background="WhiteSmoke">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="90"/>
+
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="1" Name="ParameterDataGrid" AutoGenerateColumns="False" Margin="10,0,10,0" SelectionMode="Extended" Background="Gray" HeadersVisibility="None">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Имя параметра" Binding="{Binding Name}" IsReadOnly="True" Width="210" CanUserResize="False"/>
+                <DataGridTextColumn Header="Категории" Binding="{Binding Categories}" IsReadOnly="True" Width="210" CanUserResize="False"/>
+                <DataGridTextColumn Header="Тип/Экземпляр" Binding="{Binding TypeInstance}" IsReadOnly="True" Width="210" CanUserResize="False"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,0">
+            <Button Content="Добавить параметры" Width="210" Click="AddParametersButton_Click"/>
+            <Button Content="Выбрать категории" Width="210"  Click="AddCategoriesButton_Click"/>
+            <Button Content="Тип/Экземпляр" Width="210"  Click="SetTypeInstanceButton_Click"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10">
+            <Button Content="Выполнить" Width="100" Click="ExecuteButton_Click"/>
+            <Button Content="Отмена" Width="100" Margin="10,0,0,0" Click="CancelButton_Click"/>
+        </StackPanel>
+        <GroupBox HorizontalAlignment="Stretch" Grid.Row="3" Background="WhiteSmoke" Header="Заполнить параметр" Margin="10,0,10,0">
+            <Grid Margin="0,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="25"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Grid.Row="0" Content="Категории" Width="80"  Click="SetParCategoriesButton_Click" HorizontalAlignment="Stretch"/>
+                <Label Grid.Column="1" Grid.Row="0" Content="Параметр" Background="WhiteSmoke" HorizontalAlignment="Right"/>
+                <TextBox x:Name="ParameterName" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch"  Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
+                <Label Grid.Column="3" Grid.Row="0" Content="Значение" Background="WhiteSmoke" HorizontalAlignment="Right" />
+                <TextBox Name="Value" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
+                <Button Content="Заполнить" Grid.Row="0" Grid.Column="5" Width="80" Margin="10,0,0,0" Click="SetValue_Click" HorizontalAlignment="Stretch"/>
+                <Label  Name ="CatLabel" Grid.Row="1" Content="Категории: " Background="WhiteSmoke" HorizontalAlignment="Left" Grid.ColumnSpan ="5"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

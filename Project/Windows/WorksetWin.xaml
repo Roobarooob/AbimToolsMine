@@ -1,0 +1,24 @@
+﻿<Window x:Class="AbimTools.WorksetWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WorksetTools" Height="200" Width="400" Background="WhiteSmoke">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- TextBox для префикса связи -->
+        <TextBox x:Name="PrefixTextBox" Grid.Row="0" Margin="0,0,0,10" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextChanged="PrefixTextBox_TextChanged"/>
+
+
+        <!-- Кнопка Назначить связи по рабочим наборам -->
+        <Button x:Name="AssignWorksetsButton" Grid.Row="1" Content="Назначить рабочие наборы связям" 
+                Height="30" Margin="0,10,0,10" Click="AssignWorksetsButton_Click"/>
+
+        <!-- Кнопка Фильтр пустых рабочих наборов -->
+        <Button x:Name="FilterEmptyWorksetsButton" Grid.Row="2" Content="Фильтр пустых рабочих наборов" 
+                Height="30" Click="FilterEmptyWorksetsButton_Click"/>
+    </Grid>
+</Window>
