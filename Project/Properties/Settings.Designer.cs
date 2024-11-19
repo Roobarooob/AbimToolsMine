@@ -34,5 +34,17 @@ namespace AbimTools.Properties {
                 this["LinkPrefix"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RevitServer_ip {
+            get {
+                return ((string)(this["RevitServer_ip"]));
+            }
+            set {
+                this["RevitServer_ip"] = value;
+            }
+        }
     }
 }

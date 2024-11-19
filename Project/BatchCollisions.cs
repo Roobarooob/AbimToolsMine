@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Shapes;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Application = Autodesk.Revit.ApplicationServices.Application;
@@ -85,9 +86,9 @@ namespace AbimTools
             Application app = uiapp.Application;
             foreach (string filePath in filePaths)
             {
-                if (File.Exists(filePath))
-                {
-                    ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath) || modelPath.ServerPath)
+                {                 
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     openOptions.DetachFromCentralOption = DetachFromCentralOption.ClearTransmittedSaveAsNewCentral;
@@ -142,9 +143,9 @@ namespace AbimTools
             Application app = uiapp.Application;
             foreach (string filePath in filePaths)
             {
-                if (File.Exists(filePath))
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath)||modelPath.ServerPath)
                 {
-                    ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
@@ -186,7 +187,7 @@ namespace AbimTools
                     }
                 }
             }
-            System.Windows.MessageBox.Show($"Семейства ''ПРО_Коллизия'' загружено !\nУспешно обработаны:\n{true_list}\nНе загружено:\n{false_list}");
+            System.Windows.MessageBox.Show($"Загрузка семейства !\nУспешно обработаны:\n{true_list}\nНе загружено:\n{false_list}");
         }
         //Загрузка коллизий
         public static void PlaceCollisions(ExternalCommandData commandData, List<string> filePaths, string xmlFilePath)
@@ -204,9 +205,9 @@ namespace AbimTools
                 // Перебирайте каждый файл
                 foreach (string filePath in filePaths)
                 {
-                    if (File.Exists(filePath))
-                    {
-                        ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                    ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                    if (File.Exists(filePath) || modelPath.ServerPath)
+                    {                      
                         // Настройте параметры открытия документа с закрытыми рабочими наборами
                         OpenOptions openOptions = new OpenOptions();
                         WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);

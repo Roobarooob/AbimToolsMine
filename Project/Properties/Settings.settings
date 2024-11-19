@@ -5,5 +5,8 @@
     <Setting Name="LinkPrefix" Type="System.String" Scope="User">
       <Value Profile="(Default)">#</Value>
     </Setting>
+    <Setting Name="RevitServer_ip" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -113,6 +113,12 @@ namespace AbimTools
             var rvtFiles = rvtFilePaths.ToList();
             BatchFunctions.DownloadFamily(BatchTools.CommandData, rvtFiles, FilePath);
         }
+        private void RevitServer_Click(object sender, RoutedEventArgs e)
+        {
+            RevitServerWindow RsWindow = new RevitServerWindow();
+            RsWindow.ShowDialog();
+        }
+
         private void LinkRemove_Click(object sender, RoutedEventArgs e)
         {
             var rvtFiles = rvtFilePaths.ToList();

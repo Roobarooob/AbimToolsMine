@@ -208,9 +208,10 @@ namespace AbimTools
             Application app = uiapp.Application;
             foreach (string filePath in filePaths)
             {
-                if (File.Exists(filePath))
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath) || modelPath.ServerPath)
                 {
-                    ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                    
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
@@ -268,9 +269,9 @@ namespace AbimTools
             Application app = uiapp.Application;
             foreach (string filePath in filePaths)
             {
-                if (File.Exists(filePath))
-                {
-                    ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath) || modelPath.ServerPath)
+                {                  
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
