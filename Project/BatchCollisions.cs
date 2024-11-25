@@ -40,6 +40,7 @@ namespace AbimTools
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     public class Collisions : IExternalCommand
     {
+        string xmlFilePath { get; set; }
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             UIApplication uiapp = commandData.Application;
@@ -55,7 +56,12 @@ namespace AbimTools
                                         e.Name == "Основная") as FamilySymbol;
 
             BatchFunctions.workset = BatchFunctions.GetOrCreateWorkset(doc, "*Коллизии");
-            string xmlFilePath = doc.ProjectInformation.LookupParameter("ПРО_Путь к XML коллизий").AsString();
+
+            try
+            {
+                xmlFilePath = doc.ProjectInformation.LookupParameter("ПРО_Путь к XML коллизий").AsString();
+            }
+            catch { TaskDialog.Show("Ошибка!", "нет параметра «ПРО_Путь к XML коллизий»"); }
             try
             {
                 if (familySymbol != null)
@@ -63,10 +69,14 @@ namespace AbimTools
                     int count = BatchFunctions.AnalyzeAndPlace(doc, username, familySymbol, discipline, xmlFilePath);
                     // Выполните синхронизацию с Revit Server             
                 }
+                else 
+                {
+                    TaskDialog.Show("Ошибка", "Не загружено семейство ПРО_Коллизия");
+                }
             }
             catch
             {
-                TaskDialog.Show("Ошибка", "Что-то не получлось");
+                TaskDialog.Show("Ошибка", "Что-то не получлось возможно не заполнен параметр «ПРО_Путь к XML коллизий»");
             }
             return Result.Succeeded;
         }
@@ -251,6 +261,10 @@ namespace AbimTools
                                 {
                                     continue;
                                 }
+                            }
+                            else
+                            {
+                                false_list.AppendLine(doc.Title + " - Нет семейства ПРО_Коллизия");
                             }
                         }
                         catch

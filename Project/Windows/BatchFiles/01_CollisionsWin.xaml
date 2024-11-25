@@ -16,19 +16,22 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <!-- Кнопка - добавление файлов Rvt -->
-        <Grid Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="35"/>
-            </Grid.ColumnDefinitions>
-            <Button  Content="Добавить файлы RVT" Grid.Column="0" Margin="0,0,0,0" Click="AddRvtFiles_Click"  Height="20" VerticalAlignment="Stretch" ToolTip="Добавить все файлы rvt из по одному"/>
-            <Button  Content="Revit Server" Grid.Column="1" Click="RevitServer_Click"/>
-            <Button  Content="Добавить папку" Grid.Column="2" Margin="0,0,0,0" Click="AddRvtFolder_Click" HorizontalAlignment="Stretch" ToolTip="Добавить все файлы rvt из папки и вложенных подпапках"/>
-            <Button  Content="🗑️" Grid.Column="3" Margin="0,0,0,0" Click="ClearList" HorizontalAlignment="Stretch" ToolTip="Очистить список"/>
-        </Grid>
+        <StackPanel  Grid.ColumnSpan="4" HorizontalAlignment="Stretch">
+            <TextBlock Text="Добавить файлы" HorizontalAlignment="Center" Margin="5"/>
+            <Grid Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="35"/>
+                </Grid.ColumnDefinitions>
+                <Button  Content="Revit Server" Grid.Column="0" Click="RevitServer_Click" ToolTip="Добавить файлы, расположенные на Revit Server"/>
+                <Button  Content="Из директории" Grid.Column="1" Margin="0,0,0,0" Click="AddRvtFiles_Click"  Height="20" VerticalAlignment="Stretch" ToolTip="Добавить файлы rvt из директории выборочно"/>
+                <Button  Content="Добавить папку" Grid.Column="2" Margin="0,0,0,0" Click="AddRvtFolder_Click" HorizontalAlignment="Stretch" ToolTip="Добавить все файлы rvt из папки и вложенных подпапках"/>
+                <Button  Content="🗑️" Grid.Column="3" Margin="0,0,0,0" Click="ClearList" HorizontalAlignment="Stretch" ToolTip="Очистить список"/>
+            </Grid>
+        </StackPanel>
+       
         <!-- ListBox для файлов Rvt -->
         <ListBox x:Name="RvtFilesListBox" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,10" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>

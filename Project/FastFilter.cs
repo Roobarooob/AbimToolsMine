@@ -1,12 +1,15 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace AbimTools
 {
@@ -31,6 +34,30 @@ namespace AbimTools
             return Result.Succeeded;
         }
     }
+    
+    [Transaction(TransactionMode.Manual)]
+    public class GetLookUpTable : IExternalCommand
+    {
+        public static ExternalCommandData CommandData { get; set; }
+
+        public static LookUpTableWindow window = null;
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            if (window == null)
+            {
+                window = new LookUpTableWindow(commandData);
+                window.ShowDialog();
+
+            }
+            else
+            {
+                window.Activate();
+            }
+            return Result.Succeeded;
+        }
+
+    }
+
     public class FastFilterHandler : IExternalEventHandler
     {
         public void Execute(UIApplication uiapp)

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="AbimTools.RevitServerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Revit Server Viewer" Height="450" Width="800">
+        Title="Выбрать файл с Revit Server" Height="450" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -9,9 +9,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Margin="5">
-            <TextBox x:Name="tbxServerName" Width="200" Text="172.16.11.10" Margin="5" />
-            <ComboBox x:Name="cbxVersion" Width="100" Margin="5" />
-            <Button x:Name="btnConnect" Content="Connect" Width="75" Margin="5" Click="btnConnect_Click" />
+            <TextBox x:Name="tbxServerName" Width="200" Margin="5"/>
+            <Button x:Name="btnConnect" Content="Соединение" Width="75" Margin="5" Click="btnConnect_Click" />
         </StackPanel>
         <TreeView x:Name="trvContent" Grid.Row="1" Margin="5">
             <TreeView.ItemTemplate>
@@ -23,6 +22,6 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <Button x:Name="btnProcessFiles" Grid.Row="2" Content="Process Selected Files" Height="30" Margin="5" Click="btnProcessFiles_Click" />
+        <Button x:Name="btnProcessFiles" Grid.Row="2" Content="Подтвердить выбор" Height="30" Margin="5" Click="btnProcessFiles_Click" />
     </Grid>
 </Window>

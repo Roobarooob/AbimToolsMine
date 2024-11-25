@@ -75,7 +75,8 @@ namespace AbimTools
                     foreach (string file in selectedFiles)
                     {
                         CollisionsWin.rvtFilePaths.Add(file);
-                    }                   
+                    }
+                    this.Close();
                 }
                 else
                 {
@@ -144,6 +145,8 @@ namespace AbimTools
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             GetRvtStrings();
+            Properties.Settings.Default.RevitServer_ip = tbxServerName.Text;
+            Properties.Settings.Default.Save();
         }
     }
 

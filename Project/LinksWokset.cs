@@ -187,11 +187,11 @@ namespace AbimTools
                     // Если рабочий набор пуст
                     if (isEmpty)
                     {
-                    
+#if R2023 || R2024 || R2025
                         DeleteWorksetSettings deleteSettings = new DeleteWorksetSettings();
                         // Удаление для версий 2023 и выше
                         WorksetTable.DeleteWorkset(doc, workset.Id, deleteSettings);
-                        
+#endif                      
                     }
                 }
 

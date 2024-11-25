@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 
 namespace AbimTools
 {
-
-    class App : IExternalApplication
+    public class App : IExternalApplication
     {
         public static PushButton pref_button { get; set; }
         public static PushButton selector_button { get; set; }
         public static PushButton bath_button { get; set; }
         public static PushButton col_button { get; set; }
         public static PushButton workset_button { get; set; }
+        public static PushButton lookUp_button { get; set; }
         public RibbonPanel RibbonPanel(UIControlledApplication a, string tab, string ribbonPanelText)
         {
             // Empty ribbon panel 
@@ -71,45 +71,56 @@ namespace AbimTools
             /// buttondata1.LargeImage = pb1Image1;
             
             //About
-            pref_button = CreateBtn(pan1, "About", "О программе", "AbimTools.Version", "pack://application:,,,/AbimTools;component/Resources/About.png");
+            pref_button = CreateBtn(pan1, "About", "О программе", "AbimTools.Version", "pack://application:,,,/AbimToolsMine;component/Resources/About.png");
             pref_button.ToolTip = "Общая информация и версия";
             pref_button.AvailabilityClassName = "AbimTools.CommandAvailability";
             //Pref_button.LongDescription = "";
 
             //Пакет с пакетами
-            bath_button = CreateBtn(pan1, "BatchTools", "Пакетная обработка", "AbimTools.BatchTools", "pack://application:,,,/AbimTools;component/Resources/BathName32.png");
+            bath_button = CreateBtn(pan1, "BatchTools", "Пакетная\nобработка", "AbimTools.BatchTools", "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png");
             bath_button.ToolTip = "Инструменты автоматизированной последовательной обработки нескольких файлов Revit";
             bath_button.LongDescription = "Автоматическая загрузка семейств, расстановка коллизий по XML, удаление связей из моделей";
-            BitmapImage bath_Image = new BitmapImage(new Uri("pack://application:,,,/AbimTools;component/Resources/BathName16.png"));
+            BitmapImage bath_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
             bath_button.Image = bath_Image;
             bath_button.AvailabilityClassName = "AbimTools.CommandAvailability";
             
             //Коллизии
-            col_button = CreateBtn(pan1, "CollisionTools", "Загрузить коллизии", "AbimTools.Collisions", "pack://application:,,,/AbimTools;component/Resources/Collisions32.png");
+            col_button = CreateBtn(pan1, "CollisionTools", "Загрузить\nколлизии", "AbimTools.Collisions", "pack://application:,,,/AbimToolsMine;component/Resources/Collisions32.png");
             col_button.ToolTip = "Загрузка коллизий по XML в текущий документ\n" +
                 "Путь к XML должен быть прописан в параметре ПРО_Путь XML коллизий";
-            BitmapImage col_Image = new BitmapImage(new Uri("pack://application:,,,/AbimTools;component/Resources/Collisions16.png"));
+            BitmapImage col_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));
             col_button.Image = col_Image;
 
             //Фильтр
-            selector_button = CreateBtn(pan1, "FastFilter", "БыстроФильтр", "AbimTools.FastFilter", "pack://application:,,,/AbimTools;component/Resources/FastFilter32.png");
+            selector_button = CreateBtn(pan1, "FastFilter", "БыстроФильтр", "AbimTools.FastFilter", "pack://application:,,,/AbimToolsMine;component/Resources/FastFilter32.png");
             selector_button.ToolTip = "Фильтрация выбранных категорий, одной кнопкой";
-            BitmapImage sb_Image = new BitmapImage(new Uri("pack://application:,,,/AbimTools;component/Resources/FastFilter16.png"));
+            BitmapImage sb_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FastFilter16.png"));
             selector_button.Image = sb_Image;
 
             //Рабочие наборы
             workset_button = CreateBtn(pan1, "SetWorksetForLinks", "Инструменты\n" +
-                "рабочих наборов", "AbimTools.LinksWokset", "pack://application:,,,/AbimTools;component/Resources/WSName32.png");
+                "рабочих наборов", "AbimTools.LinksWokset", "pack://application:,,,/AbimToolsMine;component/Resources/WSName32.png");
             workset_button.ToolTip = "Создание рабочих наборов для связей, фильтрация пустых рабочих наборов";
-            BitmapImage ws_Image = new BitmapImage(new Uri("pack://application:,,,/AbimTools;component/Resources/WSName16.png"));
+            BitmapImage ws_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/WSName16.png"));
             workset_button.Image = ws_Image;
-            
 
+            //Рабочие наборы
+            lookUp_button = CreateBtn(pan1, "GetLookupTable", "Экспорт таблиц\nвыбора", "AbimTools.GetLookUpTable", "pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport32.png");
+            lookUp_button.ToolTip = "Экспорт таблиц выбора из проекта";
+            BitmapImage lookup_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport16.png"));
+            lookUp_button.Image = ws_Image;
         }
-
         public Result OnStartup(UIControlledApplication application)
         {
-            OnButtonCreate(application);
+           OnButtonCreate(application);
+            application.ControlledApplication.DocumentOpened += OnDocumentOpened;
+            return Result.Succeeded;
+        }
+
+        public Result CloseApp(UIControlledApplication application)
+        {
+            var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие");
+            pan1.Visible = false;
             application.ControlledApplication.DocumentOpened += OnDocumentOpened;
             return Result.Succeeded;
         }
@@ -160,4 +171,5 @@ namespace AbimTools
             return true;
         }
     }
+
 }

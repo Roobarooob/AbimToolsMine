@@ -15,6 +15,7 @@ namespace AbimTools
 {
     public partial class ParameterWindow : Window
     {
+        public static bool Check { get; set; }
         public static List<ParameterInfo> Parameters { get; set; }
         public static string SetCategories { get; set; }
 
@@ -24,8 +25,9 @@ namespace AbimTools
             Parameters = new List<ParameterInfo>();
             ParameterDataGrid.ItemsSource = Parameters;
         }
-        private static void AddParameterToCategory(Document doc, ParameterInfo param)
+        private static bool AddParameterToCategory(Document doc, ParameterInfo param)
         {
+            Check = false;
             // Метод для добавления параметра в категорию
             var categories = param.Categories.Split(',')
                                                     .Select(c => c.Trim())
@@ -54,7 +56,13 @@ namespace AbimTools
                     binding = new InstanceBinding(categorySet);
 
                 doc.ParameterBindings.Insert(externalDef, binding, BuiltInParameterGroup.PG_DATA);
+                Check = true;
             }
+            if (Check)
+            {
+                return true;
+            }
+            else { return false; }
         }
 
         private static ExternalDefinition GetExternalDefinition(string parameterName)
@@ -75,7 +83,7 @@ namespace AbimTools
             }
             return null;
         }
-        public static void UpdateParameterForCategoryByName(Document doc, string categoryName, string parameterName, string value)
+        public static bool UpdateParameterForCategoryByName(Document doc, string categoryName, string parameterName, string value)
         {
             {
                 // Проверка, является ли категория "Сведения о проекте"
@@ -85,7 +93,7 @@ namespace AbimTools
                     if (projectInfo == null)
                     {
                         TaskDialog.Show("Ошибка", "Элемент 'Сведения о проекте' не найден.");
-                        return;
+                        return false;
                     }
                     using (Transaction trans = new Transaction(doc, "Обновление параметров"))
                     {
@@ -93,7 +101,7 @@ namespace AbimTools
                         UpdateParameterForElement(projectInfo, parameterName, value);
                         trans.Commit();
                     }
-                    return;
+                    return true;
                 }
 
                 // Получение категории по имени
@@ -101,7 +109,7 @@ namespace AbimTools
                 if (category == null)
                 {
                     TaskDialog.Show("Ошибка", $"Категория '{categoryName}' не найдена.");
-                    return;
+                    return false;
                 }
 
                 // Фильтрация элементов категории
@@ -113,7 +121,7 @@ namespace AbimTools
                 if (!elements.Any())
                 {
                     TaskDialog.Show("Результат", "Элементы указанной категории не найдены.");
-                    return;
+                    return false;
                 }
 
                 // Проверка наличия параметра
@@ -121,7 +129,7 @@ namespace AbimTools
                 if (sampleParam == null)
                 {
                     TaskDialog.Show("Ошибка", $"Параметр '{parameterName}' не найден в проекте.");
-                    return;
+                    return false;
                 }
 
                 // Начало транзакции
@@ -132,38 +140,45 @@ namespace AbimTools
                     {
                         foreach (var element in elements)
                         {
-                            UpdateParameterForElement(element, parameterName, value);
+                            if (!UpdateParameterForElement(element, parameterName, value))                          
+                            { 
+                                return false; 
+                            }
                         }
 
                         trans.Commit();
+                        return true;
                     }
                     catch (Exception ex)
                     {
                         trans.RollBack();
                         TaskDialog.Show("Ошибка", $"Произошла ошибка: {ex.Message}");
+                        return false;
                     }
                 }
             }
         }
-        private static void UpdateParameterForElement(Element element, string parameterName, string value)
+        private static bool UpdateParameterForElement(Element element, string parameterName, string value)
         {
+            Check = false;
             Parameter param = element.LookupParameter(parameterName);
             if (param == null || param.IsReadOnly)
             {
                 TaskDialog.Show("Ошибка", $"Параметр '{parameterName}' отсутствует или доступен только для чтения.");
-                return;
             }
 
             switch (param.StorageType)
             {
                 case StorageType.String:
                     param.Set(value);
+                    Check = true;
                     break;
 
                 case StorageType.Double:
                     if (double.TryParse(value, out double doubleValue))
                     {
                         param.Set(doubleValue);
+                        Check = true;
                     }
                     else
                     {
@@ -176,14 +191,17 @@ namespace AbimTools
                     if (int.TryParse(value, out int intValue))
                     {
                         param.Set(intValue);
+                        Check = true;
                     }
                     else if (value.ToLower() == "да" || value == "1")
                     {
                         param.Set(1); // Да
+                        Check = true;
                     }
                     else if (value.ToLower() == "нет" || value == "0")
                     {
                         param.Set(0); // Нет
+                        Check = true;
                     }
                     else
                     {
@@ -196,6 +214,8 @@ namespace AbimTools
                     TaskDialog.Show("Ошибка", "Тип параметра не поддерживается.");
                     throw new NotSupportedException("Тип параметра не поддерживается.");
             }
+            if (Check) { return true; }
+            else { return false; }
         }
 
         public static void SetValueExecute(ExternalCommandData commandData, ObservableCollection<string> filePaths, string parameterName, string value)
@@ -229,22 +249,24 @@ namespace AbimTools
                                                     .ToList();
                             foreach (var categoryName in categories)
                             {
-                                UpdateParameterForCategoryByName(doc, categoryName, parameterName, value);
+                                if (UpdateParameterForCategoryByName(doc, categoryName, parameterName, value))
+                                {
+                                    // Выполните синхронизацию с Revit Server
+                                    BatchFunctions.SyncWithRevitServer(doc);
+                                    // Сохраните и закройте документ
+                                    true_list.AppendLine(doc.Title);
+                                    doc.Save();
+                                    try
+                                    {
+                                        doc.Close(false);
+                                    }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else { false_list.AppendLine(doc.Title); }
                             }
-                            // Выполните синхронизацию с Revit Server
-                            BatchFunctions.SyncWithRevitServer(doc);
-                            // Сохраните и закройте документ
-                            true_list.AppendLine(doc.Title);
-                            doc.Save();
-                            try
-                            {
-                                doc.Close(false);
-                            }
-                            catch
-                            {
-                                continue;
-                            }
-
                         }
                         catch
                         {
@@ -287,23 +309,30 @@ namespace AbimTools
                             tx.Start("Загрузить параметр");
                             foreach (var param in Parameters)
                             {
-                                
-                                AddParameterToCategory(doc, param);
+
+                                if (AddParameterToCategory(doc, param))
+                                {
+                                    tx.Commit();
+                                    // Выполните синхронизацию с Revit Server
+                                    BatchFunctions.SyncWithRevitServer(doc);
+                                    // Сохраните и закройте документ
+                                    true_list.AppendLine(doc.Title);
+                                    doc.Save();
+                                    try
+                                    {
+                                        doc.Close(false);
+                                    }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    false_list.AppendLine(doc.Title);
+                                }
                             }
-                            tx.Commit();
-                            // Выполните синхронизацию с Revit Server
-                            BatchFunctions.SyncWithRevitServer(doc);
-                            // Сохраните и закройте документ
-                            true_list.AppendLine(doc.Title);
-                            doc.Save();
-                            try
-                            {
-                                doc.Close(false);
-                            }
-                            catch
-                            {
-                                continue;
-                            }
+                            
 
                         }
                         catch

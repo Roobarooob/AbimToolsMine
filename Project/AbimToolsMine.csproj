@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+      None
+    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3CFC3BC1-666B-44AB-B8FE-809B2D43E654}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AbimTools</RootNamespace>
+    <AssemblyName>AbimToolsMine</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;R2020</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>5</WarningLevel>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2019\Revit.exe</StartProgram>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2020|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\R2020\</OutputPath>
+    <DefineConstants>DEBUG;R2020</DefineConstants>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2021|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\R2021\</OutputPath>
+    <DefineConstants>DEBUG;R2021</DefineConstants>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2022|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\R2022\</OutputPath>
+    <DefineConstants>DEBUG;R2022</DefineConstants>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2023|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\R2023\</OutputPath>
+    <DefineConstants>DEBUG;R2023</DefineConstants>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2024|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\R2024\</OutputPath>
+    <DefineConstants>DEBUG;R2024</DefineConstants>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <Choose>
+    <When Condition=" '$(Configuration)'=='R2020' ">
+      <ItemGroup>
+        <Reference Include="RevitAPI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='R2021' ">
+      <ItemGroup>
+        <Reference Include="RevitAPI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='R2022' ">
+      <ItemGroup>
+        <Reference Include="RevitAPI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='R2023' ">
+      <ItemGroup>
+        <Reference Include="RevitAPI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2023\RevitAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2023\RevitAPIUI.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='R2024' ">
+      <ItemGroup>
+        <Reference Include="RevitAPI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+          <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <ItemGroup>
+    <Compile Include="BatchCollisions.cs" />
+    <Compile Include="FastFilter.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="LinksWokset.cs" />
+    <Compile Include="Version.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="App.cs" />
+    <Compile Include="Windows\BatchFiles\02_RevitServerWindow.xaml.cs">
+      <DependentUpon>02_RevitServerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\BatchParameters\01_ParameterWindow.xaml.cs">
+      <DependentUpon>01_ParameterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\BatchParameters\02_ParameterSelectionWindow.xaml.cs">
+      <DependentUpon>02_ParameterSelectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\BatchParameters\03_CategorySelectionWindow.xaml.cs">
+      <DependentUpon>03_CategorySelectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\BatchParameters\04_TypeInstanceWindow.xaml.cs">
+      <DependentUpon>04_TypeInstanceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Lookup_Tables_WPF.xaml.cs">
+      <DependentUpon>Lookup_Tables_WPF.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\WorksetWin.xaml.cs">
+      <DependentUpon>WorksetWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\FastFilterWin.xaml.cs">
+      <DependentUpon>FastFilterWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\BatchFiles\01_CollisionsWin.xaml.cs">
+      <DependentUpon>01_CollisionsWin.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Windows\BatchFiles\02_RevitServerWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\BatchParameters\01_ParameterWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\BatchParameters\02_ParameterSelectionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\BatchParameters\03_CategorySelectionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\BatchParameters\04_TypeInstanceWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\Lookup_Tables_WPF.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\WorksetWin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\FastFilterWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\BatchFiles\01_CollisionsWin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\BatchTools16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FastFilter16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\LPTableExport16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WSName16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Collisions16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\About.png" />
+    <Resource Include="Resources\BatchTools32.png" />
+    <Resource Include="Resources\Collisions32.png" />
+    <Resource Include="Resources\FastFilter32.png" />
+    <Resource Include="Resources\LPTableExport32.png" />
+    <Resource Include="Resources\WSName32.png" />
+  </ItemGroup>
+  <Choose>
+    <When Condition=" '$(Configuration)'=='R2023' ">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.Revit.API.2023">
+          <Version>4.0.0</Version>
+          <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='R2020' or '$(Configuration)'=='Debug'" />
+  </Choose>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>REM Создаем директорию для .addin файла для Revit 2020, если она не существует
+if not exist "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020" (
+    mkdir "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020"
+)
+
+REM Копируем .addin файл для Revit 2020
+copy /Y "$(ProjectDir)\AbimTools.addin" "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020"
+
+REM Создаем директорию для .dll файлов для Revit 2020, если она не существует
+if not exist "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020\APRO\AbimTools" (
+    mkdir "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020\APRO\AbimTools"
+)
+
+REM Копируем .dll файлы для Revit 2020
+xcopy /Y /Q "$(TargetDir)\*.dll" "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2020\APRO\AbimTools"
+
+REM Создаем директорию для .addin файла для Revit 2023, если она не существует
+if not exist "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023" (
+    mkdir "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023"
+)
+
+REM Копируем .addin файл для Revit 2023
+copy /Y "$(ProjectDir)\AbimTools.addin" "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023"
+
+REM Создаем директорию для .dll файлов для Revit 2023, если она не существует
+if not exist "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023\APRO\AbimTools" (
+    mkdir "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023\APRO\AbimTools"
+)
+
+REM Копируем .dll файлы для Revit 2023
+xcopy /Y /Q "$(TargetDir)\*.dll" "C:\Users\rubinshtein\AppData\Roaming\Autodesk\REVIT\Addins\2023\APRO\AbimTools"
+
+REM Копируем .addin файл в папку Debug
+copy /Y "$(ProjectDir)\AbimTools.addin" "$(TargetDir)"
+
+REM Создаем директорию для .dll файлов в Debug, если она не существует
+if not exist "$(TargetDir)\APRO\AbimTools" (
+    mkdir "$(TargetDir)\APRO\AbimTools"
+)
+
+REM Перемещаем .dll файлы в папку APRO\AbimTools в Debug
+move /Y "$(TargetDir)\*.dll" "L:\05_Программы и плагины\00_APRO\AbimTools\Dll\dev"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <Target Name="AfterClean">
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2019\Elevation_Of_Openings.addin" />
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2019\Elevation_Of_Openings.dll" />
+  </Target>
+</Project>
