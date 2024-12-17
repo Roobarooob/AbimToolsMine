@@ -13,7 +13,7 @@ using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     public class BatchTools : IExternalCommand
@@ -371,10 +371,10 @@ namespace AbimTools
         //Анализировать xml и расставить коллизии
         public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string discipline, string xmlFilePath)
         {
+            var xmlFileDate = File.GetLastWriteTime(xmlFilePath);
 
             XDocument xmlDoc = XDocument.Load(xmlFilePath);
             int count = 0;
-
             var clashResults = (from clashtest in xmlDoc.Descendants("clashtest")
                                 let clashtestName = clashtest.Attribute("name").Value
                                 from clashresult in clashtest.Descendants("clashresult")
@@ -423,7 +423,7 @@ namespace AbimTools
             {
 
                 var filteredClashResults = clashResults
-                            .Where(cr => MatchesDiscipline(cr.ClashTestName) && (cr.Status == "active" || cr.Status == "new") && cr.FileName == doc.Title.Replace("_" + username, ""))
+                            .Where(cr => (cr.Status == "active" || cr.Status == "new") && cr.FileName == doc.Title.Replace("_" + username, ""))
                             .ToList();
                 filteredClashResults = RemoveDuplicateClashResults(filteredClashResults);
                 foreach (var clashResult in filteredClashResults)
@@ -452,7 +452,7 @@ namespace AbimTools
                         NewFamilyInstance(fin_point, familySymbol, nearestLevel, nearestLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                     instance.LookupParameter("ПРО_Марка").Set(clashResult.ClashResultName);
                     instance.LookupParameter("ПРО_Обозначение").Set(clashResult.ClashTestName);
-                    instance.LookupParameter("ПРО_Дата").Set(DateTime.Today.Date.ToString("d/MM/yyyy"));
+                    instance.LookupParameter("ПРО_Дата").Set(xmlFileDate.ToString("dd/MM/yyyy"));
                     if (workset != null)
                     {
                         ChangeElementWorkset(instance, workset);
@@ -461,11 +461,11 @@ namespace AbimTools
                 return filteredClashResults.Count();
 
             }
-            bool MatchesDiscipline(string clashTestName)
+            /*bool MatchesDiscipline(string clashTestName)
             {
                 if (string.IsNullOrEmpty(discipline)) return false;
                 return clashTestName.StartsWith(discipline);
-            }
+            }*/
 
 
             Level GetNearestLowerLevel(double z)

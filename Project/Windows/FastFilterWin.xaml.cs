@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using System.Threading;
 
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     /// <summary>
     /// Логика взаимодействия для UserControl1.xaml

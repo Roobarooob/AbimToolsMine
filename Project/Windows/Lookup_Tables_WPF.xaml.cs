@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
 
     public partial class LookUpTableWindow : Window
@@ -166,7 +166,7 @@ namespace AbimTools
 #else
 
                     str3 = columnHeader.GetSpecTypeId().TypeId;
-                    str5 = columnHeader.GetUnitTypeId().TypeId;
+                    str5 = columnHeader.GetUnitTypeId().TypeId; 
                     string str4;
                     try
                     {

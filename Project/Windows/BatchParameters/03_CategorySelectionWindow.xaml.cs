@@ -3,29 +3,27 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Autodesk.Revit.DB;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class CategorySelectionWindow : Window
     {
         public List<string> SelectedCategories { get; private set; }
-        private List<CategoryInfo> allItems = new List<CategoryInfo>(); // Список для хранения всех элементов
-        public CategorySelectionWindow()
+        private List<CategoryInfo> allItems = new List<CategoryInfo>();
+
+        public CategorySelectionWindow(List<string> preselectedCategories)
         {
             InitializeComponent();
-            LoadCategories();
+            LoadCategories(preselectedCategories);
         }
 
-        private void LoadCategories()
+        private void LoadCategories(List<string> preselectedCategories)
         {
             // Загрузка категорий из документа
-            string filePath = Path.GetDirectoryName(typeof(App).Assembly.Location)+ "/Categories.csv";
+            string filePath = Path.GetDirectoryName(typeof(App).Assembly.Location) + "/Categories.csv";
 
-            // Список для хранения строк из файла
+            // Чтение строк из файла
             List<string> lines = new List<string>();
-
-            // Чтение строк из файла и добавление их в список
             using (StreamReader reader = new StreamReader(filePath))
             {
                 string line;
@@ -34,7 +32,15 @@ namespace AbimTools
                     lines.Add(line);
                 }
             }
-            allItems = lines.Select(line => new CategoryInfo { Name = line }).ToList();
+
+            // Инициализация списка категорий с учетом предварительно выбранных
+            allItems = lines.Select(line => new CategoryInfo
+            {
+                Name = line,
+                IsSelected = preselectedCategories.Contains(line)
+            }).ToList();
+
+            // Привязка списка к ListBox
             CategoryListBox.ItemsSource = allItems;
         }
 
@@ -50,6 +56,7 @@ namespace AbimTools
             DialogResult = false;
             Close();
         }
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchBox.Text.ToLower();

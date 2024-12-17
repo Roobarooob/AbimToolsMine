@@ -3,7 +3,7 @@ using Autodesk.Revit.UI;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class WorksetWin : Window
     {
@@ -21,23 +21,36 @@ namespace AbimTools
         // Обработчик кнопки "Назначить связи по рабочим наборам"
         private void AssignWorksetsButton_Click(object sender, RoutedEventArgs e)
         {
-            LinksWokset.LinksToWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+            try
+            {
+                LinksWokset.LinksToWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                MessageBox.Show("Процесс завершен!");
+            }
+            catch { MessageBox.Show("Что-то не получилось"); }
         }
 
         // Обработчик кнопки "Фильтр пустых рабочих наборов"
         private void FilterEmptyWorksetsButton_Click(object sender, RoutedEventArgs e)
         {
             // Вызов метода для фильтрации пустых рабочих наборов
-            UIApplication uiapp = LinksWokset.CommandData.Application;
-            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
-            int revitVersion = int.Parse(app.VersionNumber);
-            if (revitVersion >= 2023)
+            try
             {
-                LinksWokset.DeleteUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                UIApplication uiapp = LinksWokset.CommandData.Application;
+                Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+                int revitVersion = int.Parse(app.VersionNumber);
+                if (revitVersion >= 2023)
+                {
+                    LinksWokset.DeleteUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                }
+                else
+                {
+                    LinksWokset.RenameUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                }
+                MessageBox.Show("Процесс завершен!");
             }
-            else
+            catch
             {
-                LinksWokset.RenameUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                MessageBox.Show("Что-то не получилось");
             }
         }
 

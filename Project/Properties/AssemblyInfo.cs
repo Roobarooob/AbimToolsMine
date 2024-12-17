@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AbimTools")]
+[assembly: AssemblyTitle("AbimToolsMine")]
 [assembly: AssemblyDescription("Revit Add-In Pin Links")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Abim-Pro")]
-[assembly: AssemblyProduct("AbimTools Revit C# .NET Add-In")]
+[assembly: AssemblyProduct("AbimToolsMine Revit C# .NET Add-In")]
 [assembly: AssemblyCopyright("Copyright 2022 (C) Аnton Rubinshtein")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

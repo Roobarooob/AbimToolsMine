@@ -8,7 +8,7 @@ using Autodesk.Revit.UI;
 using System.IO;
 
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class ParameterSelectionWindow : Window
     {

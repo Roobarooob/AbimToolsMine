@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class TypeInstanceWindow : Window
     {

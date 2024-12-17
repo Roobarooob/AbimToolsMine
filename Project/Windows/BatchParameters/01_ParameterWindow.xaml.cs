@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class ParameterWindow : Window
     {
@@ -242,43 +242,57 @@ namespace AbimTools
                     Document doc = app.OpenDocumentFile(modelPath, openOptions);
                     using (Transaction tx = new Transaction(doc))
                     {
-                        try
+                        List<string> categories = new List<string>();
+                        if (SetCategories != null)
                         {
-                            var categories = SetCategories.Split(',')
-                                                    .Select(c => c.Trim())
-                                                    .ToList();
-                            foreach (var categoryName in categories)
+                            try
                             {
-                                if (UpdateParameterForCategoryByName(doc, categoryName, parameterName, value))
+
+                                categories = SetCategories.Split(',')
+                                                        .Select(c => c.Trim())
+                                                        .ToList();
+
+                                if (categories.Any())
                                 {
-                                    // Выполните синхронизацию с Revit Server
-                                    BatchFunctions.SyncWithRevitServer(doc);
-                                    // Сохраните и закройте документ
-                                    true_list.AppendLine(doc.Title);
-                                    doc.Save();
-                                    try
+                                    foreach (var categoryName in categories)
                                     {
-                                        doc.Close(false);
-                                    }
-                                    catch
-                                    {
-                                        continue;
+                                        if (UpdateParameterForCategoryByName(doc, categoryName, parameterName, value))
+                                        {
+                                            // Выполните синхронизацию с Revit Server
+                                            BatchFunctions.SyncWithRevitServer(doc);
+                                            // Сохраните и закройте документ
+                                            true_list.AppendLine(doc.Title);
+                                            doc.Save();
+                                            try
+                                            {
+                                                doc.Close(false);
+                                            }
+                                            catch
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        else { false_list.AppendLine(doc.Title); }
                                     }
                                 }
-                                else { false_list.AppendLine(doc.Title); }
+                            }
+                            catch
+                            {
+                                //закройте документ
+                                false_list.AppendLine(doc.Title);
+                                doc.Close(false);
+
                             }
                         }
-                        catch
+                        else
                         {
-                            //закройте документ
-                            false_list.AppendLine(doc.Title);
-                            doc.Close(false);
-
+                            MessageBox.Show($"Добавьте хотя бы одну категорию");
                         }
                     }
                 }
             }
             System.Windows.MessageBox.Show($"Параметры обновлены!\nУспешно обработаны:\n{true_list}\nОшибка:\n{false_list}");
+
         }
     public static void Execute(ExternalCommandData commandData, ObservableCollection<string> filePaths)
         {
@@ -381,8 +395,8 @@ namespace AbimTools
             }
             UIApplication uiapp = BatchTools.CommandData.Application;
             //Document doc = uiapp.ActiveUIDocument.Document;
-
-            var categorySelectionWindow = new CategorySelectionWindow();
+            var preselectedcategories = new List<string>();
+            var categorySelectionWindow = new CategorySelectionWindow(preselectedcategories);
             if (categorySelectionWindow.ShowDialog() == true)
             {
                 foreach (var parameter in selectedParameters)
@@ -394,8 +408,16 @@ namespace AbimTools
         }
         private void SetParCategoriesButton_Click(object sender, RoutedEventArgs e)
         {
+            var preselectedcategories = new List<string>();
+            if (SetCategories != null)
+            {
+                preselectedcategories = SetCategories.Split(',')
+                                                        .Select(c => c.Trim())
+                                                        .ToList();
+            }
+            var categorySelectionWindow = new CategorySelectionWindow(preselectedcategories);
 
-            var categorySelectionWindow = new CategorySelectionWindow();
+           
             if (categorySelectionWindow.ShowDialog() == true)
             {
 

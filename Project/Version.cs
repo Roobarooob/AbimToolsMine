@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     [Transaction(TransactionMode.Manual)]
     public class Version : IExternalCommand
@@ -15,7 +15,7 @@ namespace AbimTools
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
-            TaskDialog.Show("Информация", "Версия приложения - 4.1.0\n\n" +
+            TaskDialog.Show("Информация", "Версия приложения - 4.3.4\n\n" +
 
                 "Загруженные плагины:\n" +
                 "АвтоПиннер\n" +
@@ -24,7 +24,7 @@ namespace AbimTools
                 "Загрузка коллизий\n" +
                 "Инструменты рабочих наборов\n" +
                 "Экспорт таблиц выбора\n\n" +
-            "created by Anton Rubinshtein\n");
+            "создатель Антон Рубинштейн\n");
             return Result.Succeeded;
         }
     }

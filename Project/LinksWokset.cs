@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     [Transaction(TransactionMode.Manual)]
 
@@ -152,6 +152,7 @@ namespace AbimTools
                 }
 
                 tx.Commit();
+                
             }
             
             bool IsWorksetUsed(WorksetId worksetId)

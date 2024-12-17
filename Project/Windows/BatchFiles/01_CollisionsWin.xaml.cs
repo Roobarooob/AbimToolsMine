@@ -7,11 +7,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using static AbimTools.BatchTools;
+using static AbimToolsMine.BatchTools;
 using Button = System.Windows.Controls.Button;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class CollisionsWin : Window
     {

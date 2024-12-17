@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Json;
 using System.Windows;
 using System.Xml;
 
-namespace AbimTools
+namespace AbimToolsMine
 {
     public partial class RevitServerWindow : Window
     {
