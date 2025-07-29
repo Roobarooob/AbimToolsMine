@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AbimTools.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AbimToolsMine.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="LinkPrefix" Type="System.String" Scope="User">
@@ -7,6 +7,81 @@
     </Setting>
     <Setting Name="RevitServer_ip" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoomNumberParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Номер</Value>
+    </Setting>
+    <Setting Name="RoomGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр</Value>
+    </Setting>
+    <Setting Name="RoomKeyParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Номер помещения</Value>
+    </Setting>
+    <Setting Name="StructureColWidthMM" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="Divide" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="WallNameParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Стены</Value>
+    </Setting>
+    <Setting Name="WallValueParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Стены.Значение</Value>
+    </Setting>
+    <Setting Name="WallGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Стены.Значение.Гр</Value>
+    </Setting>
+    <Setting Name="FloorNameParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Полы</Value>
+    </Setting>
+    <Setting Name="FloorValueParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Полы.Значение</Value>
+    </Setting>
+    <Setting Name="FloorGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Полы.Значение.Гр</Value>
+    </Setting>
+    <Setting Name="CeilingNameParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Потолки</Value>
+    </Setting>
+    <Setting Name="CeilingValueParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Потолки.Значение</Value>
+    </Setting>
+    <Setting Name="CeilingGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Потолки.Значение.Гр</Value>
+    </Setting>
+    <Setting Name="PlinthNameParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Плинтус</Value>
+    </Setting>
+    <Setting Name="PlinthValueParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Плинтус.Значение</Value>
+    </Setting>
+    <Setting Name="PlinthGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Плинтус.Значение.Гр</Value>
+    </Setting>
+    <Setting Name="PlinthString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ВО_Плинтус</Value>
+    </Setting>
+    <Setting Name="StructureComp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Состав конструкции</Value>
+    </Setting>
+    <Setting Name="DimType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Тип измерения</Value>
+    </Setting>
+    <Setting Name="FloorStructureComp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Состав конструкции</Value>
+    </Setting>
+    <Setting Name="FloorRoomKeyParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Номер помещения</Value>
+    </Setting>
+    <Setting Name="FloorRoomGroupParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр</Value>
+    </Setting>
+    <Setting Name="FloorLayerName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_СЛЖ_Слой пола</Value>
+    </Setting>
+    <Setting Name="viewTemplateName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_СЛЖ_Эскиз пола</Value>
     </Setting>
   </Settings>
 </SettingsFile>

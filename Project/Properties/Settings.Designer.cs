@@ -46,5 +46,305 @@ namespace AbimToolsMine.Properties {
                 this["RevitServer_ip"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Номер")]
+        public string RoomNumberParam {
+            get {
+                return ((string)(this["RoomNumberParam"]));
+            }
+            set {
+                this["RoomNumberParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Номер помещения.Гр")]
+        public string RoomGroupParam {
+            get {
+                return ((string)(this["RoomGroupParam"]));
+            }
+            set {
+                this["RoomGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Номер помещения")]
+        public string RoomKeyParam {
+            get {
+                return ((string)(this["RoomKeyParam"]));
+            }
+            set {
+                this["RoomKeyParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int StructureColWidthMM {
+            get {
+                return ((int)(this["StructureColWidthMM"]));
+            }
+            set {
+                this["StructureColWidthMM"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int Divide {
+            get {
+                return ((int)(this["Divide"]));
+            }
+            set {
+                this["Divide"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Стены")]
+        public string WallNameParam {
+            get {
+                return ((string)(this["WallNameParam"]));
+            }
+            set {
+                this["WallNameParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Стены.Значение")]
+        public string WallValueParam {
+            get {
+                return ((string)(this["WallValueParam"]));
+            }
+            set {
+                this["WallValueParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Стены.Значение.Гр")]
+        public string WallGroupParam {
+            get {
+                return ((string)(this["WallGroupParam"]));
+            }
+            set {
+                this["WallGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Полы")]
+        public string FloorNameParam {
+            get {
+                return ((string)(this["FloorNameParam"]));
+            }
+            set {
+                this["FloorNameParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Полы.Значение")]
+        public string FloorValueParam {
+            get {
+                return ((string)(this["FloorValueParam"]));
+            }
+            set {
+                this["FloorValueParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Полы.Значение.Гр")]
+        public string FloorGroupParam {
+            get {
+                return ((string)(this["FloorGroupParam"]));
+            }
+            set {
+                this["FloorGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Потолки")]
+        public string CeilingNameParam {
+            get {
+                return ((string)(this["CeilingNameParam"]));
+            }
+            set {
+                this["CeilingNameParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Потолки.Значение")]
+        public string CeilingValueParam {
+            get {
+                return ((string)(this["CeilingValueParam"]));
+            }
+            set {
+                this["CeilingValueParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Потолки.Значение.Гр")]
+        public string CeilingGroupParam {
+            get {
+                return ((string)(this["CeilingGroupParam"]));
+            }
+            set {
+                this["CeilingGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Плинтус")]
+        public string PlinthNameParam {
+            get {
+                return ((string)(this["PlinthNameParam"]));
+            }
+            set {
+                this["PlinthNameParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Плинтус.Значение")]
+        public string PlinthValueParam {
+            get {
+                return ((string)(this["PlinthValueParam"]));
+            }
+            set {
+                this["PlinthValueParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Плинтус.Значение.Гр")]
+        public string PlinthGroupParam {
+            get {
+                return ((string)(this["PlinthGroupParam"]));
+            }
+            set {
+                this["PlinthGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ВО_Плинтус")]
+        public string PlinthString {
+            get {
+                return ((string)(this["PlinthString"]));
+            }
+            set {
+                this["PlinthString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Состав конструкции")]
+        public string StructureComp {
+            get {
+                return ((string)(this["StructureComp"]));
+            }
+            set {
+                this["StructureComp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Тип измерения")]
+        public string DimType {
+            get {
+                return ((string)(this["DimType"]));
+            }
+            set {
+                this["DimType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Состав конструкции")]
+        public string FloorStructureComp {
+            get {
+                return ((string)(this["FloorStructureComp"]));
+            }
+            set {
+                this["FloorStructureComp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Номер помещения")]
+        public string FloorRoomKeyParam {
+            get {
+                return ((string)(this["FloorRoomKeyParam"]));
+            }
+            set {
+                this["FloorRoomKeyParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Номер помещения.Гр")]
+        public string FloorRoomGroupParam {
+            get {
+                return ((string)(this["FloorRoomGroupParam"]));
+            }
+            set {
+                this["FloorRoomGroupParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_СЛЖ_Слой пола")]
+        public string FloorLayerName {
+            get {
+                return ((string)(this["FloorLayerName"]));
+            }
+            set {
+                this["FloorLayerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_СЛЖ_Эскиз пола")]
+        public string viewTemplateName {
+            get {
+                return ((string)(this["viewTemplateName"]));
+            }
+            set {
+                this["viewTemplateName"] = value;
+            }
+        }
     }
 }

@@ -1,13 +1,9 @@
-﻿using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows;
-using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace AbimToolsMine
 {
@@ -17,12 +13,12 @@ namespace AbimToolsMine
     {
         public static ExternalCommandData CommandData { get; set; }
         public static WorksetWin window = null;
-        
+
         public Result Execute(
             ExternalCommandData commandData,
             ref string message,
             ElementSet elements)
-        {        
+        {
             CommandData = commandData;
             if (window == null)
             {
@@ -41,9 +37,16 @@ namespace AbimToolsMine
         {
             List<string> razdelOptions = new List<string>
             {
-                "_АР", "_КР", "_ОВ", "_ВК", "_ЭОМ", "_СС", "_ТМ", "_РФ",
-                "_AR", "_KR", "_OV", "_VK", "_EOM", "_SS", "_TM"
+                "_АР", "_КР", "_КЖ", "_КМ", "_ОВ", "_ВК", "_ЭОМ", "_СС", "_ТМ", "_РФ", "_АК", "НТС",
+                "_AR", "_KR", "_KJ", "_KM", "_OV", "_VK", "_EOM", "_SS", "_TM", "_BF", "_AK", "HTS"
             };
+            // Словарь для соответствия разделов и префиксов
+            Dictionary<string, string> specialPrefixMap = new Dictionary<string, string>
+            {
+                { "_КР", "КР" }, { "_КЖ", "КР" }, { "_КМ", "КР" },
+                { "_KR", "KR" }, { "_KJ", "KR" }, { "_KM", "KR" }
+            };
+
             {
                 UIApplication uiapp = commandData.Application;
                 Document doc = uiapp.ActiveUIDocument.Document;
@@ -52,6 +55,10 @@ namespace AbimToolsMine
                 var rvtLinks = new FilteredElementCollector(doc)
                     .OfClass(typeof(RevitLinkType))
                     .Cast<RevitLinkType>();
+                var cadLinks = new FilteredElementCollector(doc)
+                      .OfClass(typeof(ImportInstance))
+                      .Cast<ImportInstance>()
+                      .Where(x => x.IsLinked); // Только связанные DWG
 
                 using (Transaction tx = new Transaction(doc, "Назначить рабочие наборы связям"))
                 {
@@ -61,29 +68,51 @@ namespace AbimToolsMine
                     {
                         string fileName = System.IO.Path.GetFileNameWithoutExtension(linkType.Name);
                         string razdel = GetRazdelFromFileName(fileName);
-                        string workSetName = $"{razdel}_{fileName}";
+                        string workSetName = $"#{razdel}_{fileName}";
 
                         Workset workset = GetOrCreateWorkset(doc, workSetName);
 
                         // Назначаем рабочий набор экземплярам и типу связи
                         AssignWorksetToLinkInstances(doc, linkType, workset);
                     }
+                    // CAD связи
+                    string cadWorksetName = "##DWG";
+                    Workset cadWorkset = GetOrCreateWorkset(doc, cadWorksetName);
+
+                    foreach (var cad in cadLinks)
+                    {
+                        Parameter wsParam = cad.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                        Parameter typeParam = doc.GetElement(cad.GetTypeId()).get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                        if (wsParam != null && !wsParam.IsReadOnly)
+                        {
+                            wsParam.Set(cadWorkset.Id.IntegerValue);
+                            typeParam.Set(cadWorkset.Id.IntegerValue);
+                        }
+                    }
 
                     tx.Commit();
                 }
             }
+            // Метод для определения раздела и префикса
             string GetRazdelFromFileName(string fileName)
             {
+                // Ищем раздел в имени файла
                 foreach (string option in razdelOptions)
                 {
                     if (fileName.Contains(option))
                     {
-                        return $"{prefix}{option.Replace("_", string.Empty)}";
+                        // Если раздел есть в specialPrefixMap, используем его префикс
+                        if (specialPrefixMap.ContainsKey(option))
+                        {
+                            return specialPrefixMap[option];
+                        }
+                        // Иначе возвращаем сам раздел без подчеркивания (например, "_АР" -> "АР")
+                        return option.Replace("_", string.Empty);
                     }
                 }
-                return $"{prefix}ХЗ";
+                return "ХЗ"; // Если раздел не найден, возвращаем "ХЗ"
             }
-            
+
             Workset GetOrCreateWorkset(Document doc, string workSetName)
             {
 
@@ -100,7 +129,7 @@ namespace AbimToolsMine
                 }
                 return workset;
             }
-            
+
             void AssignWorksetToLinkInstances(Document doc, RevitLinkType linkType, Workset workset)
             {
                 linkType.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM).Set(workset.Id.IntegerValue);
@@ -135,7 +164,7 @@ namespace AbimToolsMine
                 // Получаем все рабочие наборы с символом "#" в названии
                 var worksetsToCheck = new FilteredWorksetCollector(doc)
                     .OfKind(WorksetKind.UserWorkset)
-                    .Where(w => w.Name.Contains(prefix)&&!w.Name.Contains("Арматура"))
+                    .Where(w => w.Name.Contains(prefix) && !w.Name.Contains("Арматура"))
                     .ToList();
 
                 foreach (var workset in worksetsToCheck)
@@ -148,13 +177,13 @@ namespace AbimToolsMine
                         // Переименование для версий 2022 и ниже
                         string newName = $"!Удалить!_{workset.Name}";
                         WorksetTable.RenameWorkset(doc, workset.Id, newName);
-                   }
+                    }
                 }
 
                 tx.Commit();
-                
+
             }
-            
+
             bool IsWorksetUsed(WorksetId worksetId)
             {
                 // Проверка наличия элементов в рабочем наборе
@@ -189,10 +218,17 @@ namespace AbimToolsMine
                     if (isEmpty)
                     {
 #if R2023 || R2024 || R2025
-                        DeleteWorksetSettings deleteSettings = new DeleteWorksetSettings();
-                        // Удаление для версий 2023 и выше
-                        WorksetTable.DeleteWorkset(doc, workset.Id, deleteSettings);
-#endif                      
+                        try
+                        {
+                            DeleteWorksetSettings deleteSettings = new DeleteWorksetSettings();
+                            // Удаление для версий 2023 и выше
+                            WorksetTable.DeleteWorkset(doc, workset.Id, deleteSettings);
+                        }
+                        catch
+                        {
+                            //что то не так с ворксетом
+                        }
+#endif
                     }
                 }
 
@@ -211,5 +247,16 @@ namespace AbimToolsMine
         }
 
 
+    }
+    public static class Extensions
+    {
+        public static long GetValue(this ElementId elementId)
+        {
+#if R2017 || R2018 || R2019 || R2020 || R2021 || R2022 || R2023
+            return elementId.IntegerValue;
+#else
+            return elementId.Value;
+#endif
+        }
     }
 }

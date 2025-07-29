@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
@@ -8,10 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Windows.Shapes;
 using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Application = Autodesk.Revit.ApplicationServices.Application;
+using Path = System.IO.Path;
+using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 
 namespace AbimToolsMine
 {
@@ -36,7 +35,7 @@ namespace AbimToolsMine
             return Result.Succeeded;
         }
     }
-    
+
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     public class Collisions : IExternalCommand
     {
@@ -46,7 +45,7 @@ namespace AbimToolsMine
             UIApplication uiapp = commandData.Application;
             Application app = uiapp.Application;
             Document doc = uiapp.ActiveUIDocument.Document;
-            String discipline = BatchFunctions.GetDisciplineFromFileName(doc.Title);
+            //String discipline = BatchFunctions.GetDisciplineFromFileName(doc.Title);
             string username = app.Username;
 
             FamilySymbol familySymbol = new FilteredElementCollector(doc)
@@ -66,10 +65,10 @@ namespace AbimToolsMine
             {
                 if (familySymbol != null)
                 {
-                    int count = BatchFunctions.AnalyzeAndPlace(doc, username, familySymbol, discipline, xmlFilePath);
+                    int count = BatchFunctions.AnalyzeAndPlace(doc, username, familySymbol, xmlFilePath);
                     // Выполните синхронизацию с Revit Server             
                 }
-                else 
+                else
                 {
                     TaskDialog.Show("Ошибка", "Не загружено семейство ПРО_Коллизия");
                 }
@@ -81,7 +80,46 @@ namespace AbimToolsMine
             return Result.Succeeded;
         }
     }
-    public class BatchFunctions
+    public class WarningSwallower : IFailuresPreprocessor
+    {
+        FailureProcessingResult
+           IFailuresPreprocessor.PreprocessFailures(
+        FailuresAccessor failuresAccessor)
+        {
+            String transactionName
+            = failuresAccessor.GetTransactionName();
+
+            IList<FailureMessageAccessor> fmas
+            = failuresAccessor.GetFailureMessages();
+
+            if (fmas.Count == 0)
+            {
+                return FailureProcessingResult.Continue;
+            }
+
+            // We already know the transaction name.
+
+            if (transactionName.Equals("Удаление связей из файла"))
+            {
+                foreach (FailureMessageAccessor fma in fmas)
+                {
+                    // ResolveFailure mimics clicking 
+                    // 'Remove Link' button .
+
+                    //failuresAccessor.ResolveFailure(fma);
+
+                    // DeleteWarning mimics clicking 'Ok' button.
+                    failuresAccessor.DeleteWarning( fma ); 
+                }
+
+
+                return FailureProcessingResult
+                .ProceedWithCommit;
+            }
+            return FailureProcessingResult.Continue;
+        }
+    }
+        public class BatchFunctions
     {
         public static Workset workset { get; set; }
         //Удалить связи из файла
@@ -98,7 +136,7 @@ namespace AbimToolsMine
             {
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
                 if (File.Exists(filePath) || modelPath.ServerPath)
-                {                 
+                {
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     openOptions.DetachFromCentralOption = DetachFromCentralOption.ClearTransmittedSaveAsNewCentral;
@@ -106,14 +144,19 @@ namespace AbimToolsMine
                     openOptions.SetOpenWorksetsConfiguration(worksetConfig);
                     openOptions.AllowOpeningLocalByWrongUser = true;
 
+
+                 
                     // Откройте документ
                     Document doc = app.OpenDocumentFile(modelPath, openOptions);
                     using (Transaction tx = new Transaction(doc))
                     {
+
                         try
                         {
-
                             tx.Start("Удаление связей из файла");
+                            FailureHandlingOptions options = tx.GetFailureHandlingOptions();
+                            options.SetFailuresPreprocessor(new WarningSwallower());
+                            tx.SetFailureHandlingOptions(options);
                             LinkRemove(doc);
                             tx.Commit();
                             // Сохраните и закройте документ
@@ -154,7 +197,7 @@ namespace AbimToolsMine
             foreach (string filePath in filePaths)
             {
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
-                if (File.Exists(filePath)||modelPath.ServerPath)
+                if (File.Exists(filePath) || modelPath.ServerPath)
                 {
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
@@ -217,7 +260,7 @@ namespace AbimToolsMine
                 {
                     ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
                     if (File.Exists(filePath) || modelPath.ServerPath)
-                    {                      
+                    {
                         // Настройте параметры открытия документа с закрытыми рабочими наборами
                         OpenOptions openOptions = new OpenOptions();
                         WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
@@ -226,7 +269,7 @@ namespace AbimToolsMine
 
                         // Откройте документ
                         Document doc = app.OpenDocumentFile(modelPath, openOptions);
-                        String discipline = GetDisciplineFromFileName(doc.Title);
+                        //String discipline = GetDisciplineFromFileName(doc.Title);
 
                         FamilySymbol familySymbol = new FilteredElementCollector(doc)
                             .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
@@ -240,7 +283,7 @@ namespace AbimToolsMine
                         {
                             if (familySymbol != null)
                             {
-                                int count = AnalyzeAndPlace(doc, username, familySymbol, discipline, xmlFilePath);
+                                int count = AnalyzeAndPlace(doc, username, familySymbol, xmlFilePath);
                                 // Выполните синхронизацию с Revit Server
                                 SyncWithRevitServer(doc);
                                 // Сохраните и закройте документ
@@ -284,6 +327,124 @@ namespace AbimToolsMine
                 System.Windows.Forms.MessageBox.Show("Добавьте XML файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+
+        public static void RunExportNWC(ExternalCommandData commandData, List<string> filePaths, string OutputFolder)
+        {
+            
+            UIApplication uiapp = commandData.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            var true_list = new StringBuilder();
+            var false_list = new StringBuilder();
+
+            Application app = uiapp.Application;
+            foreach (string filePath in filePaths)
+            {
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath) || modelPath.ServerPath)
+                {
+                    Document doc = null;
+                    // Настройте параметры открытия документа с закрытыми рабочими наборами
+                    try
+                    {
+                        // Получаем информацию о всех пользовательских рабочих наборах в проекте перед открытием
+                        IList<WorksetPreview> worksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
+                        IList<WorksetId> worksetIdsToOpen = new List<WorksetId>();
+
+                        // Фильтруем рабочие наборы, исключая те, что начинаются с '#'
+                        foreach (WorksetPreview worksetPrev in worksets)
+                        {
+                            if (!worksetPrev.Name.StartsWith("#"))
+                            {
+                                worksetIdsToOpen.Add(worksetPrev.Id);
+                            }
+                        }
+
+                        OpenOptions openOptions = new OpenOptions();
+                        // Настраиваем конфигурацию для закрытия всех рабочих наборов по умолчанию
+                        WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+
+                        // Устанавливаем список рабочих наборов для открытия (только те, что без #)
+                        openConfig.Open(worksetIdsToOpen);
+                        openOptions.SetOpenWorksetsConfiguration(openConfig);
+
+                        doc = app.OpenDocumentFile(modelPath, openOptions);
+
+                        ///using (Transaction tx = new Transaction(doc))
+                        ///{
+                        try
+                        {
+
+                            /// tx.Start("Удаление связей из файла");
+                            ExportNWC(doc, OutputFolder);
+                            /// tx.Commit();
+                            // Сохраните и закройте документ
+                            true_list.AppendLine(doc.Title);
+                            //doc.Save();
+                            try
+                            {
+                                doc.Close(false); 
+                            }
+                            catch { }
+
+                        }
+                        catch
+                        {
+                            //закройте документ
+                            false_list.AppendLine(doc.Title);
+                            doc.Close(false);
+                        }
+                    }
+                    /// }
+                    catch (Exception e)
+                    {
+                        TaskDialog.Show("Open File Failed", e.Message);
+                    }
+                }
+            }
+            System.Windows.MessageBox.Show($"NWC выгружены! \nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
+        }
+
+        private static void ExportNWC(Document doc, String OutputFolder)
+        {           
+            // Настройки экспорта в NWC
+            NavisworksExportOptions nwcOptions = new NavisworksExportOptions()
+            {
+                FindMissingMaterials = false,
+                ConvertLights = false,
+                ConvertLinkedCADFormats = false,
+                ConvertElementProperties = true,
+                DivideFileIntoLevels = false,
+                ExportLinks = false,
+                ExportParts = false,
+                ExportRoomAsAttribute = true,
+                ExportElementIds = true,
+                ExportRoomGeometry = false,
+                Coordinates = NavisworksCoordinates.Shared,
+                ExportScope = NavisworksExportScope.View,
+                ViewId = GetViewIdByName("Navisworks")
+
+            };
+
+            // Экспорт
+            string outputPath = Path.Combine(OutputFolder, doc.Title.Replace("_" + doc.Application.Username, "")+".nwc");
+            doc.Export(Path.GetDirectoryName(outputPath), Path.GetFileName(outputPath), nwcOptions);
+
+            ElementId GetViewIdByName(string viewName)
+            {
+                // Получаем все виды в модели
+                FilteredElementCollector collector = new FilteredElementCollector(doc);
+                collector.OfClass(typeof(Autodesk.Revit.DB.View));
+
+                // Ищем вид с заданным именем
+                Autodesk.Revit.DB.View targetView = collector
+                    .Cast<Autodesk.Revit.DB.View>()
+                    .FirstOrDefault(v => v.Name.Equals(viewName, StringComparison.OrdinalIgnoreCase)&&v.IsTemplate==false);
+
+                return targetView?.Id ?? ElementId.InvalidElementId;
+            }
+        }
+
         private static void LinkRemove(Document doc)
         {
 
@@ -369,7 +530,7 @@ namespace AbimToolsMine
 
         }
         //Анализировать xml и расставить коллизии
-        public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string discipline, string xmlFilePath)
+        public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string xmlFilePath)
         {
             var xmlFileDate = File.GetLastWriteTime(xmlFilePath);
 
@@ -384,11 +545,14 @@ namespace AbimToolsMine
                                 let posX = pos3f.Attribute("x").Value
                                 let posY = pos3f.Attribute("y").Value
                                 let posZ = pos3f.Attribute("z").Value
-                                let clashObject = clashresult.Descendants("clashobject").FirstOrDefault()
-                                let fileName = clashObject?.Descendants("pathlink").FirstOrDefault()?
+                                let clashObject1 = clashresult.Descendants("clashobject").FirstOrDefault()
+                                let clashObject2 = clashresult.Descendants("clashobject").Skip(1).FirstOrDefault()
+                                let fileName1 = clashObject1?.Descendants("pathlink").FirstOrDefault()?
                                                     .Elements("node").Skip(2).FirstOrDefault()?.Value
+                                let fileName2 = clashObject2?.Descendants("pathlink").FirstOrDefault()?
+                                .Elements("node").Skip(2).FirstOrDefault()?.Value
                                 where !string.IsNullOrEmpty(clashtestName) && !string.IsNullOrEmpty(clashResultName)
-                                        && pos3f != null && clashObject != null // Пропускаем элементы с отсутствующими данными
+                                        && pos3f != null && clashObject1 != null // Пропускаем элементы с отсутствующими данными
                                 select new ClashResult
                                 {
                                     ClashTestName = clashtestName,
@@ -398,7 +562,8 @@ namespace AbimToolsMine
                                     PosY = posY,
                                     PosZ = posZ,
                                     Status = status,
-                                    FileName = fileName.Replace(".nwc", "")
+                                    FileName1 = fileName1?.Replace(".nwc", "").Replace(".nwd", ""),
+                                    FileName2 = fileName2?.Replace(".nwc", "").Replace(".nwd", "")
                                 }).ToList();
             //Создать элементы
             Autodesk.Revit.DB.Transform transform = doc.ActiveProjectLocation.GetTotalTransform();
@@ -423,7 +588,7 @@ namespace AbimToolsMine
             {
 
                 var filteredClashResults = clashResults
-                            .Where(cr => (cr.Status == "active" || cr.Status == "new") && cr.FileName == doc.Title.Replace("_" + username, ""))
+                            .Where(cr => (cr.Status == "active" || cr.Status == "new") && (cr.FileName1 == doc.Title.Replace("_" + username, "") || (cr.FileName2 == doc.Title.Replace("_" + username, ""))))
                             .ToList();
                 filteredClashResults = RemoveDuplicateClashResults(filteredClashResults);
                 foreach (var clashResult in filteredClashResults)
@@ -496,13 +661,19 @@ namespace AbimToolsMine
 
             bool DelBefore()
             {
-
-                ElementId newId = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
-                .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
-                .FirstOrDefault(e => (e as ElementType).FamilyName.Equals("ПРО_Коллизия") &&
-                                        e.Name == "Смежная").Id;
-
+                ElementId newId = null;
+                try
+                {
+                    newId = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
+                    .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
+                    .FirstOrDefault(e => (e as ElementType).FamilyName.Equals("ПРО_Коллизия") &&
+                                            e.Name == "Смежная").Id;
+                }
+                catch
+                {
+                    MessageBox.Show("Обновите семейство коллизии", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
                 var instances = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .WhereElementIsNotElementType()
@@ -584,6 +755,7 @@ namespace AbimToolsMine
                     }
                     else
                     {
+                        MessageBox.Show("Найдены элементы заблокированные другим пользователем. Коллизии не будут обновлены");
                         return false; // Найден элемент, редактируемый другим пользователем
                     }
                 }
@@ -677,7 +849,7 @@ namespace AbimToolsMine
             }
         }
 
-        public static string GetDisciplineFromFileName(string fileName)
+        /*public static string GetDisciplineFromFileName(string fileName)
         {
             if (fileName.Contains("АР")) return "0";
             if (fileName.Contains("КР")) return "1";
@@ -689,10 +861,10 @@ namespace AbimToolsMine
             if (fileName.Contains("ТМ")) return "7";
             if (fileName.Contains("ТХ")) return "8";
             return null;
-        }
+        }*/
     }
-        //загрузить семейства в модель
-        
+    //загрузить семейства в модель
+
     public static class XYZExtensions
     {
         public static bool IsAlmostEqualTo(this XYZ point1, XYZ point2, double tolerance)
@@ -706,8 +878,16 @@ namespace AbimToolsMine
     {
         public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
         {
-            overwriteParameterValues = true;
-            return true;
+            if (CollisionsWin.reblaceBarametersBool == true)
+            {
+                overwriteParameterValues = true;
+                return true;
+            }
+            else
+            {
+                overwriteParameterValues = false;
+                return false;
+            }
         }
 
         public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues)
@@ -725,9 +905,11 @@ namespace AbimToolsMine
         public string PosY { get; set; }
         public string PosZ { get; set; }
         public string Status { get; set; }
-        public string FileName { get; set; } // Добавляем поле для имени файла первого элемента коллизии
+        public string FileName1 { get; set; } // Добавляем поле для имени файла первого элемента коллизии
+        public string FileName2 { get; set; } // Добавляем поле для имени файла первого элемента коллизии
+
 
     }
 
 }
-    
+

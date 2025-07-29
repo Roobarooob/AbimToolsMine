@@ -1,0 +1,151 @@
+﻿<Window x:Class="AbimToolsMine.ScheduleFinishingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройка отделки помещений" Height="500" Width="750"
+        WindowStartupLocation="CenterScreen">
+    <TabControl>
+        <TabItem Header="Ведомость отделки">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Параметры помещений -->
+                    <Label Content="Параметр номера помещения:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RoomNumberParamBox" Grid.Row="0" Grid.Column="1" Text="Номер" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр группы помещений:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RoomGroupParamBox" Grid.Row="1" Grid.Column="1" Text="ПРО_ОП_Номер помещения.Гр" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр ключа помещения (в стенах):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+                    <TextBox x:Name="RoomKeyParamBox" Grid.Row="2" Grid.Column="1" Text="ПРО_Номер помещения" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Ширина колонки (мм):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="StructureWidthBox" Grid.Row="6" Grid.Column="1" Text="50" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Подстрока плинтуса:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="PlinthStringBox" Grid.Row="5" Grid.Column="1" Text="ВО_Плинтус" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр состава конструкции:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="StructureCompBox" Grid.Row="4" Grid.Column="1" Text="ПРО_Состав конструкции" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр типа единиц измерения:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="DimTypeBox" Grid.Row="3" Grid.Column="3" Text="ПРО_Тип измерения" VerticalContentAlignment="Center"/>
+                </Grid>
+                <!-- Параметры отделки -->
+                <GroupBox Header="Параметры отделки" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,10">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Категория отделки" Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" />
+                        <TextBlock Text="Параметр" Grid.Row="0" Grid.Column="1" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="Параметр значения" Grid.Row="0" Grid.Column="2" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="Параметр группы" Grid.Row="0" Grid.Column="3" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                        <!-- Стены -->
+                        <TextBlock Text="Стены:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="WallNameBox" Grid.Row="1" Grid.Column="1" Text="ПРО_ОП_Стены"/>
+                        <TextBox x:Name="WallValueBox" Grid.Row="1" Grid.Column="2" Text="ПРО_ОП_Стены.Значение"/>
+                        <TextBox x:Name="WallGroupBox" Grid.Row="1" Grid.Column="3" Text="ПРО_ОП_Стены.Значение.Гр"/>
+
+                        <!-- Полы -->
+                        <TextBlock Text="Полы:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="FloorNameBox" Grid.Row="2" Grid.Column="1" Text="ПРО_ОП_Полы"/>
+                        <TextBox x:Name="FloorValueBox" Grid.Row="2" Grid.Column="2" Text="ПРО_ОП_Полы.Значение"/>
+                        <TextBox x:Name="FloorGroupBox" Grid.Row="2" Grid.Column="3" Text="ПРО_ОП_Полы.Значение.Гр"/>
+
+                        <!-- Потолки -->
+                        <TextBlock Text="Потолки:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CeilingNameBox" Grid.Row="3" Grid.Column="1" Text="ПРО_ОП_Потолки"/>
+                        <TextBox x:Name="CeilingValueBox" Grid.Row="3" Grid.Column="2" Text="ПРО_ОП_Потолки.Значение"/>
+                        <TextBox x:Name="CeilingGroupBox" Grid.Row="3" Grid.Column="3" Text="ПРО_ОП_Потолки.Значение.Гр"/>
+
+                        <!-- Плинтус -->
+                        <TextBlock Text="Плинтус:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PlinthNameBox" Grid.Row="4" Grid.Column="1" Text="ПРО_ОП_Плинтус"/>
+                        <TextBox x:Name="PlinthValueBox" Grid.Row="4" Grid.Column="2" Text="ПРО_ОП_Плинтус.Значение"/>
+                        <TextBox x:Name="PlinthGroupBox" Grid.Row="4" Grid.Column="3" Text="ПРО_ОП_Плинтус.Значение.Гр"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Отступ -->
+                <Label Content="Количество отступов между отделками:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+                <TextBox x:Name="DivideBox" Grid.Row="3" Grid.Column="1" Text="2" VerticalContentAlignment="Center"/>
+
+                <!-- Кнопка -->
+                <Button Content="OK" Grid.Row="4" Grid.ColumnSpan="2" Height="30" Width="80" Margin="0,10,0,0"
+                VerticalAlignment="Bottom" HorizontalAlignment="Center" Click="OK_Click"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Экспликация полов">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Параметр группы помещений:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="FloorRoomGroupParamBox" Grid.Row="1" Grid.Column="1" Text="ПРО_ОП_Номер помещения.Гр" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр ключа помещения (в полах):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+                    <TextBox x:Name="FloorKeyParamBox" Grid.Row="2" Grid.Column="1" Text="ПРО_Номер помещения" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Параметр состава конструкции:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="FloorStructureCompBox" Grid.Row="3" Grid.Column="1" Text="ПРО_Состав конструкции" VerticalContentAlignment="Center"/>
+
+                    <Label Content="Имя семейства слоя" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="FoorLayerNameBox" Grid.Row="4" Grid.Column="3" Text="ПРО_СЛЖ_Слой пола" VerticalContentAlignment="Center"/>
+                    
+                    <Label Content="Имя шаблона вида для эскизов" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="ViewTemplateNameBox" Grid.Row="5" Grid.Column="3" Text="ПРО_СЛЖ_Эскиз пола" VerticalContentAlignment="Center"/>
+                </Grid>
+                <Button Content="OK" Grid.Row="1" Grid.ColumnSpan="2" Height="30" Width="80" Margin="0,10,0,0"  VerticalAlignment="Bottom" HorizontalAlignment="Center" Click="Floor_OK_Click"/>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>

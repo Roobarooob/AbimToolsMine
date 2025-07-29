@@ -1,7 +1,6 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 using System.Windows;
-using System.Windows.Controls;
+
 
 namespace AbimToolsMine
 {
@@ -26,7 +25,7 @@ namespace AbimToolsMine
                 LinksWokset.LinksToWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
                 MessageBox.Show("Процесс завершен!");
             }
-            catch { MessageBox.Show("Что-то не получилось"); }
+            catch { MessageBox.Show("Что-то не получилось..."); }
         }
 
         // Обработчик кнопки "Фильтр пустых рабочих наборов"

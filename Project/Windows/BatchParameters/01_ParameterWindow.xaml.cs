@@ -54,8 +54,11 @@ namespace AbimToolsMine
                     binding = new TypeBinding(categorySet);
                 else
                     binding = new InstanceBinding(categorySet);
-
+#if R2017 || R2018 || R2019 || R2020 || R2021 || R2022 || R2023
                 doc.ParameterBindings.Insert(externalDef, binding, BuiltInParameterGroup.PG_DATA);
+#else
+                doc.ParameterBindings.Insert(externalDef, binding, GroupTypeId.Data);
+#endif
                 Check = true;
             }
             if (Check)

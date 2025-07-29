@@ -10,12 +10,14 @@ using System.Windows.Forms;
 using static AbimToolsMine.BatchTools;
 using Button = System.Windows.Controls.Button;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 
 namespace AbimToolsMine
 {
     public partial class CollisionsWin : Window
     {
         public static ObservableCollection<string> rvtFilePaths = new ObservableCollection<string>();
+        public static bool reblaceBarametersBool = false;
 
         public CollisionsWin()
         {
@@ -33,6 +35,16 @@ namespace AbimToolsMine
             if (openFileDialog.ShowDialog() == true)
             {
                 XmlFilePath.Text = openFileDialog.FileName;
+            }
+        }
+
+        private void SelectNWCPath_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedPath = folderBrowserDialog.SelectedPath;
+                NwcFilePath.Text = selectedPath;
             }
         }
 
@@ -113,6 +125,21 @@ namespace AbimToolsMine
             var rvtFiles = rvtFilePaths.ToList();
             BatchFunctions.DownloadFamily(BatchTools.CommandData, rvtFiles, FilePath);
         }
+
+        private void ExportNWC_Click(object sender, RoutedEventArgs e)
+        {
+            string FilePath = rfaFilePath.Text;
+            var rvtFiles = rvtFilePaths.ToList();
+            if (NwcFilePath.Text != "" && NwcFilePath.Text != null)
+            {
+                BatchFunctions.RunExportNWC(BatchTools.CommandData, rvtFiles, NwcFilePath.Text);
+            }
+            else
+            {
+                TaskDialog.Show("Ошибка", "Заполните выберите путь к папке экспорта NWC");
+            }
+        }
+
         private void RevitServer_Click(object sender, RoutedEventArgs e)
         {
             RevitServerWindow RsWindow = new RevitServerWindow();
@@ -135,6 +162,18 @@ namespace AbimToolsMine
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             BatchTools.window=null;
+        }
+
+        private void ReplaceParameters_Checked(object sender, RoutedEventArgs e)
+        {
+            if (ReplaceParameters.IsChecked == true)
+            {
+                reblaceBarametersBool = true;
+            }
+            else
+            {
+                reblaceBarametersBool = false;
+            }
         }
     }
 }

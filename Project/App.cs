@@ -1,14 +1,11 @@
 #region Namespaces
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
-
-
 #endregion
 
 namespace AbimToolsMine
@@ -21,112 +18,248 @@ namespace AbimToolsMine
         public static PushButton col_button { get; set; }
         public static PushButton workset_button { get; set; }
         public static PushButton lookUp_button { get; set; }
+
         public RibbonPanel RibbonPanel(UIControlledApplication a, string tab, string ribbonPanelText)
         {
-            // Empty ribbon panel 
             RibbonPanel ribbonPanel = null;
-            // Try to create ribbon tab. 
+
             try
             {
                 a.CreateRibbonTab(tab);
             }
-            catch { }
-            // Try to create ribbon panel.
+            catch 
+            {
+
+            }
+
             try
             {
-                RibbonPanel panel = a.CreateRibbonPanel(tab, ribbonPanelText);
+                ribbonPanel = a.CreateRibbonPanel(tab, ribbonPanelText);
             }
-            catch { }
-            // Search existing tab for your panel.
-            List<RibbonPanel> panels = a.GetRibbonPanels(tab);
-            foreach (RibbonPanel p in panels)
+            catch (Exception ex)
             {
-                if (p.Name == ribbonPanelText)
-                {
-                    ribbonPanel = p;
-                }
+                // Логирование ошибки
+                TaskDialog.Show("Error", ex.Message);
             }
-            //return panel 
+
+            if (ribbonPanel == null)
+            {
+                List<RibbonPanel> panels = a.GetRibbonPanels(tab);
+                ribbonPanel = panels.FirstOrDefault(p => p.Name == ribbonPanelText);
+            }
+
             return ribbonPanel;
         }
-        private void OnButtonCreate(UIControlledApplication application)
+
+        private PushButton CreateButton(
+            RibbonPanel panel,
+            string name,
+            string text,
+            string command,
+            string imageUri,
+            string toolTip = "",
+            string longDescription = "",
+            string availabilityClassName = "",
+            string dllName = "")
         {
-
-            string assemblyPath = typeof(App).Assembly.Location;
-            var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие");
-
-            // Create push buttons
-            PushButton CreateBtn(RibbonPanel panel, string name, string text, string command, string image_uri)
+            // Определяем путь к DLL-файлу: если имя DLL задано, используем его, иначе берем текущую DLL
+            string assemblyPath;
+            if (!string.IsNullOrWhiteSpace(dllName))
             {
-                PushButtonData buttondata = new PushButtonData(name, text, assemblyPath, command);
-                BitmapImage pb1Image = new BitmapImage(new Uri(image_uri));
-                buttondata.LargeImage = pb1Image;
-                PushButton button = panel.AddItem(buttondata) as PushButton;
-                return button;
+                string thisDllPath = typeof(App).Assembly.Location;
+                string folder = Path.GetDirectoryName(thisDllPath);
+                assemblyPath = Path.Combine(folder, dllName);
+            }
+            else
+            {
+                assemblyPath = typeof(App).Assembly.Location;
             }
 
+            // Создаём данные кнопки
+            PushButtonData buttonData = new PushButtonData(name, text, assemblyPath, command);
 
-            /// PushButtonData buttondata1 = new PushButtonData("Opening_Tools", "Расстановка отверстий\nв стенах", assemblyPath, "Opening_Tools.Command");
-            /// BitmapImage pb1Image1 = new BitmapImage(new Uri("pack://application:,,,/Opening_Tools;component/Resources/PlaceIcon.png"));
-            /// buttondata1.LargeImage = pb1Image1;
-            
-            //About
-            pref_button = CreateBtn(pan1, "About", "О программе", "AbimToolsMine.Version", "pack://application:,,,/AbimToolsMine;component/Resources/About.png");
-            pref_button.ToolTip = "Общая информация и версия";
-            pref_button.AvailabilityClassName = "AbimToolsMine.CommandAvailability";
-            //Pref_button.LongDescription = "";
+            // Загружаем изображение
+            BitmapImage pbImage = new BitmapImage(new Uri(imageUri));
+            buttonData.LargeImage = pbImage;
 
-            //Пакет с пакетами
-            bath_button = CreateBtn(pan1, "BatchTools", "Пакетная\nобработка", "AbimToolsMine.BatchTools", "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png");
-            bath_button.ToolTip = "Инструменты автоматизированной последовательной обработки нескольких файлов Revit";
-            bath_button.LongDescription = "Автоматическая загрузка семейств, расстановка коллизий по XML, удаление связей из моделей";
-            BitmapImage bath_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
-            bath_button.Image = bath_Image;
-            bath_button.AvailabilityClassName = "AbimToolsMine.CommandAvailability";
-            
-            //Коллизии
-            col_button = CreateBtn(pan1, "CollisionTools", "Загрузить\nколлизии", "AbimToolsMine.Collisions", "pack://application:,,,/AbimToolsMine;component/Resources/Collisions32.png");
-            col_button.ToolTip = "Загрузка коллизий по XML в текущий документ\n" +
-                "Путь к XML должен быть прописан в параметре ПРО_Путь XML коллизий";
-            BitmapImage col_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));
-            col_button.Image = col_Image;
+            // Добавляем кнопку на панель
+            PushButton button = panel.AddItem(buttonData) as PushButton;
+            button.ToolTip = toolTip;
+            button.LongDescription = longDescription;
 
-            //Фильтр
-            selector_button = CreateBtn(pan1, "FastFilter", "БыстроФильтр", "AbimToolsMine.FastFilter", "pack://application:,,,/AbimToolsMine;component/Resources/FastFilter32.png");
-            selector_button.ToolTip = "Фильтрация выбранных категорий, одной кнопкой";
-            BitmapImage sb_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FastFilter16.png"));
-            selector_button.Image = sb_Image;
+            // Устанавливаем класс доступности, если указан
+            if (!string.IsNullOrWhiteSpace(availabilityClassName))
+            {
+                try
+                {
+                    button.AvailabilityClassName = availabilityClassName;
+                }
+                catch (Exception) { }
+            }
 
-            //Рабочие наборы
-            workset_button = CreateBtn(pan1, "SetWorksetForLinks", "Инструменты\n" +
-                "рабочих наборов", "AbimToolsMine.LinksWokset", "pack://application:,,,/AbimToolsMine;component/Resources/WSName32.png");
-            workset_button.ToolTip = "Создание рабочих наборов для связей, фильтрация пустых рабочих наборов";
-            BitmapImage ws_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/WSName16.png"));
-            workset_button.Image = ws_Image;
-
-            //Экспорт таблиц выбора
-            lookUp_button = CreateBtn(pan1, "GetLookupTable", "Экспорт таблиц\nвыбора", "AbimToolsMine.GetLookUpTable", "pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport32.png");
-            lookUp_button.ToolTip = "Экспорт таблиц выбора из документа семейства или семейства из проекта";
-            BitmapImage lookup_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport16.png"));
-            lookUp_button.Image = lookup_Image;
-
-            //Экспорт таблиц выбора
-            PushButton linkChecker_button = CreateBtn(pan1, "DuplicateLinkChecker", "Проверка\nдубликатов связей", "AbimToolsMine.DuplicateLinkChecker", "pack://application:,,,/AbimToolsMine;component/Resources/linkChecker32.png");
-            linkChecker_button.ToolTip = "Проверка модели на дубликаты связей";
-            BitmapImage linkChecker_Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
-            lookUp_button.Image = linkChecker_Image;
-        }
-        public Result OnStartup(UIControlledApplication application)
-        {
-           OnButtonCreate(application);
-            application.ControlledApplication.DocumentOpened += OnDocumentOpened;
-            return Result.Succeeded;
+            return button;
         }
 
-        public Result CloseApp(UIControlledApplication application)
+        private void OnButtonCreate(UIControlledApplication application)
         {
             var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие");
-            pan1.Visible = false;
+            
+            // Кнопка "О программе"
+            PushButton pref_button = CreateButton(
+                panel: pan1,
+                name: "About",
+                text: "О программе",
+                command: "AbimToolsMine.Version",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/About.png",
+                toolTip: "Общая информация и версия",
+                longDescription: "",
+                availabilityClassName: "AbimToolsMine.CommandAvailability",
+                dllName: "AbimToolsMine.dll"
+            );
+
+            // Кнопка "Пакетная обработка"
+            PushButton bath_button = CreateButton(
+                panel: pan1,
+                name: "BatchTools",
+                text: "Пакетная\nобработка",
+                command: "AbimToolsMine.BatchTools",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png",
+                toolTip: "Инструменты автоматизированной последовательной обработки нескольких файлов Revit",
+                longDescription: "Автоматическая загрузка семейств, расстановка коллизий по XML, удаление связей из моделей",
+                availabilityClassName: "AbimToolsMine.CommandAvailability",
+                dllName: "AbimToolsMine.dll"
+            );
+            bath_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
+
+            // Кнопка "Загрузить коллизии"
+            PushButton col_button = CreateButton(
+                panel: pan1,
+                name: "CollisionTools",
+                text: "Загрузить\nколлизии",
+                command: "AbimToolsMine.Collisions",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Collisions32.png",
+                toolTip: "Загрузка коллизий по XML в текущий документ\nПуть к XML должен быть прописан в параметре ПРО_Путь XML коллизий",
+                dllName: "AbimToolsMine.dll"
+            );
+            col_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));
+
+            // Кнопка "БыстроФильтр"
+            PushButton selector_button = CreateButton(
+                panel: pan1,
+                name: "FastFilter",
+                text: "БыстроФильтр",
+                command: "AbimToolsMine.FastFilter",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/FastFilter32.png",
+                toolTip: "Фильтрация выбранных категорий, одной кнопкой",
+                dllName: "AbimToolsMine.dll"
+            );
+            selector_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FastFilter16.png"));
+
+            // Кнопка "Инструменты рабочих наборов"
+            PushButton workset_button = CreateButton(
+                panel: pan1,
+                name: "SetWorksetForLinks",
+                text: "Инструменты\nрабочих наборов",
+                command: "AbimToolsMine.LinksWokset",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/WSName32.png",
+                toolTip: "Создание рабочих наборов для связей, фильтрация пустых рабочих наборов",
+                dllName: "AbimToolsMine.dll"
+            );
+            workset_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/WSName16.png"));
+
+            // Кнопка "Экспорт таблиц выбора"
+            PushButton lookUp_button = CreateButton(
+                panel: pan1,
+                name: "GetLookupTable",
+                text: "Экспорт таблиц\nвыбора",
+                command: "AbimToolsMine.GetLookUpTable",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport32.png",
+                toolTip: "Экспорт таблиц выбора из документа семейства или семейства из проекта",
+                dllName: "AbimToolsMine.dll"
+            );
+            lookUp_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport16.png"));
+
+            // Кнопка "Проверка дубликатов связей"
+            PushButton linkChecker_button = CreateButton(
+                panel: pan1,
+                name: "DuplicateLinkChecker",
+                text: "Проверка\nдубликатов связей",
+                command: "AbimToolsMine.DuplicateLinkChecker",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/linkChecker32.png",
+                toolTip: "Проверка модели на дубликаты связей",
+                dllName: "AbimToolsMine.dll"
+            );
+            linkChecker_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
+
+            // Кнопка "Работа с уровнями"
+            PushButton CheckLevels = CreateButton(
+                panel: pan1,
+                name: "CheckLevels",
+                text: "Работа с уровнями",
+                command: "AbimToolsMine.LevelTools",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Levels32.png",
+                toolTip: "Проверка привязки и заполнение параметров уровням",
+                dllName: "AbimToolsMine.dll"
+            );
+            CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));
+
+
+            var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и  полы");
+            
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton Pref_ScheduleFinishing = CreateButton(
+                panel: pan2,
+                name: "Pref_ScheduleFinishing",
+                text: "Параметры",
+                command: "AbimToolsMine.Pref_ScheduleFinishingWindow",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Pref_Finishing32.png",
+                toolTip: "Настройки создания ведомости отделки",
+                dllName: "AbimToolsMine.dll"
+            );
+            Pref_ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Pref_Finishing32.png"));
+
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton ScheduleFinishing = CreateButton(
+                panel: pan2,
+                name: "ScheduleFinishing",
+                text: "Ведомость отделки",
+                command: "AbimToolsMine.ScheduleFinishing",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png",
+                toolTip: "Создание ведомости отделки по ГОСТ",
+                dllName: "AbimToolsMine.dll"
+            );
+            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png"));
+           
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton FloorLegends = CreateButton(
+                panel: pan2,
+                name: "FloorLegends",
+                text: "Полы\nСоздание эскизов",
+                command: "AbimToolsMine.FloorLegends",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends32.png",
+                toolTip: "Создание эскизов для каждого типа пола. (типы полов создаются чертёжными видами)",
+                dllName: "AbimToolsMine.dll"
+            );
+            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
+
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton LegendsToParameters = CreateButton(
+                panel: pan2,
+                name: "LegendsToParameter",
+                text: "Полы\nЭскизы в параметр",
+                command: "AbimToolsMine.LegendsToParameter",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
+                toolTip: "Эскизы переходят в параметр типа пола",
+                dllName: "AbimToolsMine.dll"
+            );
+            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+
+        }
+            
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+            OnButtonCreate(application);
             application.ControlledApplication.DocumentOpened += OnDocumentOpened;
             return Result.Succeeded;
         }
@@ -141,41 +274,39 @@ namespace AbimToolsMine
         {
             Document doc = e.Document;
 
-            // Проверяем, что документ не является семейным
             if (!doc.IsFamilyDocument)
             {
                 PinLink(doc);
             }
         }
+
         private void PinLink(Document doc)
         {
-            // Получаем все связи
             FilteredElementCollector collector = new FilteredElementCollector(doc);
-            collector.OfClass(typeof(RevitLinkInstance));
-            collector.UnionWith(new FilteredElementCollector(doc).OfClass(typeof(Grid)));
-            collector.UnionWith(new FilteredElementCollector(doc).OfClass(typeof(Level)));
-            var linkInstances = collector.Cast<Element>();
+            var elementsToPin = collector.OfClass(typeof(RevitLinkInstance))
+                                        .UnionWith(new FilteredElementCollector(doc).OfClass(typeof(Grid)))
+                                        .UnionWith(new FilteredElementCollector(doc).OfClass(typeof(Level)))
+                                        .Cast<Element>();
 
             using (Transaction trans = new Transaction(doc, "Pin"))
             {
                 trans.Start();
 
-                foreach (var linkInstance in linkInstances)
+                foreach (var element in elementsToPin)
                 {
-                    // Закрепляем каждую связь
-                    linkInstance.Pinned = true;
+                    element.Pinned = true;
                 }
+
                 trans.Commit();
             }
         }
     }
+
     public class CommandAvailability : IExternalCommandAvailability
     {
         public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
         {
-            // Команда всегда доступна
             return true;
         }
     }
-
 }

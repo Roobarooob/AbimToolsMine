@@ -34,19 +34,23 @@ namespace AbimToolsMine
         }
         private void LoadFamilies()
         {
-
-            var families = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family))
-                .Cast<Family>()
-                .Where(fam => fam.FamilyCategory.CategoryType == CategoryType.Model && fam.IsEditable)
-                .OrderBy(fam => fam.Name)
-                .ToList();
-
-            comboBoxFamilies.ItemsSource = families.Select(fam => fam.Name).ToList();
-            if (comboBoxFamilies.Items.Count > 0)
+            if (!doc.IsFamilyDocument)
             {
-                comboBoxFamilies.SelectedIndex = 0;
+                comboBoxFamilies.IsEnabled = true;
+                var families = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Family))
+                    .Cast<Family>()
+                    .Where(fam => fam.FamilyCategory.CategoryType == CategoryType.Model && fam.IsEditable)
+                    .OrderBy(fam => fam.Name)
+                    .ToList();
+
+                comboBoxFamilies.ItemsSource = families.Select(fam => fam.Name).ToList();
+                if (comboBoxFamilies.Items.Count > 0)
+                {
+                    comboBoxFamilies.SelectedIndex = 0;
+                }
             }
+            else { comboBoxFamilies.IsEnabled = false;}
         }
 
         private void GetTables(bool familyDocument)

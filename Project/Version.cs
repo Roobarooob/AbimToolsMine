@@ -15,7 +15,7 @@ namespace AbimToolsMine
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
-            TaskDialog.Show("Информация", "Версия приложения - 4.3.4\n\n" +
+            TaskDialog.Show("Информация", "Версия приложения - 5.0.0\n\n" +
 
                 "Загруженные плагины:\n" +
                 "АвтоПиннер\n" +
@@ -24,9 +24,9 @@ namespace AbimToolsMine
                 "Загрузка коллизий\n" +
                 "Инструменты рабочих наборов\n" +
                 "Экспорт таблиц выбора\n\n" +
+                "Ведомость отделки\n\n" +
             "создатель Антон Рубинштейн\n");
             return Result.Succeeded;
         }
     }
-
 }
