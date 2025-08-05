@@ -14,12 +14,13 @@ namespace AbimToolsMine
     [Transaction(TransactionMode.Manual)]
     public class ScheduleFinishing : IExternalCommand
     {
-        private static readonly string RoomNumberParam = Settings.Default.RoomNumberParam;
-        private static readonly string RoomGroupParam = Settings.Default.RoomGroupParam;
-        private static readonly string RoomKeyParam = Settings.Default.RoomKeyParam;
-        private static readonly string PlinthString = Settings.Default.PlinthString;
-        private static readonly string StructureComp = Settings.Default.StructureComp;
-        private static readonly string DimType = Settings.Default.DimType;
+        private static string RoomNumberParam => Settings.Default.RoomNumberParam;
+        private static string RoomGroupParam => Settings.Default.RoomGroupParam;
+        private static string RoomKeyParam => Settings.Default.RoomKeyParam;
+        private static string PlinthString => Settings.Default.PlinthString;
+        private static string StructureComp => Settings.Default.StructureComp;
+        private static string DimType => Settings.Default.DimType;
+        private static bool NeedFloor => Settings.Default.NeedFloor;
 
         private static readonly Dictionary<string, (string nameParam, string valueParam)> RoomParams = new Dictionary<string, (string, string)>
         {
@@ -68,6 +69,9 @@ namespace AbimToolsMine
 
                 foreach (var part in data)
                 {
+                    if (!NeedFloor && part.Key == Settings.Default.FloorNameParam)
+                        continue;
+
                     foreach (var entry in part.Value)
                     {
                         if (!groupAreas[groupKey][part.Key].ContainsKey(entry.Key))
@@ -98,6 +102,9 @@ namespace AbimToolsMine
                     {
                         var nameParam = kv.Value.nameParam;
                         var valueParam = kv.Value.valueParam;
+                        
+                        if (!NeedFloor && nameParam == Settings.Default.FloorNameParam)
+                            continue;
 
                         if (!data.ContainsKey(nameParam))
                             continue;
@@ -250,7 +257,8 @@ namespace AbimToolsMine
         private string GetGroupKey(Dictionary<string, Dictionary<string, double>> data)
         {
             var keys = RoomParams.Values
-                .SelectMany(p => data.ContainsKey(p.Item1) ? data[p.Item1].Keys.OrderBy(x => x) : Enumerable.Empty<string>())
+                .Where(p => NeedFloor || p.nameParam != Settings.Default.FloorNameParam)
+                .SelectMany(p => data.ContainsKey(p.nameParam) ? data[p.nameParam].Keys.OrderBy(x => x) : Enumerable.Empty<string>())
                 .ToList();
             return string.Join("|", keys);
         }

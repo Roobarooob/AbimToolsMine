@@ -83,5 +83,17 @@
     <Setting Name="viewTemplateName" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_СЛЖ_Эскиз пола</Value>
     </Setting>
+    <Setting Name="HiddenPanels" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Access_Org" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Access_Code" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NeedFloor" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

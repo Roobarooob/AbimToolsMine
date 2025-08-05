@@ -346,5 +346,52 @@ namespace AbimToolsMine.Properties {
                 this["viewTemplateName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection HiddenPanels {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HiddenPanels"]));
+            }
+            set {
+                this["HiddenPanels"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Access_Org {
+            get {
+                return ((string)(this["Access_Org"]));
+            }
+            set {
+                this["Access_Org"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Access_Code {
+            get {
+                return ((string)(this["Access_Code"]));
+            }
+            set {
+                this["Access_Code"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NeedFloor {
+            get {
+                return ((bool)(this["NeedFloor"]));
+            }
+            set {
+                this["NeedFloor"] = value;
+            }
+        }
     }
 }

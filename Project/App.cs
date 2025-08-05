@@ -6,18 +6,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using Settings = AbimToolsMine.Properties.Settings;
 #endregion
 
 namespace AbimToolsMine
 {
     public class App : IExternalApplication
     {
-        public static PushButton pref_button { get; set; }
-        public static PushButton selector_button { get; set; }
-        public static PushButton bath_button { get; set; }
-        public static PushButton col_button { get; set; }
-        public static PushButton workset_button { get; set; }
-        public static PushButton lookUp_button { get; set; }
+        private UIControlledApplication _application;
+        private bool _panelsInitialized = false;
+        private string superpanel = "Плагин";
 
         public RibbonPanel RibbonPanel(UIControlledApplication a, string tab, string ribbonPanelText)
         {
@@ -102,21 +100,23 @@ namespace AbimToolsMine
 
         private void OnButtonCreate(UIControlledApplication application)
         {
-            var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие");
+            var pan0 = RibbonPanel(application, "АБИМ-ПРО", superpanel);
             
-            // Кнопка "О программе"
-            PushButton pref_button = CreateButton(
-                panel: pan1,
+            // Кнопка "Программа"
+
+            PushButton ToggleAbimPanels = CreateButton(
+                panel: pan0,
                 name: "About",
-                text: "О программе",
-                command: "AbimToolsMine.Version",
+                text: "Программа",
+                command: "AbimToolsMine.ToggleAbimPanels",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/About.png",
-                toolTip: "Общая информация и версия",
+                toolTip: "Настройки лицензий панелей",
                 longDescription: "",
                 availabilityClassName: "AbimToolsMine.CommandAvailability",
                 dllName: "AbimToolsMine.dll"
             );
-
+            
+            var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие утилиты");
             // Кнопка "Пакетная обработка"
             PushButton bath_button = CreateButton(
                 panel: pan1,
@@ -204,7 +204,7 @@ namespace AbimToolsMine
             CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));
 
 
-            var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и  полы");
+            var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
             
             // Кнопка "Cоздание ведомости отделки"
             PushButton Pref_ScheduleFinishing = CreateButton(
@@ -259,8 +259,11 @@ namespace AbimToolsMine
 
         public Result OnStartup(UIControlledApplication application)
         {
+            _application = application;
             OnButtonCreate(application);
             application.ControlledApplication.DocumentOpened += OnDocumentOpened;
+            // Поставь отложенное применение:
+            application.Idling += OnIdling_ApplyPanelVisibility;
             return Result.Succeeded;
         }
 
@@ -298,6 +301,53 @@ namespace AbimToolsMine
                 }
 
                 trans.Commit();
+            }
+        }
+
+        public static void ApplyPanelVisibilityFromSettings(UIControlledApplication app)
+        {
+            var hiddenPanels = Settings.Default.HiddenPanels ?? new System.Collections.Specialized.StringCollection();
+
+            // Пробуем получить панели из вкладки
+            var panels = app.GetRibbonPanels("АБИМ-ПРО");
+
+            foreach (var panel in panels)
+            {
+                panel.Visible = !hiddenPanels.Contains(panel.Name);
+            }
+        }
+        private void OnIdling_ApplyPanelVisibility(object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e)
+        {
+            if (_panelsInitialized)
+                return;
+
+            _panelsInitialized = true;
+
+            var panels = _application.GetRibbonPanels("АБИМ-ПРО");
+            var hiddenPanels = Settings.Default.HiddenPanels ?? new System.Collections.Specialized.StringCollection();
+            string org = Settings.Default.Access_Org;
+            string code = Settings.Default.Access_Code;
+
+            bool licenseValid = LicenseChecker.IsLicenseValid(org, code);
+
+            foreach (var panel in panels)
+            {
+                if (panel.Name == superpanel)
+                {
+                    panel.Visible = true;
+                    continue;
+                }
+
+                if (licenseValid)
+                {
+                    // Восстанавливаем видимость по настройкам
+                    panel.Visible = !hiddenPanels.Contains(panel.Name);
+                }
+                else
+                {
+                    // Скрываем всё кроме "Плагин"
+                    panel.Visible = false;
+                }
             }
         }
     }

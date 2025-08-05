@@ -1,0 +1,34 @@
+﻿<Window x:Class="AbimToolsMine.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройка отделки помещений" Height="500" Width="400"
+        WindowStartupLocation="CenterScreen" Background="WhiteSmoke">
+    <StackPanel Margin="10">
+        <TextBlock Text="Доступ к плагину:" FontWeight="Bold" Margin="0,0,0,10"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label Content ="Организация" Grid.Row="0" Grid.Column="0"/>
+            <TextBox x:Name="Org" Margin="1" Grid.Row="0" Grid.Column="1"/>
+            <Label Content ="Проверочный код" Grid.Row="1" Grid.Column="0"/>
+            <TextBox x:Name="Code" Margin="1" Grid.Row="1" Grid.Column="1"/>
+            <Button Content="Проверить"  Grid.Row="2" Grid.Column="0" Margin="1" Click="LCheck_Click"/>
+            <Label  x:Name="Check_Label" Content ="" Grid.Row="2" Grid.Column="1"/>
+        </Grid>
+        <TextBlock Text="Выберите панели для отображения:" FontWeight="Bold" Margin="0,0,0,10"/>
+        <ItemsControl x:Name="CheckboxContainer"/>
+        <TextBlock>
+            <LineBreak/>
+            <LineBreak/>
+            v. 6.0.0<LineBreak/>
+              создатель Антон Рубинштейн
+        </TextBlock>
+    </StackPanel>
+</Window>

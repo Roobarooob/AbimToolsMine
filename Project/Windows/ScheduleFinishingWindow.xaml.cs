@@ -77,6 +77,9 @@ namespace AbimToolsMine
             FloorKeyParamBox.Text = Settings.Default.FloorRoomKeyParam;
             FoorLayerNameBox.Text = Settings.Default.FloorLayerName;
             ViewTemplateNameBox.Text = Settings.Default.viewTemplateName;
+            if ( Settings.Default.NeedFloor == true )
+                NeeFloorCheckBox.IsChecked = true;
+            else NeeFloorCheckBox.IsChecked = false;
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)
@@ -110,6 +113,9 @@ namespace AbimToolsMine
             
             Settings.Default.StructureComp = StructureCompBox.Text;
             Settings.Default.DimType = DimTypeBox.Text;
+            if (NeeFloorCheckBox.IsChecked == true )
+                Settings.Default.NeedFloor = true;
+            else Settings.Default.NeedFloor = false;
 
             Settings.Default.Save();
             this.DialogResult = true;

@@ -74,7 +74,8 @@ namespace AbimToolsMine
 
                     if (floorType == null)
                     {
-                        TaskDialog.Show("Внимание", $"Не найден тип перекрытия с именем: {typeName}");
+                        File.Delete(filePath);
+                        //TaskDialog.Show("Внимание", $"Не найден тип перекрытия с именем: {typeName}");
                         continue;
                     }
 
@@ -114,7 +115,8 @@ namespace AbimToolsMine
                     else
                     {
                         TaskDialog.Show("Ошибка", $"Параметр не найден или неправильного типа у {typeName}");
-                    }                
+                    }    
+                    File.Delete(filePath);
                 }
                 // Собираем все полы
                 var floors = new FilteredElementCollector(doc)

@@ -12,11 +12,13 @@
     <RootNamespace>AbimToolsMine</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PostBuildEvent>if not exist "%AppData%\Autodesk\REVIT\Addins\2021\APRO\AbimTools" (
-    mkdir "%AppData%\Autodesk\REVIT\Addins\2021\APRO\AbimTools"
+    <PostBuildEvent>set "VERSION=2022"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
 )
 
-copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\2021\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2020|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -156,6 +158,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\2021\APRO\
     <None Remove="Resources\Pref_Finishing16.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Resources\BatchTools16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +214,9 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\2021\APRO\
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Windows\About.xaml.cs">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
