@@ -175,5 +175,11 @@ namespace AbimToolsMine
                 reblaceBarametersBool = false;
             }
         }
+
+        private void WorsetPrefClick(object sender, RoutedEventArgs e)
+        {
+            WorksetPrefWin worksetPrefWin = new WorksetPrefWin();
+            worksetPrefWin.ShowDialog();
+        }
     }
 }

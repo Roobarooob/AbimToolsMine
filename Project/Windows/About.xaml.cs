@@ -19,7 +19,7 @@ namespace AbimToolsMine
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             var window = new AboutWindow(commandData.Application);
-            window.Show();
+            window.ShowDialog();
             return Result.Succeeded;
         }
     }

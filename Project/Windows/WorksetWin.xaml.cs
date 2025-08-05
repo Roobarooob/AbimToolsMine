@@ -7,13 +7,16 @@ namespace AbimToolsMine
     public partial class WorksetWin : Window
     {
         public string DefaultPrefix { get; set; }
-        
+        public string DWGPrefix { get; set; }
+
         public WorksetWin()
         {
             InitializeComponent();
             // Загружаем значение из Default.Settings и устанавливаем его в TextBox
             DefaultPrefix = Properties.Settings.Default.LinkPrefix;
-            PrefixTextBox.Text = DefaultPrefix;
+            DWGPrefix = Properties.Settings.Default.DWGWorksetName;
+            PrefixTextBox.Text = $"Связи RVT - {DefaultPrefix}";
+            DWGTextBox.Text = $"Связи DWG - {DWGPrefix}";
             DataContext = this;
         }
 
@@ -39,11 +42,11 @@ namespace AbimToolsMine
                 int revitVersion = int.Parse(app.VersionNumber);
                 if (revitVersion >= 2023)
                 {
-                    LinksWokset.DeleteUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                    LinksWokset.DeleteUnusedWorksets(LinksWokset.CommandData, DefaultPrefix);
                 }
                 else
                 {
-                    LinksWokset.RenameUnusedWorksets(LinksWokset.CommandData, PrefixTextBox.Text);
+                    LinksWokset.RenameUnusedWorksets(LinksWokset.CommandData, DefaultPrefix);
                 }
                 MessageBox.Show("Процесс завершен!");
             }
@@ -53,15 +56,15 @@ namespace AbimToolsMine
             }
         }
 
-        private void PrefixTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            // Обновляем значение ConnectionPrefix в Settings
-            Properties.Settings.Default.LinkPrefix = PrefixTextBox.Text;
-            Properties.Settings.Default.Save();
-        }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             LinksWokset.window = null;
+        }
+
+        private void WorsetPrefClick(object sender, RoutedEventArgs e)
+        {
+           WorksetPrefWin worksetPrefWin = new WorksetPrefWin();
+            worksetPrefWin.ShowDialog();
         }
     }
 }

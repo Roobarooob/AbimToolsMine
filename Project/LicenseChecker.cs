@@ -22,6 +22,12 @@ namespace AbimToolsMine
 
         public static bool IsLicenseValid(string org, string code)
         {
+            if (string.IsNullOrWhiteSpace(org) || string.IsNullOrWhiteSpace(code))
+            {
+                Console.WriteLine("❌ Организация или код не указаны");
+                return false;
+            }
+
             string url = $"http://176.113.83.160:3001/check?org={Uri.EscapeDataString(org)}&code={Uri.EscapeDataString(code)}";
             string cacheFile = GetCacheFilePath();
 

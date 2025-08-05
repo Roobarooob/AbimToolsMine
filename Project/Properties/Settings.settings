@@ -95,5 +95,11 @@
     <Setting Name="NeedFloor" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="NavisworkViweString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Navisworks</Value>
+    </Setting>
+    <Setting Name="DWGWorksetName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">##DWG</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

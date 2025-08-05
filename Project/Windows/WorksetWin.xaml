@@ -10,8 +10,12 @@
         </Grid.RowDefinitions>
 
         <!-- TextBox для префикса связи -->
-        <TextBox x:Name="PrefixTextBox" Grid.Row="0" Margin="0,0,0,10" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextChanged="PrefixTextBox_TextChanged"/>
-
+        <UniformGrid Rows="1" Grid.Row="0" Margin="0,0,50,0" HorizontalAlignment="Stretch">
+            <TextBox x:Name="PrefixTextBox" Grid.Row="0"  Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" IsEnabled="False"/>
+            <TextBox x:Name="DWGTextBox" Grid.Row="0"  Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" IsEnabled="False"/>
+        </UniformGrid>
+        
+        <Button Grid.Row="0" Click="WorsetPrefClick" Content ="⚙️" Width="50" HorizontalAlignment="Right" VerticalAlignment="Center" Height="30"/>
 
         <!-- Кнопка Назначить связи по рабочим наборам -->
         <Button x:Name="AssignWorksetsButton" Grid.Row="1" Content="Назначить рабочие наборы связям" 

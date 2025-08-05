@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Settings = AbimToolsMine.Properties.Settings;
 
 namespace AbimToolsMine
 {
@@ -13,6 +14,8 @@ namespace AbimToolsMine
     {
         public static ExternalCommandData CommandData { get; set; }
         public static WorksetWin window = null;
+        private static string LinkWoksetSymbol => Settings.Default.LinkPrefix;
+        private static string DWGWorksetName => Settings.Default.DWGWorksetName;
 
         public Result Execute(
             ExternalCommandData commandData,
@@ -68,7 +71,7 @@ namespace AbimToolsMine
                     {
                         string fileName = System.IO.Path.GetFileNameWithoutExtension(linkType.Name);
                         string razdel = GetRazdelFromFileName(fileName);
-                        string workSetName = $"#{razdel}_{fileName}";
+                        string workSetName = $"{LinkWoksetSymbol}{razdel}_{fileName}";
 
                         Workset workset = GetOrCreateWorkset(doc, workSetName);
 
@@ -76,7 +79,7 @@ namespace AbimToolsMine
                         AssignWorksetToLinkInstances(doc, linkType, workset);
                     }
                     // CAD связи
-                    string cadWorksetName = "##DWG";
+                    string cadWorksetName = DWGWorksetName;
                     Workset cadWorkset = GetOrCreateWorkset(doc, cadWorksetName);
 
                     foreach (var cad in cadLinks)

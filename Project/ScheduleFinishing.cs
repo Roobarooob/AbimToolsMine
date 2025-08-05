@@ -113,7 +113,7 @@ namespace AbimToolsMine
                         var lines = new List<string>();
                         var values = new List<string>();
                         var groupValues = new List<string>();
-                        var entries = finishDict.ToList();  // Преобразуем в список для индексации
+                        var entries = finishDict.OrderBy(e => e.Key).ToList();  // Преобразуем в список для индексации
                         for (int i = 0; i < entries.Count; i++)
                         {
                             var pair = entries[i];

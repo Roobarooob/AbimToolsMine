@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 using Path = System.IO.Path;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
+using Settings = AbimToolsMine.Properties.Settings;
 
 namespace AbimToolsMine
 {
@@ -20,6 +21,7 @@ namespace AbimToolsMine
         public static ExternalCommandData CommandData { get; set; }
 
         public static CollisionsWin window = null;
+        
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             CommandData = commandData;
@@ -40,6 +42,7 @@ namespace AbimToolsMine
     public class Collisions : IExternalCommand
     {
         string xmlFilePath { get; set; }
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             UIApplication uiapp = commandData.Application;
@@ -122,6 +125,7 @@ namespace AbimToolsMine
         public class BatchFunctions
     {
         public static Workset workset { get; set; }
+        private static string LinkWoksetSymbol => Settings.Default.LinkPrefix;
         //Удалить связи из файла
         public static void BatchLinkRemove(ExternalCommandData commandData, List<string> filePaths)
         {
@@ -351,10 +355,10 @@ namespace AbimToolsMine
                         IList<WorksetPreview> worksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
                         IList<WorksetId> worksetIdsToOpen = new List<WorksetId>();
 
-                        // Фильтруем рабочие наборы, исключая те, что начинаются с '#'
+                        // Фильтруем рабочие наборы, исключая те, что начинаются с 'символа'
                         foreach (WorksetPreview worksetPrev in worksets)
                         {
-                            if (!worksetPrev.Name.StartsWith("#"))
+                            if (!worksetPrev.Name.StartsWith(LinkWoksetSymbol))
                             {
                                 worksetIdsToOpen.Add(worksetPrev.Id);
                             }
@@ -439,7 +443,7 @@ namespace AbimToolsMine
                 // Ищем вид с заданным именем
                 Autodesk.Revit.DB.View targetView = collector
                     .Cast<Autodesk.Revit.DB.View>()
-                    .FirstOrDefault(v => v.Name.Equals(viewName, StringComparison.OrdinalIgnoreCase)&&v.IsTemplate==false);
+                    .FirstOrDefault(v => v.Name.IndexOf(viewName, StringComparison.OrdinalIgnoreCase)>=0&&v.IsTemplate==false);
 
                 return targetView?.Id ?? ElementId.InvalidElementId;
             }

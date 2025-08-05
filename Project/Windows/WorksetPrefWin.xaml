@@ -1,0 +1,19 @@
+﻿<Window x:Class="AbimToolsMine.WorksetPrefWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WorksetTools" Height="200" Width="250" Background="WhiteSmoke">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- TextBox для префикса связи -->
+        <Label Grid.Row="0" Content="Префикс рабочего набора связи"/>
+        <Label Grid.Row="2" Content="Префикс рабочего набора DWG"/>
+        <TextBox x:Name="PrefixTextBox" Grid.Row="1" Margin="0,0,0,10" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextChanged="PrefixTextBox_TextChanged"/>
+        <TextBox x:Name="DWGStringBox" Grid.Row="3" Margin="0,0,0,10" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextChanged="PrefixTextBox_TextChanged"/>
+    </Grid>
+</Window>
