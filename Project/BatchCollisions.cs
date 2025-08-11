@@ -42,6 +42,7 @@ namespace AbimToolsMine
     public class Collisions : IExternalCommand
     {
         string xmlFilePath { get; set; }
+        public static string FamilyCollisionName = "ПРО_О_СЛЖ_Коллизия";
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -54,7 +55,7 @@ namespace AbimToolsMine
             FamilySymbol familySymbol = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
                 .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
-                .FirstOrDefault(e => (e as ElementType).FamilyName.Equals("ПРО_Коллизия") &&
+                .FirstOrDefault(e => (e as ElementType).FamilyName.Equals(FamilyCollisionName) &&
                                         e.Name == "Основная") as FamilySymbol;
 
             BatchFunctions.workset = BatchFunctions.GetOrCreateWorkset(doc, "*Коллизии");
@@ -73,7 +74,7 @@ namespace AbimToolsMine
                 }
                 else
                 {
-                    TaskDialog.Show("Ошибка", "Не загружено семейство ПРО_Коллизия");
+                    TaskDialog.Show("Ошибка", $"Не загружено семейство {FamilyCollisionName}");
                 }
             }
             catch
@@ -278,7 +279,7 @@ namespace AbimToolsMine
                         FamilySymbol familySymbol = new FilteredElementCollector(doc)
                             .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
                             .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
-                            .FirstOrDefault(e => (e as ElementType).FamilyName.Equals("ПРО_Коллизия") &&
+                            .FirstOrDefault(e => (e as ElementType).FamilyName.Equals(Collisions.FamilyCollisionName) &&
                                                     e.Name == "Основная") as FamilySymbol;
 
                         workset = GetOrCreateWorkset(doc, "*Коллизии");
@@ -553,8 +554,13 @@ namespace AbimToolsMine
                                 let clashObject2 = clashresult.Descendants("clashobject").Skip(1).FirstOrDefault()
                                 let fileName1 = clashObject1?.Descendants("pathlink").FirstOrDefault()?
                                                     .Elements("node").Skip(2).FirstOrDefault()?.Value
+                                let element1 = clashObject1?.Descendants("pathlink").FirstOrDefault()?
+                                .Elements("node").Skip(5).FirstOrDefault()?.Value
+
                                 let fileName2 = clashObject2?.Descendants("pathlink").FirstOrDefault()?
                                 .Elements("node").Skip(2).FirstOrDefault()?.Value
+                                let element2 = clashObject2?.Descendants("pathlink").FirstOrDefault()?
+                                                    .Elements("node").Skip(5).FirstOrDefault()?.Value
                                 where !string.IsNullOrEmpty(clashtestName) && !string.IsNullOrEmpty(clashResultName)
                                         && pos3f != null && clashObject1 != null // Пропускаем элементы с отсутствующими данными
                                 select new ClashResult
@@ -567,7 +573,9 @@ namespace AbimToolsMine
                                     PosZ = posZ,
                                     Status = status,
                                     FileName1 = fileName1?.Replace(".nwc", "").Replace(".nwd", ""),
-                                    FileName2 = fileName2?.Replace(".nwc", "").Replace(".nwd", "")
+                                    FileName2 = fileName2?.Replace(".nwc", "").Replace(".nwd", ""),
+                                    Element1 = element1,
+                                    Element2 = element2
                                 }).ToList();
             //Создать элементы
             Autodesk.Revit.DB.Transform transform = doc.ActiveProjectLocation.GetTotalTransform();
@@ -622,6 +630,8 @@ namespace AbimToolsMine
                     instance.LookupParameter("ПРО_Марка").Set(clashResult.ClashResultName);
                     instance.LookupParameter("ПРО_Обозначение").Set(clashResult.ClashTestName);
                     instance.LookupParameter("ПРО_Дата").Set(xmlFileDate.ToString("dd/MM/yyyy"));
+                    instance.LookupParameter("ПРО_Коллизия_Элемент1").Set(clashResult.Element1);
+                    instance.LookupParameter("ПРО_Коллизия_Элемент2").Set(clashResult.Element2);
                     if (workset != null)
                     {
                         ChangeElementWorkset(instance, workset);
@@ -671,7 +681,7 @@ namespace AbimToolsMine
                     newId = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_GenericModel)  // Категория "Обобщенные модели"
                     .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
-                    .FirstOrDefault(e => (e as ElementType).FamilyName.Equals("ПРО_Коллизия") &&
+                    .FirstOrDefault(e => (e as ElementType).FamilyName.Equals(Collisions.FamilyCollisionName) &&
                                             e.Name == "Смежная").Id;
                 }
                 catch
@@ -684,7 +694,7 @@ namespace AbimToolsMine
                     .Where(e =>
                     {
                         var familyInstance = e as FamilyInstance;
-                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals("ПРО_Коллизия");
+                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals(Collisions.FamilyCollisionName);
                     })
                     .ToList();
 
@@ -768,26 +778,26 @@ namespace AbimToolsMine
             }
             void DelAfter()
             {
-                // Получаем все элементы семейства "ПРО_Коллизия" тип "А"
+                // Получаем все элементы семейства FamilyCollisionName тип "А"
                 var typeAElements = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .WhereElementIsNotElementType()
                     .Where(e =>
                     {
                         var familyInstance = e as FamilyInstance;
-                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals("ПРО_Коллизия");
+                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals(Collisions.FamilyCollisionName);
                     })
                     .Where(e => e.Name == "Смежная")
                     .ToList();
 
-                // Получаем все элементы семейства "ПРО_Коллизия" тип "Б"
+                // Получаем все элементы семейства FamilyCollisionName тип "Б"
                 var typeBElements = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .WhereElementIsNotElementType()
                     .Where(e =>
                     {
                         var familyInstance = e as FamilyInstance;
-                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals("ПРО_Коллизия");
+                        return familyInstance != null && familyInstance.Symbol.FamilyName.Equals(Collisions.FamilyCollisionName);
                     })
                     .Where(e => e.Name == "Основная")
                     .ToList();
@@ -911,7 +921,8 @@ namespace AbimToolsMine
         public string Status { get; set; }
         public string FileName1 { get; set; } // Добавляем поле для имени файла первого элемента коллизии
         public string FileName2 { get; set; } // Добавляем поле для имени файла первого элемента коллизии
-
+        public string Element1 { get; set; }
+        public string Element2 { get; set; }
 
     }
 

@@ -27,10 +27,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="35"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Revit Server" Grid.Column="0" Click="RevitServer_Click" ToolTip="Добавить файлы, расположенные на Revit Server"/>
-                <Button Content="Из директории" Grid.Column="1" Click="AddRvtFiles_Click" ToolTip="Добавить файлы rvt из директории выборочно"/>
-                <Button Content="Добавить папку" Grid.Column="2" Click="AddRvtFolder_Click" ToolTip="Добавить все файлы rvt из папки и вложенных подпапках"/>
-                <Button Content="🗑️" Grid.Column="3" Click="ClearList" ToolTip="Очистить список"/>
+                <Button Content="Revit Server" Grid.Column="0" Click="RevitServer_Click"/>
+                <Button Content="Из директории" Grid.Column="1" Click="AddRvtFiles_Click"/>
+                <Button Content="Добавить папку" Grid.Column="2" Click="AddRvtFolder_Click"/>
+                <Button Content="🗑️" Grid.Column="3" Click="ClearList"/>
             </Grid>
         </GroupBox>
 
@@ -51,12 +51,12 @@
         </ListBox>
 
         <!-- Выбор XML -->
-        <Label Content="XML файл:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
-        <TextBox x:Name="XmlFilePath" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Margin="0,0,5,10" Background="WhiteSmoke"/>
-        <Button Grid.Row="2" Grid.Column="2" Content="Загрузить коллизии" Click="StartProcessing_Click" Width="130" Margin="0,0,0,10" Background="#FFC85A5A" Foreground="White"/>
+        <Button Content="Выбор файла Xml" Grid.Row="2" Grid.Column="0" Margin="0,0,10,10" Click="SelectXmlFile_Click"/>
+        <TextBox x:Name="XmlFilePath" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,10" Background="WhiteSmoke"/>
+        <Button Content="Загрузить коллизии" Grid.Row="2" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="StartProcessing_Click" Background="#FFC85A5A" Foreground="White"/>
 
-        <!-- Экспорт NWC -->
-        <Label Content="Папка NWC:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+        <!-- Путь NWC -->
+        <Button Content="Путь NWC" Grid.Row="3" Grid.Column="0" Margin="0,0,10,10" Click="SelectNWCPath_Click"/>
         <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -65,23 +65,23 @@
             <TextBox x:Name="NwcFilePath" Grid.Column="0" IsReadOnly="True" Background="WhiteSmoke"/>
             <Button Width="35" Grid.Column="1" Content="⚙️" Click="WorsetPrefClick" Margin="5,0,0,0"/>
         </Grid>
-        <Button Grid.Row="3" Grid.Column="2" Content="Экспорт NWC" Click="ExportNWC_Click" Width="130" Margin="0,0,0,10" Background="#FF358611" Foreground="White"/>
+        <Button Content="Экспорт NWC" Grid.Row="3" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="ExportNWC_Click" Background="#FF358611" Foreground="White"/>
 
-        <!-- Семейство -->
-        <Label Content="Файл семейства:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
+        <!-- Файл семейства -->
+        <Button Content="Выбор файла семейства" Grid.Row="4" Grid.Column="0" Margin="0,0,10,10" Click="SelectRfaFile_Click"/>
         <Grid Grid.Row="4" Grid.Column="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox x:Name="rfaFilePath" Grid.Column="0" IsReadOnly="True" Background="WhiteSmoke"/>
-            <CheckBox x:Name="ReplaceParameters" Grid.Column="1" IsChecked="False" FontSize="10" VerticalAlignment="Center" Margin="10,0,0,0">
+            <CheckBox x:Name="ReplaceParameters" Grid.Column="1" IsChecked="False" FontSize="10" VerticalAlignment="Center" Margin="10,0,0,0" Checked="ReplaceParameters_Checked">
                 <TextBlock Text="С заменой параметров"/>
             </CheckBox>
         </Grid>
-        <Button Grid.Row="4" Grid.Column="2" Content="Загрузить семейства" Click="Download_Click" Width="130" Margin="0,0,0,10"/>
+        <Button Content="Загрузить семейства" Grid.Row="4" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="Download_Click"/>
 
-        <!-- Доп. действия -->
+        <!-- Кнопки снизу -->
         <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0">
             <Button Content="Удалить связи" Click="LinkRemove_Click" Margin="0,0,10,0"/>
             <Button Content="Добавить параметры" Click="ParameterTools_Click"/>
