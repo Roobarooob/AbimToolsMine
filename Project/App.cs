@@ -215,6 +215,18 @@ namespace AbimToolsMine
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
 
+            // Кнопка "Локальная копия модели" (создание резервной копии в C:\a и архивной в C:\a\архив)
+            PushButton localBackupBtn = CreateButton(
+                panel: pan1,
+                name: "ModelLocalBackup",
+                text: "Выдать\nзадание",
+                command: "AbimToolsMine.ModelLocalBackupCommand",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png",
+                toolTip: "Синхронизация/сохранение и копии файла для задания смежным разделам)",
+                dllName: "AbimToolsMine.dll"
+            );
+            localBackupBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
+            
             var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
             
             // Кнопка "Cоздание ведомости отделки"
@@ -265,8 +277,8 @@ namespace AbimToolsMine
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
 
-            // Кнопка "Cоздание ведомости отделки"
-            PushButton LintelsPlacing = CreateButton(
+            // Кнопка "Пермычки"
+            /*PushButton LintelsPlacing = CreateButton(
                 panel: pan2,
                 name: "LintelsPlacing",
                 text: "Полы\nЭскизы в параметр",
@@ -275,9 +287,8 @@ namespace AbimToolsMine
                 toolTip: "Эскизы переходят в параметр типа пола",
                 dllName: "AbimToolsMine.dll"
             );
-            LintelsPlacing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+            LintelsPlacing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));*/
         }
-            
 
         public Result OnStartup(UIControlledApplication application)
         {
