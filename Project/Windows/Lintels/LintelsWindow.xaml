@@ -1,0 +1,30 @@
+﻿<Window x:Class="AbimToolsMine.Lintels"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Перемычки" Height="450" Width="600" Background="White">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DataGrid x:Name="OpeningsGrid" 
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False"
+                  ItemsSource="{Binding Openings}"
+                  IsReadOnly="False" Grid.Row="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ширина" Binding="{Binding Width}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Толщина стены" Binding="{Binding WallThickness}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Тип материала" Binding="{Binding MaterialType}" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Тип перемычки" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding SelectedElementsText}" Click="SelectLintel_Click"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="Расставить" Click="PlaceButton_Click" Grid.Row="1"/>
+    </Grid>
+</Window>

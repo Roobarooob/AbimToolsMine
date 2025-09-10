@@ -1,0 +1,89 @@
+﻿<Window x:Class="AbimToolsMine.LintelPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выбор перемычки" Height="500" Width="700"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+    <TabControl x:Name="TabControlTypes">
+        <TabItem Header="Брусковые">
+            <StackPanel Margin="10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock Text="Количество элементов:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox x:Name="CountBrusBox" Width="50" Text="1" TextChanged="CountBox_TextChanged"/>
+                </StackPanel>
+                <ItemsControl x:Name="ButtonContainer" />
+                <Button Content="OK" HorizontalAlignment="Right" Width="80" Margin="0,10,0,0" Click="OK_Click"/>
+            </StackPanel>
+        </TabItem>
+        
+        <TabItem Header="Швеллерные">
+            <StackPanel Margin="10">
+                <TextBlock Text="Швеллерные перемычки (будет реализовано позже)" FontSize="14" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </StackPanel>
+        </TabItem>
+        
+        <TabItem Header="Уголковые">
+            <StackPanel Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Шаг полос:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="UgolkStepBox" Width="100" HorizontalAlignment="Left" Margin="0,0,0,5"/>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Отступ полосы от края:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="UgolkOffsetBox" Width="100" HorizontalAlignment="Left" Margin="0,0,0,5"/>
+                    
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип уголка:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="UgolkTypeComboBox" Width="200" HorizontalAlignment="Left" Margin="0,0,0,5" IsEditable="True"/>
+                    
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Тип полосы:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" x:Name="UgolkStripTypeComboBox" Width="200" HorizontalAlignment="Left" Margin="0,0,0,10" IsEditable="True"/>
+                    
+                    <Button Grid.Row="4" Grid.Column="1" Content="OK" HorizontalAlignment="Left" Width="80" VerticalAlignment="Top" Click="UgolkOK_Click"/>
+                </Grid>
+            </StackPanel>
+        </TabItem>
+        
+        <TabItem Header="Арматурные">
+            <StackPanel Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Количество стержней:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="ArmaturaCountBox" Width="100" Text="4" HorizontalAlignment="Left" Margin="0,0,0,5"/>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="ГОСТ:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ArmaturaGostComboBox" Width="200" HorizontalAlignment="Left" Margin="0,0,0,5" SelectionChanged="ArmaturaGostComboBox_SelectionChanged"/>
+                    
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Класс арматуры:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ArmaturaClassComboBox" Width="100" HorizontalAlignment="Left" Margin="0,0,0,5" SelectionChanged="ArmaturaClassComboBox_SelectionChanged"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Диаметр арматуры:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ArmaturaDiamComboBox" Width="100" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                    
+                    <Button Grid.Row="4" Grid.Column="1" Content="OK" HorizontalAlignment="Left" Width="80" VerticalAlignment="Top" Click="ArmaturaOK_Click"/>
+                </Grid>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Window>

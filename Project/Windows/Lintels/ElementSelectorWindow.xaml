@@ -1,0 +1,73 @@
+﻿<Window x:Class="AbimToolsMine.ElementSelectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выбор элемента" Height="400" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl x:Name="TabControlCategories">
+            <TabItem Header="Брусковые">
+                <ListBox x:Name="ListBrus" SelectionMode="Single"/>
+            </TabItem>
+            <TabItem Header="Арматура">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="ГОСТ:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="ArmaturaGostComboBox" Grid.Column="1" 
+                                  SelectionChanged="ArmaturaGostComboBox_SelectionChanged"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Класс:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="ArmaturaClassComboBox" Grid.Column="1" 
+                                  SelectionChanged="ArmaturaClassComboBox_SelectionChanged"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="2" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Диаметр:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="ArmaturaDiameterComboBox" Grid.Column="1" 
+                                  SelectionChanged="ArmaturaDiameterComboBox_SelectionChanged"/>
+                    </Grid>
+                    
+                    <ListBox x:Name="ListArmatura" Grid.Row="3" SelectionMode="Single"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Уголки">
+                <ListBox x:Name="ListUgolk" SelectionMode="Single"/>
+            </TabItem>
+            <TabItem Header="Швеллера">
+                <ListBox x:Name="ListShveller" SelectionMode="Single"/>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="ОК" Width="80" Margin="0,0,10,0" Click="Ok_Click"/>
+            <Button Content="Отмена" Width="80" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

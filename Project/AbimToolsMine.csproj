@@ -175,6 +175,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\LPTableExport16.png" />
+    <Resource Include="Resources\Osi32.png" />
     <Resource Include="Resources\Pref_Finishing16.png" />
   </ItemGroup>
   <ItemGroup>

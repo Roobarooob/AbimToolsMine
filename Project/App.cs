@@ -203,6 +203,17 @@ namespace AbimToolsMine
             );
             CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));
 
+            // Кнопка "Скрыть оси во всех связях"
+            PushButton hideAxes_button = CreateButton(
+                panel: pan1,
+                name: "DisableLevelsAndGridsWorksetInLinks",
+                text: "Скрыть оси\nво всех\nсвязях",
+                command: "AbimToolsMine.DisableLevelsAndGridsWorksetInLinks",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/linkChecker32.png",
+                toolTip: "Скрыть оси во всех связанных моделях",
+                dllName: "AbimToolsMine.dll"
+            );
+            hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
 
             var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
             
@@ -254,6 +265,17 @@ namespace AbimToolsMine
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
 
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton LintelsPlacing = CreateButton(
+                panel: pan2,
+                name: "LintelsPlacing",
+                text: "Полы\nЭскизы в параметр",
+                command: "AbimToolsMine.LintelsPlacing",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
+                toolTip: "Эскизы переходят в параметр типа пола",
+                dllName: "AbimToolsMine.dll"
+            );
+            LintelsPlacing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
         }
             
 
