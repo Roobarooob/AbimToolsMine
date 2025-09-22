@@ -10,8 +10,8 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 using Path = System.IO.Path;
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using Settings = AbimToolsMine.Properties.Settings;
+using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 
 namespace AbimToolsMine
 {
@@ -21,7 +21,7 @@ namespace AbimToolsMine
         public static ExternalCommandData CommandData { get; set; }
 
         public static CollisionsWin window = null;
-        
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             CommandData = commandData;
@@ -113,7 +113,7 @@ namespace AbimToolsMine
                     //failuresAccessor.ResolveFailure(fma);
 
                     // DeleteWarning mimics clicking 'Ok' button.
-                    failuresAccessor.DeleteWarning( fma ); 
+                    failuresAccessor.DeleteWarning(fma);
                 }
 
 
@@ -123,7 +123,7 @@ namespace AbimToolsMine
             return FailureProcessingResult.Continue;
         }
     }
-        public class BatchFunctions
+    public class BatchFunctions
     {
         public static Workset workset { get; set; }
         private static string LinkWoksetSymbol => Settings.Default.LinkPrefix;
@@ -150,7 +150,7 @@ namespace AbimToolsMine
                     openOptions.AllowOpeningLocalByWrongUser = true;
 
 
-                 
+
                     // Откройте документ
                     Document doc = app.OpenDocumentFile(modelPath, openOptions);
                     using (Transaction tx = new Transaction(doc))
@@ -336,7 +336,7 @@ namespace AbimToolsMine
 
         public static void RunExportNWC(ExternalCommandData commandData, List<string> filePaths, string OutputFolder)
         {
-            
+
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             var true_list = new StringBuilder();
@@ -388,7 +388,7 @@ namespace AbimToolsMine
                             //doc.Save();
                             try
                             {
-                                doc.Close(false); 
+                                doc.Close(false);
                             }
                             catch { }
 
@@ -411,7 +411,7 @@ namespace AbimToolsMine
         }
 
         private static void ExportNWC(Document doc, String OutputFolder)
-        {           
+        {
             // Настройки экспорта в NWC
             NavisworksExportOptions nwcOptions = new NavisworksExportOptions()
             {
@@ -432,7 +432,7 @@ namespace AbimToolsMine
             };
 
             // Экспорт
-            string outputPath = Path.Combine(OutputFolder, doc.Title.Replace("_" + doc.Application.Username, "")+".nwc");
+            string outputPath = Path.Combine(OutputFolder, doc.Title.Replace("_" + doc.Application.Username, "") + ".nwc");
             doc.Export(Path.GetDirectoryName(outputPath), Path.GetFileName(outputPath), nwcOptions);
 
             ElementId GetViewIdByName(string viewName)
@@ -444,7 +444,7 @@ namespace AbimToolsMine
                 // Ищем вид с заданным именем
                 Autodesk.Revit.DB.View targetView = collector
                     .Cast<Autodesk.Revit.DB.View>()
-                    .FirstOrDefault(v => v.Name.IndexOf(viewName, StringComparison.OrdinalIgnoreCase)>=0&&v.IsTemplate==false);
+                    .FirstOrDefault(v => v.Name.IndexOf(viewName, StringComparison.OrdinalIgnoreCase) >= 0 && v.IsTemplate == false);
 
                 return targetView?.Id ?? ElementId.InvalidElementId;
             }

@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Path = System.IO.Path;
-using View = Autodesk.Revit.DB.View;
 using Settings = AbimToolsMine.Properties.Settings;
+using View = Autodesk.Revit.DB.View;
 
 namespace AbimToolsMine
 {
@@ -20,7 +20,7 @@ namespace AbimToolsMine
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-            
+
 
             List<ElementId> legends = new FilteredElementCollector(doc)
                 .OfClass(typeof(View))
@@ -85,7 +85,7 @@ namespace AbimToolsMine
 
                     ImageType existingImage = imageCollector
                         .Cast<ImageType>()
-                        .FirstOrDefault(img => img.Name.Equals(fileName+".png", StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(img => img.Name.Equals(fileName + ".png", StringComparison.OrdinalIgnoreCase));
 
                     ImageType imageType;
 #if R2020
@@ -102,7 +102,7 @@ namespace AbimToolsMine
                     else
                     {
                         // Создаём новое
-                        
+
                         imageType = ImageType.Create(doc, imageOptions);
                     }
 
@@ -115,7 +115,7 @@ namespace AbimToolsMine
                     else
                     {
                         TaskDialog.Show("Ошибка", $"Параметр не найден или неправильного типа у {typeName}");
-                    }    
+                    }
                     File.Delete(filePath);
                 }
                 // Собираем все полы

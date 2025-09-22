@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Settings = AbimToolsMine.Properties.Settings;
 
 
@@ -18,6 +17,7 @@ namespace AbimToolsMine
         private static string RoomGroupParam => Settings.Default.RoomGroupParam;
         private static string RoomKeyParam => Settings.Default.RoomKeyParam;
         private static string PlinthString => Settings.Default.PlinthString;
+        private static string FlWallString => Settings.Default.FlWallString;
         private static string StructureComp => Settings.Default.StructureComp;
         private static string DimType => Settings.Default.DimType;
         private static bool NeedFloor => Settings.Default.NeedFloor;
@@ -86,6 +86,26 @@ namespace AbimToolsMine
                 trans.Start();
                 foreach (var room in rooms)
                 {
+                    // --- 1. Очистка параметров ---
+                    var groupParam = room.LookupParameter(RoomGroupParam);
+                    if (groupParam != null && groupParam.StorageType == StorageType.String)
+                        groupParam.Set(string.Empty);
+
+                    foreach (var kv in RoomParams)
+                    {
+                        var nameParam = room.LookupParameter(kv.Value.nameParam);
+                        if (nameParam != null && nameParam.StorageType == StorageType.String)
+                            nameParam.Set(string.Empty);
+
+                        var valueParam = room.LookupParameter(kv.Value.valueParam);
+                        if (valueParam != null && valueParam.StorageType == StorageType.String)
+                            valueParam.Set(string.Empty);
+
+                        var groupValueParam = room.LookupParameter(kv.Value.valueParam + ".Гр");
+                        if (groupValueParam != null && groupValueParam.StorageType == StorageType.String)
+                            groupValueParam.Set(string.Empty);
+                    }
+
                     var roomNum = GetParamValue(room, RoomNumberParam);
                     if (string.IsNullOrEmpty(roomNum) || !roomData.ContainsKey(roomNum))
                         continue;
@@ -102,7 +122,7 @@ namespace AbimToolsMine
                     {
                         var nameParam = kv.Value.nameParam;
                         var valueParam = kv.Value.valueParam;
-                        
+
                         if (!NeedFloor && nameParam == Settings.Default.FloorNameParam)
                             continue;
 
@@ -118,7 +138,7 @@ namespace AbimToolsMine
                         {
                             var pair = entries[i];
                             var finishLines = new List<string>();
-                            var preSplit = pair.Key.Split(new[] {"\r\n", "\n" }, StringSplitOptions.None);
+                            var preSplit = pair.Key.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
                             foreach (var line in preSplit)
                             {
@@ -127,11 +147,11 @@ namespace AbimToolsMine
                             }
 
                             int count = finishLines.Count;
-                            int before = (count/2);
+                            int before = (count / 2);
                             if (before < 0) before = 0;
                             int after = count - before - 1;
                             if (after < 0) after = 0;
-                            
+
                             lines.AddRange(finishLines);
 
                             // значение
@@ -183,6 +203,11 @@ namespace AbimToolsMine
                     bool isPlinth = typeName.Contains(PlinthString);
                     if (isPlinth && typeKey != "plinth") continue;
                     if (!isPlinth && typeKey == "plinth") continue;
+                }
+
+                if (category == BuiltInCategory.OST_Floors && typeName.Contains(FlWallString))
+                {
+                    typeKey = "wall";
                 }
 
                 var roomKey = GetParamValue(el, RoomKeyParam);

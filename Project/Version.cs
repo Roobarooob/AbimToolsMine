@@ -1,11 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AbimToolsMine
 {
@@ -20,7 +15,7 @@ namespace AbimToolsMine
                 "Загруженные плагины:\n" +
                 "АвтоПиннер\n" +
                 "БыстроФильтр\n" +
-                "Пакетная обработка v2.0\n"+
+                "Пакетная обработка v2.0\n" +
                 "Загрузка коллизий\n" +
                 "Инструменты рабочих наборов\n" +
                 "Экспорт таблиц выбора\n\n" +

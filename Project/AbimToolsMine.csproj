@@ -12,7 +12,7 @@
     <RootNamespace>AbimToolsMine</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PostBuildEvent>set "VERSION=2021"
+    <PostBuildEvent>set "VERSION=2022"
 
 if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
     mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
@@ -175,6 +175,8 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\LPTableExport16.png" />
+    <Resource Include="Resources\SheetNumbers16.png" />
+    <Resource Include="Resources\SheetNumbers32.png" />
     <Resource Include="Resources\Pref_Finishing16.png" />
   </ItemGroup>
   <ItemGroup>
