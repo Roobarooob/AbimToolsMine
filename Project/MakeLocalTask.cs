@@ -13,7 +13,7 @@ namespace AbimToolsMine
     /// Работа пользователя продолжается в исходном открытом документе.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class ModelLocalBackupCommand : IExternalCommand
+    public class MakeLocalTask : IExternalCommand
     {
         private static readonly string ArchiveDirectoryName = "Архив"; // Подкаталог для архивов
         private const string FolderParameterName = "ПРО_Путь к папке с заданиями";

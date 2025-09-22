@@ -209,23 +209,23 @@ namespace AbimToolsMine
                 name: "DisableLevelsAndGridsWorksetInLinks",
                 text: "Скрыть оси\nво всех\nсвязях",
                 command: "AbimToolsMine.DisableLevelsAndGridsWorksetInLinks",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/linkChecker32.png",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
                 toolTip: "Скрыть оси во всех связанных моделях",
                 dllName: "AbimToolsMine.dll"
             );
-            hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
+            hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
 
             // Кнопка "Локальная копия модели" (создание резервной копии в C:\a и архивной в C:\a\архив)
             PushButton localBackupBtn = CreateButton(
                 panel: pan1,
-                name: "ModelLocalBackup",
+                name: "MakeLocalTask",
                 text: "Выдать\nзадание",
-                command: "AbimToolsMine.ModelLocalBackupCommand",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png",
+                command: "AbimToolsMine.MakeLocalTask",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask32.png",
                 toolTip: "Синхронизация/сохранение и копии файла для задания смежным разделам)",
                 dllName: "AbimToolsMine.dll"
             );
-            localBackupBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
+            localBackupBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask16.png"));
             
             var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
             
