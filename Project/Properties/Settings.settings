@@ -60,7 +60,7 @@
       <Value Profile="(Default)">ПРО_ОП_Плинтус.Значение.Гр</Value>
     </Setting>
     <Setting Name="PlinthString" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ВО_Плинтус</Value>
+      <Value Profile="(Default)">ВО Плинтус</Value>
     </Setting>
     <Setting Name="StructureComp" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_Состав конструкции</Value>
@@ -100,6 +100,9 @@
     </Setting>
     <Setting Name="DWGWorksetName" Type="System.String" Scope="User">
       <Value Profile="(Default)">##DWG</Value>
+    </Setting>
+    <Setting Name="FlWallString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ВО Стена</Value>
     </Setting>
   </Settings>
 </SettingsFile>

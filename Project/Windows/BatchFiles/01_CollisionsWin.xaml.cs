@@ -1,13 +1,8 @@
-﻿using Autodesk.Revit.UI;
-using Microsoft.Win32;
-using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
-using static AbimToolsMine.BatchTools;
 using Button = System.Windows.Controls.Button;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -77,8 +72,8 @@ namespace AbimToolsMine
                 }
             }
         }
-            private void AddRvtFolder_Click(object sender, RoutedEventArgs e)
-        { 
+        private void AddRvtFolder_Click(object sender, RoutedEventArgs e)
+        {
             // Вариант выбора папки
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
             if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -116,7 +111,7 @@ namespace AbimToolsMine
             // Логика обработки
             string xmlFilePath = XmlFilePath.Text;
             var rvtFiles = rvtFilePaths.ToList();
-            BatchFunctions.PlaceCollisions(BatchTools.CommandData,rvtFiles,xmlFilePath);
+            BatchFunctions.PlaceCollisions(BatchTools.CommandData, rvtFiles, xmlFilePath);
         }
 
         private void Download_Click(object sender, RoutedEventArgs e)
@@ -161,7 +156,7 @@ namespace AbimToolsMine
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            BatchTools.window=null;
+            BatchTools.window = null;
         }
 
         private void ReplaceParameters_Checked(object sender, RoutedEventArgs e)

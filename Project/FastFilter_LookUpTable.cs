@@ -1,15 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace AbimToolsMine
 {
@@ -34,7 +26,7 @@ namespace AbimToolsMine
             return Result.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class GetLookUpTable : IExternalCommand
     {

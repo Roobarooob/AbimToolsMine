@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Windows.Controls;
-using System.Windows;
-using System;
-using System.Linq;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 
 namespace AbimToolsMine
@@ -74,7 +72,7 @@ namespace AbimToolsMine
                                 Name = parameterName,
                                 IsSelected = false
                             };
-                            groupDictionary[groupId].Parameters.Add(parameter);                          
+                            groupDictionary[groupId].Parameters.Add(parameter);
                         }
                     }
                 }

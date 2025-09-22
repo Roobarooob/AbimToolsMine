@@ -1,26 +1,13 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Threading;
-using Autodesk.Revit.Attributes;
-using System.Text.RegularExpressions;
+﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using System.Data.Common;
+using Autodesk.Revit.UI;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows;
 
 
 namespace AbimToolsMine
@@ -265,7 +252,7 @@ namespace AbimToolsMine
 
                 foreach (Element element in familyInstances)
                 {
-                  
+
                     // Проверяем соответствие уровней
                     try
                     {
