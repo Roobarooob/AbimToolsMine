@@ -63,7 +63,7 @@ namespace AbimToolsMine
 
         private void WorsetPrefClick(object sender, RoutedEventArgs e)
         {
-           WorksetPrefWin worksetPrefWin = new WorksetPrefWin();
+            WorksetPrefWin worksetPrefWin = new WorksetPrefWin();
             worksetPrefWin.ShowDialog();
         }
     }

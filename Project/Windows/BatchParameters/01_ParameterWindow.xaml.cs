@@ -1,14 +1,12 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace AbimToolsMine
@@ -143,9 +141,9 @@ namespace AbimToolsMine
                     {
                         foreach (var element in elements)
                         {
-                            if (!UpdateParameterForElement(element, parameterName, value))                          
-                            { 
-                                return false; 
+                            if (!UpdateParameterForElement(element, parameterName, value))
+                            {
+                                return false;
                             }
                         }
 
@@ -226,7 +224,7 @@ namespace AbimToolsMine
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             var true_list = new StringBuilder();
-            var false_list = new StringBuilder();           
+            var false_list = new StringBuilder();
             Opt opt = new Opt();
             Application app = uiapp.Application;
             foreach (string filePath in filePaths)
@@ -234,7 +232,7 @@ namespace AbimToolsMine
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
                 if (File.Exists(filePath) || modelPath.ServerPath)
                 {
-                    
+
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
@@ -297,7 +295,7 @@ namespace AbimToolsMine
             System.Windows.MessageBox.Show($"Параметры обновлены!\nУспешно обработаны:\n{true_list}\nОшибка:\n{false_list}");
 
         }
-    public static void Execute(ExternalCommandData commandData, ObservableCollection<string> filePaths)
+        public static void Execute(ExternalCommandData commandData, ObservableCollection<string> filePaths)
         {
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
@@ -310,7 +308,7 @@ namespace AbimToolsMine
             {
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
                 if (File.Exists(filePath) || modelPath.ServerPath)
-                {                  
+                {
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     OpenOptions openOptions = new OpenOptions();
                     WorksetConfiguration worksetConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
@@ -349,7 +347,7 @@ namespace AbimToolsMine
                                     false_list.AppendLine(doc.Title);
                                 }
                             }
-                            
+
 
                         }
                         catch
@@ -381,7 +379,7 @@ namespace AbimToolsMine
 
         private void AddCategoriesButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedParameters = new List<ParameterInfo>(); 
+            var selectedParameters = new List<ParameterInfo>();
             try
             {
                 selectedParameters = ParameterDataGrid.SelectedItems.Cast<ParameterInfo>().ToList();
@@ -420,7 +418,7 @@ namespace AbimToolsMine
             }
             var categorySelectionWindow = new CategorySelectionWindow(preselectedcategories);
 
-           
+
             if (categorySelectionWindow.ShowDialog() == true)
             {
 
@@ -452,7 +450,7 @@ namespace AbimToolsMine
         private void ExecuteButton_Click(object sender, RoutedEventArgs e)
         {
 
-                Execute(BatchTools.CommandData, CollisionsWin.rvtFilePaths);
+            Execute(BatchTools.CommandData, CollisionsWin.rvtFilePaths);
 
         }
         private void SetValue_Click(object sender, RoutedEventArgs e)

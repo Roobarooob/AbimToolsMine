@@ -1,9 +1,7 @@
-﻿using System;
-using System.Windows;
-using AbimToolsMine.Properties;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System.Windows;
 using Settings = AbimToolsMine.Properties.Settings;
 
 namespace AbimToolsMine
@@ -34,7 +32,7 @@ namespace AbimToolsMine
         }
     }
 
-        public partial class ScheduleFinishingWindow : Window
+    public partial class ScheduleFinishingWindow : Window
     {
         public ScheduleFinishingWindow()
         {
@@ -67,17 +65,18 @@ namespace AbimToolsMine
             PlinthValueBox.Text = Settings.Default.PlinthValueParam;
             PlinthGroupBox.Text = Settings.Default.PlinthGroupParam;
             PlinthStringBox.Text = Settings.Default.PlinthString;
+            FlWallStringBox.Text = Settings.Default.FlWallString;
 
             StructureCompBox.Text = Settings.Default.StructureComp;
             DimTypeBox.Text = Settings.Default.DimType;
-            
+
             //Полы
             FloorStructureCompBox.Text = Settings.Default.FloorStructureComp;
             FloorRoomGroupParamBox.Text = Settings.Default.FloorRoomGroupParam;
             FloorKeyParamBox.Text = Settings.Default.FloorRoomKeyParam;
             FoorLayerNameBox.Text = Settings.Default.FloorLayerName;
             ViewTemplateNameBox.Text = Settings.Default.viewTemplateName;
-            if ( Settings.Default.NeedFloor == true )
+            if (Settings.Default.NeedFloor == true)
                 NeeFloorCheckBox.IsChecked = true;
             else NeeFloorCheckBox.IsChecked = false;
         }
@@ -110,10 +109,11 @@ namespace AbimToolsMine
             Settings.Default.PlinthValueParam = PlinthValueBox.Text;
             Settings.Default.PlinthGroupParam = PlinthGroupBox.Text;
             Settings.Default.PlinthString = PlinthStringBox.Text;
-            
+            Settings.Default.FlWallString = FlWallStringBox.Text;
+
             Settings.Default.StructureComp = StructureCompBox.Text;
             Settings.Default.DimType = DimTypeBox.Text;
-            if (NeeFloorCheckBox.IsChecked == true )
+            if (NeeFloorCheckBox.IsChecked == true)
                 Settings.Default.NeedFloor = true;
             else Settings.Default.NeedFloor = false;
 
@@ -127,10 +127,10 @@ namespace AbimToolsMine
             Settings.Default.FloorStructureComp = FloorStructureCompBox.Text;
             Settings.Default.FloorRoomGroupParam = FloorRoomGroupParamBox.Text;
             Settings.Default.FloorRoomKeyParam = FloorKeyParamBox.Text;
-            Settings.Default.FloorLayerName= FoorLayerNameBox.Text;
+            Settings.Default.FloorLayerName = FoorLayerNameBox.Text;
             Settings.Default.viewTemplateName = ViewTemplateNameBox.Text;
 
-        Settings.Default.Save();
+            Settings.Default.Save();
             this.DialogResult = true;
             this.Close();
         }

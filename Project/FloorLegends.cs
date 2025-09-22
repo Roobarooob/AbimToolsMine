@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Shapes;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Settings = AbimToolsMine.Properties.Settings;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using View = Autodesk.Revit.DB.View;
-using Settings = AbimToolsMine.Properties.Settings;
 
 namespace AbimToolsMine
 {
@@ -21,7 +17,7 @@ namespace AbimToolsMine
         private static readonly string ParamName = Settings.Default.StructureComp;
         private static readonly string SymbolName = Settings.Default.FloorLayerName;
         private static readonly string viewTemplateName = Settings.Default.viewTemplateName;
-        private static readonly Dictionary<string, int> LayerTypeToHatchType = new Dictionary<string, int>     
+        private static readonly Dictionary<string, int> LayerTypeToHatchType = new Dictionary<string, int>
         {
             { "Железобетон", 1 },
             { "Плитка", 2 },
@@ -32,7 +28,7 @@ namespace AbimToolsMine
             { "Стяжка", 7 },
             { "Пенополистерол", 8 },
             {"Гидроизоляция", 9 }
-        };      
+        };
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
@@ -158,7 +154,7 @@ namespace AbimToolsMine
                 t.Start();
 
                 int legendIndex = 1;
-               
+
 
                 foreach (var (typeEl, layers) in parsedData)
                 {
@@ -192,16 +188,16 @@ namespace AbimToolsMine
                         legendView.get_Parameter(BuiltInParameter.VIEW_SCALE_PULLDOWN_METRIC).Set(20);
                         legendView.Name = legendName;
 
-                            // Поиск шаблона вида по имени
-                            View viewTemplate = new FilteredElementCollector(doc)
-                                .OfClass(typeof(View))
-                                .Cast<View>()
-                                .FirstOrDefault(v => v.IsTemplate && v.Name.Equals(viewTemplateName));
+                        // Поиск шаблона вида по имени
+                        View viewTemplate = new FilteredElementCollector(doc)
+                            .OfClass(typeof(View))
+                            .Cast<View>()
+                            .FirstOrDefault(v => v.IsTemplate && v.Name.Equals(viewTemplateName));
 
-                            if (viewTemplate != null)
-                            {
-                                legendView.ViewTemplateId = viewTemplate.Id;
-                            }
+                        if (viewTemplate != null)
+                        {
+                            legendView.ViewTemplateId = viewTemplate.Id;
+                        }
                     }
                     catch
                     {
@@ -232,8 +228,8 @@ namespace AbimToolsMine
 
                         XYZ position = new XYZ(0, y, 0);
                         familySymbol.Activate();
-                        FamilyInstance layerElement = doc.Create.NewFamilyInstance(position, familySymbol,legendView);
-                        layerElement.LookupParameter("Ширина").Set(layer.Thickness/304.8);
+                        FamilyInstance layerElement = doc.Create.NewFamilyInstance(position, familySymbol, legendView);
+                        layerElement.LookupParameter("Ширина").Set(layer.Thickness / 304.8);
                         layerElement.LookupParameter("Тип штриховки").Set(layer.HatchType);
                         layerElement.LookupParameter("Отступ").Set(tag_offset);
                         layerElement.LookupParameter("Номер слоя").Set(layer.Position.ToString());
@@ -242,12 +238,12 @@ namespace AbimToolsMine
                         double offset = layer.Thickness / 304.8;
                         y -= offset;
                         tag_offset -= tag_h - offset;
-                        
-                    }                   
+
+                    }
 
                     legendIndex++;
                     legendsCreated++;
-                }               
+                }
 
                 t.Commit();
             }

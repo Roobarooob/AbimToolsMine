@@ -253,7 +253,7 @@ namespace AbimToolsMine.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ВО_Плинтус")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ВО Плинтус")]
         public string PlinthString {
             get {
                 return ((string)(this["PlinthString"]));
@@ -415,6 +415,18 @@ namespace AbimToolsMine.Properties {
             }
             set {
                 this["DWGWorksetName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ВО Стена")]
+        public string FlWallString {
+            get {
+                return ((string)(this["FlWallString"]));
+            }
+            set {
+                this["FlWallString"] = value;
             }
         }
     }

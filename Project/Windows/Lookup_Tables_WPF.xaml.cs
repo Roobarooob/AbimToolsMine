@@ -1,9 +1,5 @@
-﻿using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -50,7 +46,7 @@ namespace AbimToolsMine
                     comboBoxFamilies.SelectedIndex = 0;
                 }
             }
-            else { comboBoxFamilies.IsEnabled = false;}
+            else { comboBoxFamilies.IsEnabled = false; }
         }
 
         private void GetTables(bool familyDocument)
@@ -114,7 +110,7 @@ namespace AbimToolsMine
                     .Cast<Family>()
                     .FirstOrDefault(fam => fam.Name == selectedFamily);
                 GetTables(false);
-            }   
+            }
         }
 
         private void ButtonExportTable_Click(object sender, RoutedEventArgs e)
@@ -170,7 +166,7 @@ namespace AbimToolsMine
 #else
 
                     str3 = columnHeader.GetSpecTypeId().TypeId;
-                    str5 = columnHeader.GetUnitTypeId().TypeId; 
+                    str5 = columnHeader.GetUnitTypeId().TypeId;
                     string str4;
                     try
                     {
@@ -198,9 +194,9 @@ namespace AbimToolsMine
 
                     // Формируем строку для заголовка, включая имя и unitType
                     if (columnHeader.Name.Length > 0)
-                    { 
-                    return $"{columnHeader.Name}##{str4}##{str6}";
-                }
+                    {
+                        return $"{columnHeader.Name}##{str4}##{str6}";
+                    }
                     else { return ""; }
                 })) + "\n";
 #endif

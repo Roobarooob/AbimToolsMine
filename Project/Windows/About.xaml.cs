@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using AbimToolsMine.Properties;
-using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Settings = AbimToolsMine.Properties.Settings;
 
 namespace AbimToolsMine
 {
-   
+
     [Transaction(TransactionMode.Manual)]
     public class ToggleAbimPanels : IExternalCommand
     {
@@ -28,7 +27,7 @@ namespace AbimToolsMine
     {
         private string superpanel = "Плагин";
         private readonly UIApplication _uiApp;
-        private readonly Dictionary<string, RibbonPanel> _panelMap =  new Dictionary<string, RibbonPanel>();
+        private readonly Dictionary<string, RibbonPanel> _panelMap = new Dictionary<string, RibbonPanel>();
 
         public AboutWindow(UIApplication uiApp)
         {
@@ -68,12 +67,12 @@ namespace AbimToolsMine
             var allPanels = app.GetRibbonPanels("АБИМ-ПРО");
             return allPanels;
         }
-        
+
         public static void SetRibbonPanelVisibility(RibbonPanel panel, bool visible)
         {
             panel.Visible = visible;
         }
-        
+
         private void LoadPanelVisibilitySettings()
         {
             var hiddenPanels = Settings.Default.HiddenPanels ?? new System.Collections.Specialized.StringCollection();
@@ -93,7 +92,7 @@ namespace AbimToolsMine
                 {
                     checkbox.IsChecked = true;
                     checkbox.IsEnabled = false;
-                }    
+                }
                 checkbox.Checked += CheckboxChanged;
                 checkbox.Unchecked += CheckboxChanged;
 
@@ -111,7 +110,7 @@ namespace AbimToolsMine
                     hiddenPanels.Add(kvp.Key);
                 }
             }
-            Settings.Default.Access_Org= Org.Text;
+            Settings.Default.Access_Org = Org.Text;
             Settings.Default.Access_Code = Code.Text;
             Settings.Default.HiddenPanels = hiddenPanels;
             Settings.Default.Save();
@@ -119,7 +118,7 @@ namespace AbimToolsMine
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            SavePanelVisibilitySettings();    
+            SavePanelVisibilitySettings();
         }
 
         private void LCheck_Click(object sender, RoutedEventArgs e)

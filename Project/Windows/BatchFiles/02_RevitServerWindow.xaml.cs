@@ -69,7 +69,7 @@ namespace AbimToolsMine
             if (trvContent.ItemsSource is ObservableCollection<TreeNode> nodes)
             {
                 var selectedFiles = nodes.SelectMany(node => GetSelectedFiles(node, "rsn:/")).ToList();
-                
+
                 if (selectedFiles.Any())
                 {
                     foreach (string file in selectedFiles)

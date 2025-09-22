@@ -25,7 +25,7 @@ namespace AbimToolsMine
             {
                 a.CreateRibbonTab(tab);
             }
-            catch 
+            catch
             {
 
             }
@@ -101,7 +101,7 @@ namespace AbimToolsMine
         private void OnButtonCreate(UIControlledApplication application)
         {
             var pan0 = RibbonPanel(application, "АБИМ-ПРО", superpanel);
-            
+
             // Кнопка "Программа"
 
             PushButton ToggleAbimPanels = CreateButton(
@@ -115,11 +115,16 @@ namespace AbimToolsMine
                 availabilityClassName: "AbimToolsMine.CommandAvailability",
                 dllName: "AbimToolsMine.dll"
             );
-            
-            var pan1 = RibbonPanel(application, "АБИМ-ПРО", "Общие утилиты");
+
+            var pan_bim = RibbonPanel(application, "АБИМ-ПРО", "BIM");
+            var pan_gen = RibbonPanel(application, "АБИМ-ПРО", "Общие утилиты");
+            var pan_otd = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
+        
+
+
             // Кнопка "Пакетная обработка"
             PushButton bath_button = CreateButton(
-                panel: pan1,
+                panel: pan_bim,
                 name: "BatchTools",
                 text: "Пакетная\nобработка",
                 command: "AbimToolsMine.BatchTools",
@@ -133,7 +138,7 @@ namespace AbimToolsMine
 
             // Кнопка "Загрузить коллизии"
             PushButton col_button = CreateButton(
-                panel: pan1,
+                panel: pan_gen,
                 name: "CollisionTools",
                 text: "Загрузить\nколлизии",
                 command: "AbimToolsMine.Collisions",
@@ -145,7 +150,7 @@ namespace AbimToolsMine
 
             // Кнопка "БыстроФильтр"
             PushButton selector_button = CreateButton(
-                panel: pan1,
+                panel: pan_gen,
                 name: "FastFilter",
                 text: "БыстроФильтр",
                 command: "AbimToolsMine.FastFilter",
@@ -157,7 +162,7 @@ namespace AbimToolsMine
 
             // Кнопка "Инструменты рабочих наборов"
             PushButton workset_button = CreateButton(
-                panel: pan1,
+                panel: pan_bim,
                 name: "SetWorksetForLinks",
                 text: "Инструменты\nрабочих наборов",
                 command: "AbimToolsMine.LinksWokset",
@@ -169,7 +174,7 @@ namespace AbimToolsMine
 
             // Кнопка "Экспорт таблиц выбора"
             PushButton lookUp_button = CreateButton(
-                panel: pan1,
+                panel: pan_bim,
                 name: "GetLookupTable",
                 text: "Экспорт таблиц\nвыбора",
                 command: "AbimToolsMine.GetLookUpTable",
@@ -181,7 +186,7 @@ namespace AbimToolsMine
 
             // Кнопка "Проверка дубликатов связей"
             PushButton linkChecker_button = CreateButton(
-                panel: pan1,
+                panel: pan_bim,
                 name: "DuplicateLinkChecker",
                 text: "Проверка\nдубликатов связей",
                 command: "AbimToolsMine.DuplicateLinkChecker",
@@ -193,7 +198,7 @@ namespace AbimToolsMine
 
             // Кнопка "Работа с уровнями"
             PushButton CheckLevels = CreateButton(
-                panel: pan1,
+                panel: pan_bim,
                 name: "CheckLevels",
                 text: "Работа с уровнями",
                 command: "AbimToolsMine.LevelTools",
@@ -203,12 +208,10 @@ namespace AbimToolsMine
             );
             CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));
 
-
-            var pan2 = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
-            
+          
             // Кнопка "Cоздание ведомости отделки"
             PushButton Pref_ScheduleFinishing = CreateButton(
-                panel: pan2,
+                panel: pan_otd,
                 name: "Pref_ScheduleFinishing",
                 text: "Параметры",
                 command: "AbimToolsMine.Pref_ScheduleFinishingWindow",
@@ -220,7 +223,7 @@ namespace AbimToolsMine
 
             // Кнопка "Cоздание ведомости отделки"
             PushButton ScheduleFinishing = CreateButton(
-                panel: pan2,
+                panel: pan_otd,
                 name: "ScheduleFinishing",
                 text: "Ведомость отделки",
                 command: "AbimToolsMine.ScheduleFinishing",
@@ -229,10 +232,10 @@ namespace AbimToolsMine
                 dllName: "AbimToolsMine.dll"
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png"));
-           
+
             // Кнопка "Cоздание ведомости отделки"
             PushButton FloorLegends = CreateButton(
-                panel: pan2,
+                panel: pan_otd,
                 name: "FloorLegends",
                 text: "Полы\nСоздание эскизов",
                 command: "AbimToolsMine.FloorLegends",
@@ -242,11 +245,11 @@ namespace AbimToolsMine
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
 
-            // Кнопка "Cоздание ведомости отделки"
+            // Кнопка Ведомость полов заполнение параметров"
             PushButton LegendsToParameters = CreateButton(
-                panel: pan2,
+                panel: pan_otd,
                 name: "LegendsToParameter",
-                text: "Полы\nЭскизы в параметр",
+                text: "Полы\nЗаполнить параметры",
                 command: "AbimToolsMine.LegendsToParameter",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
                 toolTip: "Эскизы переходят в параметр типа пола",
@@ -254,8 +257,20 @@ namespace AbimToolsMine
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
 
+            // Кнопка заполнение параметра ПРО_Номер листа"
+            PushButton SheetNumbers = CreateButton(
+                panel: pan_gen,
+                name: "SheetNumbers",
+                text: "Замена спецсимвола в листе",
+                command: "AbimToolsMine.SheetNumbers",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers32.png",
+                toolTip: "Удаление спецсиимвола в параметре и заполнение ПРО_Номер листа",
+                dllName: "AbimToolsMine.dll"
+            );
+            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers16.png"));
+
         }
-            
+
 
         public Result OnStartup(UIControlledApplication application)
         {
