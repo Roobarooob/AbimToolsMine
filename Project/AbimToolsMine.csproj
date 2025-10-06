@@ -155,6 +155,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <None Remove="Resources\FloorLegends32.png" />
     <None Remove="Resources\LegendsToParameter16.png" />
     <None Remove="Resources\LegendsToParameter32.png" />
+    <None Remove="Resources\MakeLocalTask16.png" />
+    <None Remove="Resources\MakeLocalTask32.png" />
+    <None Remove="Resources\Osi16.png" />
+    <None Remove="Resources\Osi32.png" />
     <None Remove="Resources\Pref_Finishing16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +179,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\LPTableExport16.png" />
+    <Resource Include="Resources\MakeLocalTask16.png" />
+    <Resource Include="Resources\MakeLocalTask32.png" />
+    <Resource Include="Resources\Osi16.png" />
+    <Resource Include="Resources\Osi32.png" />
     <Resource Include="Resources\SheetNumbers16.png" />
     <Resource Include="Resources\SheetNumbers32.png" />
     <Resource Include="Resources\Pref_Finishing16.png" />

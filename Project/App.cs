@@ -261,13 +261,37 @@ namespace AbimToolsMine
             PushButton SheetNumbers = CreateButton(
                 panel: pan_gen,
                 name: "SheetNumbers",
-                text: "Замена спецсимвола в листе",
+                text: "Замена спецсимвола\nв номере листа",
                 command: "AbimToolsMine.SheetNumbers",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers32.png",
                 toolTip: "Удаление спецсиимвола в параметре и заполнение ПРО_Номер листа",
                 dllName: "AbimToolsMine.dll"
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers16.png"));
+
+            // Кнопка "Скрыть оси во всех связях"
+            PushButton hideAxes_button = CreateButton(
+                panel: pan_gen,
+                name: "DisableLevelsAndGridsWorksetInLinks",
+                text: "Скрыть оси\nво всех связях",
+                command: "AbimToolsMine.DisableLevelsAndGridsWorksetInLinks",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
+                toolTip: "Скрыть оси во всех связанных моделях",
+                dllName: "AbimToolsMine.dll"
+            );
+            hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
+
+            // Кнопка "Локальная копия модели" (создание резервной копии в C:\a и архивной в C:\a\архив)
+            PushButton localBackupBtn = CreateButton(
+                panel: pan_gen,
+                name: "MakeLocalTask",
+                text: "Выдать\nзадание",
+                command: "AbimToolsMine.MakeLocalTask",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask32.png",
+                toolTip: "Синхронизация/сохранение и копии файла для задания смежным разделам)",
+                dllName: "AbimToolsMine.dll"
+            );
+            localBackupBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask16.png"));
 
         }
 

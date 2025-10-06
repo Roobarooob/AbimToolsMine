@@ -106,11 +106,30 @@ namespace AbimToolsMine
                         TaskDialog.Show("Отладка", "layerType == null");
                     }
                     int hatchType = (layerType != null && LayerTypeToHatchType.TryGetValue(layerType, out int code)) ? code : 0;
+
                     // Определение толщины
-                    var matches = Regex.Matches(thicknessPart, @"\d+(\.\d+)?");
-                    List<double> thicknessNumbers = matches.Cast<Match>()
-                                                           .Select(m => double.Parse(m.Value))
-                                                           .ToList();
+                    var matches = Regex.Matches(thicknessPart, @"\d+([.,]\d+)?");
+                    var thicknessNumbers = new List<double>();
+                    try
+                    {
+                        foreach (Match m in matches)
+                        {
+                            string token = m.Value.Replace(',', '.');
+                            if (double.TryParse(token,
+                                                System.Globalization.NumberStyles.Float,
+                                                System.Globalization.CultureInfo.InvariantCulture,
+                                                out double val))
+                            {
+                                thicknessNumbers.Add(val);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        TaskDialog.Show("Ошибка парсинга толщины",
+                            $"Тип пола: {typeEl.Name}\nСлой: {namePart}\nТекст толщины: {thicknessPart}\nОшибка: {ex.Message}");
+                        continue; // пропустить этот слой
+                    }
 
                     double thickness = 0;
                     bool isVariable = false;
