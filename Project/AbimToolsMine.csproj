@@ -12,7 +12,7 @@
     <RootNamespace>AbimToolsMine</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PostBuildEvent>set "VERSION=2022"
+    <PostBuildEvent>set "VERSION=2024"
 
 if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
     mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
