@@ -281,18 +281,6 @@ namespace AbimToolsMine
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
 
-            // Кнопка "Локальная копия модели" (создание резервной копии в C:\a и архивной в C:\a\архив)
-            PushButton localBackupBtn = CreateButton(
-                panel: pan_gen,
-                name: "MakeLocalTask",
-                text: "Выдать\nзадание",
-                command: "AbimToolsMine.MakeLocalTask",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask32.png",
-                toolTip: "Синхронизация/сохранение и копии файла для задания смежным разделам)",
-                dllName: "AbimToolsMine.dll"
-            );
-            localBackupBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/MakeLocalTask16.png"));
-
         }
 
 
