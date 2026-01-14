@@ -75,21 +75,24 @@ namespace AbimToolsMine
                     foreach (WorksetPreview item in lstPreview)
                     {
                         Workset wkset = worksetTable.GetWorkset(item.Id);
-                        string name = wkset.Name;
+                        if (wkset!=null)
+                        {
+                            string name = wkset.Name;
 
-                        // »щем рабочий набор, который содержит targetWorksetName
-                        if (name.Contains(targetWorksetName))
-                        {
-                            foundTargetWorkset = true;
-                            targetWorksetIsOpen = wkset.IsOpen;
-                            // Ётот рабочий набор Ќ≈ добавл€ем в список открытых
-                        }
-                        else
-                        {
-                            // ¬се остальные рабочие наборы - сохран€ем их текущее состо€ние
-                            if (wkset.IsOpen)
+                            // »щем рабочий набор, который содержит targetWorksetName
+                            if (name.Contains(targetWorksetName))
                             {
-                                lstWkSet_ToOpen.Add(wkset.Id);
+                                foundTargetWorkset = true;
+                                targetWorksetIsOpen = wkset.IsOpen;
+                                // Ётот рабочий набор Ќ≈ добавл€ем в список открытых
+                            }
+                            else
+                            {
+                                // ¬се остальные рабочие наборы - сохран€ем их текущее состо€ние
+                                if (wkset.IsOpen)
+                                {
+                                    lstWkSet_ToOpen.Add(wkset.Id);
+                                }
                             }
                         }
                     }

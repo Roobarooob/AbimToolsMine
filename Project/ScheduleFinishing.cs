@@ -47,7 +47,7 @@ namespace AbimToolsMine
             ProcessElements(doc, BuiltInCategory.OST_Ceilings, "ceiling", roomData);
             ProcessElements(doc, BuiltInCategory.OST_Walls, "plinth", roomData);
 
-            var groupingDict = new Dictionary<string, List<string>>();
+            var groupingDict = new Dictionary<string, HashSet<string>>();
             var groupAreas = new Dictionary<string, Dictionary<string, Dictionary<string, double>>>();
 
             foreach (var room in rooms)
@@ -61,7 +61,7 @@ namespace AbimToolsMine
 
                 if (!groupingDict.ContainsKey(groupKey))
                 {
-                    groupingDict[groupKey] = new List<string>();
+                    groupingDict[groupKey] = new HashSet<string>();
                     groupAreas[groupKey] = InitGroupArea();
                 }
 
@@ -197,10 +197,13 @@ namespace AbimToolsMine
                 var type = doc.GetElement(el.GetTypeId());
                 var typeName = type.Name ?? "";
 
-                // Обработка плинтусов из стен
+                // Фильтр стен: пропускать все, кроме FlWallString и PlinthString
                 if (category == BuiltInCategory.OST_Walls)
                 {
                     bool isPlinth = typeName.Contains(PlinthString);
+
+
+                    // существующая логика плинтусов
                     if (isPlinth && typeKey != "plinth") continue;
                     if (!isPlinth && typeKey == "plinth") continue;
                 }
@@ -213,7 +216,12 @@ namespace AbimToolsMine
                 var roomKey = GetParamValue(el, RoomKeyParam);
                 if (string.IsNullOrEmpty(roomKey)) continue;
 
-                var name = GetParamValue(type, StructureComp) ?? GetParamValue(type, "Тип") ?? "Без имени";
+                var name =
+                    GetParamValue(type, StructureComp)
+                    ?? GetParamValue(type, "Тип");
+
+                if (string.IsNullOrEmpty(name))
+                    continue;
 
                 double value = 0;
 

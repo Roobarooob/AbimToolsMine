@@ -164,6 +164,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   <ItemGroup>
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\BatchTools16.png" />

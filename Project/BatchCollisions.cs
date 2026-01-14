@@ -12,6 +12,7 @@ using Application = Autodesk.Revit.ApplicationServices.Application;
 using Path = System.IO.Path;
 using Settings = AbimToolsMine.Properties.Settings;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
+using System.Data.SQLite;
 
 namespace AbimToolsMine
 {
@@ -62,9 +63,9 @@ namespace AbimToolsMine
 
             try
             {
-                xmlFilePath = doc.ProjectInformation.LookupParameter("ПРО_Путь к XML коллизий").AsString();
+                xmlFilePath = doc.ProjectInformation.LookupParameter("ПРО_Путь к DB коллизий").AsString();
             }
-            catch { TaskDialog.Show("Ошибка!", "нет параметра «ПРО_Путь к XML коллизий»"); }
+            catch { TaskDialog.Show("Ошибка!", "нет параметра «ПРО_Путь к DB коллизий»"); }
             try
             {
                 if (familySymbol != null)
@@ -79,7 +80,7 @@ namespace AbimToolsMine
             }
             catch
             {
-                TaskDialog.Show("Ошибка", "Что-то не получлось возможно не заполнен параметр «ПРО_Путь к XML коллизий»");
+                TaskDialog.Show("Ошибка", "Что-то не получлось возможно не заполнен параметр «ПРО_Путь к DB коллизий»");
             }
             return Result.Succeeded;
         }
@@ -329,7 +330,7 @@ namespace AbimToolsMine
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("Добавьте XML файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                System.Windows.Forms.MessageBox.Show("Добавьте DB файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -537,46 +538,48 @@ namespace AbimToolsMine
         //Анализировать xml и расставить коллизии
         public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string xmlFilePath)
         {
-            var xmlFileDate = File.GetLastWriteTime(xmlFilePath);
+            // var xmlFileDate = File.GetLastWriteTime(xmlFilePath);
 
-            XDocument xmlDoc = XDocument.Load(xmlFilePath);
+            // XDocument xmlDoc = XDocument.Load(xmlFilePath);
             int count = 0;
-            var clashResults = (from clashtest in xmlDoc.Descendants("clashtest")
-                                let clashtestName = clashtest.Attribute("name").Value
-                                from clashresult in clashtest.Descendants("clashresult")
-                                let clashResultName = clashresult.Attribute("name").Value
-                                let status = clashresult.Attribute("status").Value
-                                let pos3f = clashresult.Descendants("pos3f").FirstOrDefault()
-                                let posX = pos3f.Attribute("x").Value
-                                let posY = pos3f.Attribute("y").Value
-                                let posZ = pos3f.Attribute("z").Value
-                                let clashObject1 = clashresult.Descendants("clashobject").FirstOrDefault()
-                                let clashObject2 = clashresult.Descendants("clashobject").Skip(1).FirstOrDefault()
-                                let fileName1 = clashObject1?.Descendants("pathlink").FirstOrDefault()?
-                                                    .Elements("node").Skip(2).FirstOrDefault()?.Value
-                                let element1 = clashObject1?.Descendants("pathlink").FirstOrDefault()?
-                                .Elements("node").Skip(5).FirstOrDefault()?.Value
+            var clashResults = new List<ClashResult>();
 
-                                let fileName2 = clashObject2?.Descendants("pathlink").FirstOrDefault()?
-                                .Elements("node").Skip(2).FirstOrDefault()?.Value
-                                let element2 = clashObject2?.Descendants("pathlink").FirstOrDefault()?
-                                                    .Elements("node").Skip(5).FirstOrDefault()?.Value
-                                where !string.IsNullOrEmpty(clashtestName) && !string.IsNullOrEmpty(clashResultName)
-                                        && pos3f != null && clashObject1 != null // Пропускаем элементы с отсутствующими данными
-                                select new ClashResult
-                                {
-                                    ClashTestName = clashtestName,
-                                    ClashResultName = clashResultName,
+            using (var connection = new SQLiteConnection($"Data Source={xmlFilePath}"))
+            {
+                connection.Open();
+                var command = new SQLiteCommand("SELECT Date, Test_Name, Collision_Name, Status, Pos_X, Pos_Y, Pos_Z, Model_1, Model_2 FROM Collision", connection);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string fileName1 = reader.GetValue(reader.GetOrdinal("Model_1"))?.ToString() ?? "";
+                        string fileName2 = reader.GetValue(reader.GetOrdinal("Model_2"))?.ToString() ?? "";
+                        var clashResult = new ClashResult
+                        {
+                            Date = reader.GetDateTime(reader.GetOrdinal("Date")),
+                            ClashTestName = reader.GetValue(reader.GetOrdinal("Test_Name"))?.ToString() ?? "",
+                            ClashResultName = reader.GetValue(reader.GetOrdinal("Collision_Name"))?.ToString() ?? "",
+                            PosX = reader.GetValue(reader.GetOrdinal("Pos_X"))?.ToString() ?? "",
+                            PosY = reader.GetValue(reader.GetOrdinal("Pos_Y"))?.ToString() ?? "",
+                            PosZ = reader.GetValue(reader.GetOrdinal("Pos_Z"))?.ToString() ?? "",
+                            Status = reader.GetValue(reader.GetOrdinal("Status"))?.ToString() ?? "",
+                            FileName1 = fileName1?.Replace(".nwc", "").Replace(".nwd", ""),
+                            FileName2 = fileName2?.Replace(".nwc", "").Replace(".nwd", ""),
+                            Element1 = "",
+                            Element2 = ""
+                        };
+                        clashResults.Add(clashResult);
+                    }
+                }
+            }
 
-                                    PosX = posX,
-                                    PosY = posY,
-                                    PosZ = posZ,
-                                    Status = status,
-                                    FileName1 = fileName1?.Replace(".nwc", "").Replace(".nwd", ""),
-                                    FileName2 = fileName2?.Replace(".nwc", "").Replace(".nwd", ""),
-                                    Element1 = element1,
-                                    Element2 = element2
-                                }).ToList();
+            // Filter to only the latest date
+            if (clashResults.Any())
+            {
+                var maxDate = clashResults.Max(cr => cr.Date);
+                clashResults = clashResults.Where(cr => cr.Date == maxDate).ToList();
+            }
+
             //Создать элементы
             Autodesk.Revit.DB.Transform transform = doc.ActiveProjectLocation.GetTotalTransform();
             if (DelBefore())
@@ -605,14 +608,28 @@ namespace AbimToolsMine
                 filteredClashResults = RemoveDuplicateClashResults(filteredClashResults);
                 foreach (var clashResult in filteredClashResults)
                 {
-                    if (!double.TryParse(clashResult.PosX, NumberStyles.Float, CultureInfo.InvariantCulture, out double posX) ||
-                                    !double.TryParse(clashResult.PosY, NumberStyles.Float, CultureInfo.InvariantCulture, out double posY) ||
-                                    !double.TryParse(clashResult.PosZ, NumberStyles.Float, CultureInfo.InvariantCulture, out double posZ))
+                    if (!TryParseDouble(clashResult.PosX, out double posX) ||
+                        !TryParseDouble(clashResult.PosY, out double posY) ||
+                        !TryParseDouble(clashResult.PosZ, out double posZ))
                     {
-                        // Если парсинг не удался, пропускаем этот элемент
                         continue;
                     }
+                    bool TryParseDouble(string value, out double result)
+                    {
+                        result = 0;
 
+                        if (string.IsNullOrWhiteSpace(value))
+                            return false;
+
+                        value = value.Replace(',', '.');
+
+                        return double.TryParse(
+                            value,
+                            NumberStyles.Float,
+                            CultureInfo.InvariantCulture,
+                            out result
+                        );
+                    }
 
                     XYZ point = new XYZ(posX, posY, posZ) * 1000 / 304.8;
                     XYZ trans_point = transform.OfPoint(point);
@@ -629,7 +646,7 @@ namespace AbimToolsMine
                         NewFamilyInstance(fin_point, familySymbol, nearestLevel, nearestLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                     instance.LookupParameter("ПРО_Марка").Set(clashResult.ClashResultName);
                     instance.LookupParameter("ПРО_Обозначение").Set(clashResult.ClashTestName);
-                    instance.LookupParameter("ПРО_Дата").Set(xmlFileDate.ToString("dd/MM/yyyy"));
+                    instance.LookupParameter("ПРО_Дата").Set(clashResult.Date.ToString("dd/MM/yyyy"));
                     instance.LookupParameter("ПРО_Коллизия_Элемент1").Set(clashResult.Element1);
                     instance.LookupParameter("ПРО_Коллизия_Элемент2").Set(clashResult.Element2);
                     if (workset != null)
@@ -739,10 +756,7 @@ namespace AbimToolsMine
                         if (blacklist.Count > 0)
                         {
                             foreach (ElementId elementId in blacklist.Distinct().ToList())
-                            {
-                                doc.Delete(elementId);
-                            }
-
+                            doc.Delete(elementId);
                         }
                         trans.Commit();
                     }
@@ -923,6 +937,7 @@ namespace AbimToolsMine
         public string FileName2 { get; set; } // Добавляем поле для имени файла первого элемента коллизии
         public string Element1 { get; set; }
         public string Element2 { get; set; }
+        public DateTime Date { get; set; }
 
     }
 

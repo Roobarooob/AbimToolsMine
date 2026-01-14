@@ -40,14 +40,15 @@ namespace AbimToolsMine
         {
             List<string> razdelOptions = new List<string>
             {
-                "_АР", "_КР", "_КЖ", "_КМ", "_ОВ", "_ВК", "_ЭОМ", "_СС", "_ТМ", "_РФ", "_АК", "_НТС", "_ТХ",
-                "_AR", "_KR", "_KJ", "_KM", "_OV", "_VK", "_EOM", "_SS", "_TM", "_BF", "_AK", "_HTS", "_TH",
+                "_АР", "_КР", "_КЖ", "_КМ", "_ОВ", "_ВК", "_ЭОМ", "_ЕС", "_СС", "_ТМ", "_РФ", "_АК", "_НТС", "_ТХ", "_АПТ",
+                "_AR", "_KR", "_KJ", "_KM", "_OV", "_VK", "_EOM", "_ES", "_SS", "_TM", "_BF", "_AK", "_HTS", "_TH", "_APT", 
             };
             // Словарь для соответствия разделов и префиксов
             Dictionary<string, string> specialPrefixMap = new Dictionary<string, string>
             {
                 { "_КР", "КР" }, { "_КЖ", "КР" }, { "_КМ", "КР" },
-                { "_KR", "KR" }, { "_KJ", "KR" }, { "_KM", "KR" }
+                { "_KR", "KR" }, { "_KJ", "KR" }, {"_KG","КR" }, { "_KM", "KR" },
+                {"_HS","OV"}, {"_OT","OV"}
             };
 
             {
