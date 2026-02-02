@@ -10,6 +10,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -55,9 +56,21 @@
         <TextBox x:Name="XmlFilePath" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,10" Background="WhiteSmoke"/>
         <Button Content="Загрузить коллизии" Grid.Row="2" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="StartProcessing_Click" Background="#FFC85A5A" Foreground="White"/>
 
-        <!-- Путь NWC -->
-        <Button Content="Путь NWC" Grid.Row="3" Grid.Column="0" Margin="0,0,10,10" Click="SelectNWCPath_Click"/>
+        <!-- Путь RVT -->
+        <Button Content="Путь RVT" Grid.Row="3" Grid.Column="0" Margin="0,0,10,10" Click="SelectRVTPath_Click"/>
         <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="RvtFilePath" Grid.Column="0" IsReadOnly="True" Background="WhiteSmoke"/>
+            <Button Width="35" Grid.Column="1" Content="⚙️" Click="RvtPrefClick" Margin="5,0,0,0"/>
+        </Grid>
+        <Button Content="Экспорт RVT" Grid.Row="3" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="ExportRVT_Click" Background="#FF358611" Foreground="White"/>
+
+        <!-- Путь NWC -->
+        <Button Content="Путь NWC" Grid.Row="4" Grid.Column="0" Margin="0,0,10,10" Click="SelectNWCPath_Click"/>
+        <Grid Grid.Row="4" Grid.Column="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -65,11 +78,11 @@
             <TextBox x:Name="NwcFilePath" Grid.Column="0" IsReadOnly="True" Background="WhiteSmoke"/>
             <Button Width="35" Grid.Column="1" Content="⚙️" Click="WorsetPrefClick" Margin="5,0,0,0"/>
         </Grid>
-        <Button Content="Экспорт NWC" Grid.Row="3" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="ExportNWC_Click" Background="#FF358611" Foreground="White"/>
+        <Button Content="Экспорт NWC" Grid.Row="4" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="ExportNWC_Click" Background="#FF358611" Foreground="White"/>
 
         <!-- Файл семейства -->
-        <Button Content="Выбор файла семейства" Grid.Row="4" Grid.Column="0" Margin="0,0,10,10" Click="SelectRfaFile_Click"/>
-        <Grid Grid.Row="4" Grid.Column="1" Margin="0,0,0,10">
+        <Button Content="Выбор файла семейства" Grid.Row="5" Grid.Column="0" Margin="0,0,10,10" Click="SelectRfaFile_Click"/>
+        <Grid Grid.Row="5" Grid.Column="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -79,10 +92,10 @@
                 <TextBlock Text="С заменой параметров"/>
             </CheckBox>
         </Grid>
-        <Button Content="Загрузить семейства" Grid.Row="4" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="Download_Click"/>
+        <Button Content="Загрузить семейства" Grid.Row="5" Grid.Column="2" Width="130" Margin="10,0,0,10" Click="Download_Click"/>
 
         <!-- Кнопки снизу -->
-        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0">
+        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0">
             <Button Content="Удалить связи" Click="LinkRemove_Click" Margin="0,0,10,0"/>
             <Button Content="Добавить параметры" Click="ParameterTools_Click"/>
         </StackPanel>

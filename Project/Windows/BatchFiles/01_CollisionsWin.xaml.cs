@@ -33,6 +33,16 @@ namespace AbimToolsMine
             }
         }
 
+        private void SelectRVTPath_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedPath = folderBrowserDialog.SelectedPath;
+                RvtFilePath.Text = selectedPath;
+            }
+        }
+
         private void SelectNWCPath_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
@@ -175,6 +185,25 @@ namespace AbimToolsMine
         {
             WorksetPrefWin worksetPrefWin = new WorksetPrefWin();
             worksetPrefWin.ShowDialog();
+        }
+
+        private void ExportRVT_Click(object sender, RoutedEventArgs e)
+        {
+            var rvtFiles = rvtFilePaths.ToList();
+            if (RvtFilePath.Text != "" && RvtFilePath.Text != null)
+            {
+                BatchFunctions.RunExportRVT(BatchTools.CommandData, rvtFiles, RvtFilePath.Text);
+            }
+            else
+            {
+                TaskDialog.Show("Ошибка", "Выберите путь к папке экспорта RVT");
+            }
+        }
+
+        private void RvtPrefClick(object sender, RoutedEventArgs e)
+        {
+            RvtExportPrefWin rvtExportPrefWin = new RvtExportPrefWin();
+            rvtExportPrefWin.ShowDialog();
         }
     }
 }
