@@ -12,7 +12,7 @@
     <RootNamespace>AbimToolsMine</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PostBuildEvent>set "VERSION=2021"
+    <PostBuildEvent>set "VERSION=2024"
 
 if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
     mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
@@ -28,6 +28,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2020</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2021|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +38,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2021</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2022|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +48,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2022</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2023|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,6 +58,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2023</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2024|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,6 +68,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2024</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2025|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +78,7 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <DefineConstants>DEBUG;R2025</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(Configuration)'=='R2020' ">

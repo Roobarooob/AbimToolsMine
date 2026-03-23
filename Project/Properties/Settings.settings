@@ -78,7 +78,7 @@
       <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр</Value>
     </Setting>
     <Setting Name="FloorLayerName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ПРО_СЛЖ_Слой пола</Value>
+      <Value Profile="(Default)">ПРО_АР_СЛЖ_Слой пола</Value>
     </Setting>
     <Setting Name="viewTemplateName" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_СЛЖ_Эскиз пола</Value>
@@ -103,6 +103,12 @@
     </Setting>
     <Setting Name="FlWallString" Type="System.String" Scope="User">
       <Value Profile="(Default)">ВО Стена</Value>
+    </Setting>
+    <Setting Name="IFCExportConfig" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="IFCViewName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Navisworks</Value>
     </Setting>
   </Settings>
 </SettingsFile>

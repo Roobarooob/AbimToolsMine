@@ -10,7 +10,7 @@ namespace AbimToolsMine
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
-            TaskDialog.Show("Информация", "Версия приложения - 6.0.0\n\n" +
+            TaskDialog.Show("Информация", "Версия приложения - 6.2.0\n\n" +
 
                 "Загруженные плагины:\n" +
                 "АвтоПиннер\n" +

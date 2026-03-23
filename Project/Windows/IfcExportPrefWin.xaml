@@ -1,0 +1,23 @@
+<Window x:Class="AbimToolsMine.IfcExportPrefWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+     Title="IFC Export Settings" Height="200" Width="400" Background="WhiteSmoke" Closing="Window_Closing">
+    <Grid Margin="10">
+     <Grid.RowDefinitions>
+    <RowDefinition Height="Auto"/>
+    <RowDefinition Height="Auto"/>
+       <RowDefinition Height="Auto"/>
+    <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Content="IFC Export Configuration Name" Margin="0,0,0,5"/>
+  <TextBox x:Name="IfcConfigTextBox" Grid.Row="1" Margin="0,0,0,10" Height="30" 
+ HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+TextChanged="IfcConfigTextBox_TextChanged"/>
+
+        <Label Grid.Row="2" Content="View Name Substring for Export" Margin="0,0,0,5"/>
+  <TextBox x:Name="IfcViewNameTextBox" Grid.Row="3" Margin="0,0,0,10" Height="30"
+              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+     TextChanged="IfcViewNameTextBox_TextChanged"/>
+    </Grid>
+</Window>

@@ -97,7 +97,8 @@ namespace AbimToolsMine
                                        lname.Contains("тепл") ? "Утеплитель" :
                                        lname.Contains("звук") ? "Утеплитель" :
                                        lname.Contains("керам") ? "Плитка" :
-                                       lname.Contains("ж/б") || lname.Contains("железобетон") ? "Железобетон" :
+                                       lname.Contains("ж/б") || lname.Contains("жб")||lname.Contains(@"ж\б") || lname.Contains("железобетон") || 
+                                       lname.Contains("монолит")||lname.Contains("ж.б.") || lname.Contains("ж.-б.") || lname.Contains("ж-б") ? "Железобетон"  :
                                        lname.Contains(" бетон") ? "Бетон" :
                                        lname.Contains("сталь") ? "Сталь" :
                                        "Другое";
@@ -232,7 +233,7 @@ namespace AbimToolsMine
 
 
                     FamilySymbol familySymbol = new FilteredElementCollector(doc)
-                        .OfCategory(BuiltInCategory.OST_DetailComponents)  // Категория "Обобщенные модели"
+                        .OfCategory(BuiltInCategory.OST_DetailComponents)  // Категория "Элементы узлов"
                         .WhereElementIsElementType()                   // Выбираем только типоразмеры (ElementType)
                         .FirstOrDefault(e => e.Name == SymbolName) as FamilySymbol;
 

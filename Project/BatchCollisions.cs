@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -9,12 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using Application = Autodesk.Revit.ApplicationServices.Application;
 using Path = System.IO.Path;
 using Settings = AbimToolsMine.Properties.Settings;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using System.Data.SQLite;
 
 namespace AbimToolsMine
 {
@@ -361,56 +360,56 @@ namespace AbimToolsMine
 
                         // Фильтруем рабочие наборы, исключая те, что начинаются с 'символа'
                         foreach (WorksetPreview worksetPrev in worksets)
-                          {
-if (!worksetPrev.Name.StartsWith(LinkWoksetSymbol))
-      {
-      worksetIdsToOpen.Add(worksetPrev.Id);
-   }
-          }
+                        {
+                            if (!worksetPrev.Name.Contains(LinkWoksetSymbol))
+                            {
+                                worksetIdsToOpen.Add(worksetPrev.Id);
+                            }
+                        }
 
-         OpenOptions openOptions = new OpenOptions();
-  // Настраиваем конфигурацию для закрытия всех рабочих наборов по умолчанию
- WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+                        OpenOptions openOptions = new OpenOptions();
+                        // Настраиваем конфигурацию для закрытия всех рабочих наборов по умолчанию
+                        WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
 
-             // Устанавливаем список рабочих наборов для открытия (только те, что без #)
-    openConfig.Open(worksetIdsToOpen);
-   openOptions.SetOpenWorksetsConfiguration(openConfig);
+                        // Устанавливаем список рабочих наборов для открытия (только те, что без #)
+                        openConfig.Open(worksetIdsToOpen);
+                        openOptions.SetOpenWorksetsConfiguration(openConfig);
 
-         doc = app.OpenDocumentFile(modelPath, openOptions);
+                        doc = app.OpenDocumentFile(modelPath, openOptions);
 
-         ///using (Transaction tx = new Transaction(doc))
-         ///{
-              try
-   {
+                        ///using (Transaction tx = new Transaction(doc))
+                        ///{
+                        try
+                        {
 
-         /// tx.Start("Удаление связей из файла");
-      ExportNWC(doc, OutputFolder);
-         /// tx.Commit();
-         // Сохраните и закройте документ
- true_list.AppendLine(doc.Title);
-  //doc.Save();
-               try
-                 {
-        doc.Close(false);
-     }
-          catch { }
+                            /// tx.Start("Удаление связей из файла");
+                            ExportNWC(doc, OutputFolder);
+                            /// tx.Commit();
+                            // Сохраните и закройте документ
+                            true_list.AppendLine(doc.Title);
+                            //doc.Save();
+                            try
+                            {
+                                doc.Close(false);
+                            }
+                            catch { }
 
-   }
-     catch
-    {
-       //закройте документ
-     false_list.AppendLine(doc.Title);
-     doc.Close(false);
-      }
-             }
-             /// }
-         catch (Exception e)
-           {
-       TaskDialog.Show("Open File Failed", e.Message);
-        }
+                        }
+                        catch
+                        {
+                            //закройте документ
+                            false_list.AppendLine(doc.Title);
+                            doc.Close(false);
+                        }
+                    }
+                    /// }
+                    catch (Exception e)
+                    {
+                        TaskDialog.Show("Open File Failed", e.Message);
+                    }
                 }
-         }
-System.Windows.MessageBox.Show($"NWC выгружены! \nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
+            }
+            System.Windows.MessageBox.Show($"NWC выгружены! \nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
         }
 
         public static void RunExportRVT(ExternalCommandData commandData, List<string> filePaths, string OutputFolder)
@@ -420,109 +419,219 @@ System.Windows.MessageBox.Show($"NWC выгружены! \nУспешно обр
             var true_list = new StringBuilder();
             var false_list = new StringBuilder();
 
-          string serverName = Properties.Settings.Default.RevitServer_ip;
+            string serverName = Properties.Settings.Default.RevitServer_ip;
 
             if (string.IsNullOrEmpty(serverName))
-      {
-     System.Windows.MessageBox.Show("Не указано имя сервера. Укажите его в настройках (кнопка ⚙️).", "Ошибка");
-           return;
+            {
+                System.Windows.MessageBox.Show("Не указано имя сервера. Укажите его в настройках (кнопка ⚙️).", "Ошибка");
+                return;
             }
 
             // Получаем версию Revit
-      string revitVersion = app.VersionNumber;
-         string revitServerToolPath = $@"C:\Program Files\Autodesk\Revit {revitVersion}\RevitServerToolCommand\RevitServerTool.exe";
+            string revitVersion = app.VersionNumber;
+            string revitServerToolPath = $@"C:\Program Files\Autodesk\Revit {revitVersion}\RevitServerToolCommand\RevitServerTool.exe";
 
- // Проверяем существование RevitServerTool
+            // Проверяем существование RevitServerTool
             if (!File.Exists(revitServerToolPath))
             {
-System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути:\n{revitServerToolPath}", "Ошибка");
-     return;
-        }
+                System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути:\n{revitServerToolPath}", "Ошибка");
+                return;
+            }
 
             // Ограничиваем количество одновременных процессов (максимум 5)
-     var semaphore = new System.Threading.SemaphoreSlim(5, 5);
+            var semaphore = new System.Threading.SemaphoreSlim(5, 5);
             var tasks = new List<Task>();
 
-    foreach (string filePath in filePaths)
+            foreach (string filePath in filePaths)
             {
-   ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
 
-        // Проверяем, что это путь на сервере
+                // Проверяем, что это путь на сервере
                 if (modelPath.ServerPath)
-     {
-             tasks.Add(Task.Run(async () =>
-         {
-            await semaphore.WaitAsync();
-      try
-      {
-    // Получаем относительный путь модели на сервере
-             string serverPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-        // Убираем префикс "RSN://<servername>/"
-  serverPath = serverPath.Replace($"RSN://{serverName}/", "").Replace("\\", "/");
-
-  // Формируем имя выходного файла
-                string fileName = Path.GetFileName(serverPath);
-         string outputPath = Path.Combine(OutputFolder, fileName);
-
-        // Формируем команду для RevitServerTool
-     string arguments = $"/c \"\"{revitServerToolPath}\" createLocalRVT \"{serverPath}\" -s {serverName} -d \"{outputPath}\" -o\"";
-
-                 // Запускаем процесс
-    ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-      FileName = "cmd.exe",
-     Arguments = arguments,
-   UseShellExecute = false,
-               RedirectStandardOutput = true,
-              RedirectStandardError = true,
-         CreateNoWindow = true
-         };
+                    tasks.Add(Task.Run(async () =>
+                {
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        // Получаем относительный путь модели на сервере
+                        string serverPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+                        // Убираем префикс "RSN://<servername>/"
+                        serverPath = serverPath.Replace($"RSN://{serverName}/", "").Replace("\\", "/");
 
-     using (Process process = Process.Start(startInfo))
-          {
-     process.WaitForExit();
+                        // Формируем имя выходного файла
+                        string fileName = Path.GetFileName(serverPath);
+                        string outputPath = Path.Combine(OutputFolder, fileName);
 
-                if (process.ExitCode == 0)
-             {
-         lock (true_list)
+                        // Формируем команду для RevitServerTool
+                        string arguments = $"/c \"\"{revitServerToolPath}\" createLocalRVT \"{serverPath}\" -s {serverName} -d \"{outputPath}\" -o\"";
+
+                        // Запускаем процесс
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = arguments,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = Process.Start(startInfo))
+                        {
+                            process.WaitForExit();
+
+                            if (process.ExitCode == 0)
+                            {
+                                lock (true_list)
+                                {
+                                    true_list.AppendLine(fileName);
+                                }
+                            }
+                            else
+                            {
+                                string error = process.StandardError.ReadToEnd();
+                                lock (false_list)
+                                {
+                                    false_list.AppendLine($"{fileName} - {error}");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        lock (false_list)
+                        {
+                            false_list.AppendLine($"{filePath} - {ex.Message}");
+                        }
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }));
+                }
+                else
+                {
+                    false_list.AppendLine($"{filePath} - не является путем на Revit Server");
+                }
+            }
+
+            // Ждем завершения всех задач
+            Task.WaitAll(tasks.ToArray());
+
+            System.Windows.MessageBox.Show($"RVT экспорт завершен!\nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
+        }
+        public static void RunExportIFC(ExternalCommandData commandData, List<string> filePaths, string OutputFolder)
+        {
+            UIApplication uiapp = commandData.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            var true_list = new StringBuilder();
+            var false_list = new StringBuilder();
+
+            Application app = uiapp.Application;
+            foreach (string filePath in filePaths)
             {
-   true_list.AppendLine(fileName);
-        }
-   }
-          else
-           {
-              string error = process.StandardError.ReadToEnd();
-      lock (false_list)
-          {
-       false_list.AppendLine($"{fileName} - {error}");
-      }
-     }
-          }
-             }
-           catch (Exception ex)
-{
-        lock (false_list)
-  {
-        false_list.AppendLine($"{filePath} - {ex.Message}");
-           }
-       }
-     finally
-  {
-        semaphore.Release();
-    }
-  }));
-         }
-  else
-          {
-     false_list.AppendLine($"{filePath} - не является путем на Revit Server");
-        }
-    }
+                ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+                if (File.Exists(filePath) || modelPath.ServerPath)
+                {
+                    Document doc = null;
+                    // Настройте параметры открытия документа с закрытыми рабочими наборами
+                    try
+                    {
+                        // Получаем информацию о всех пользовательских рабочих наборах в проекте перед открытием
+                        IList<WorksetPreview> worksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
+                        IList<WorksetId> worksetIdsToOpen = new List<WorksetId>();
 
-  // Ждем завершения всех задач
-        Task.WaitAll(tasks.ToArray());
+                        // Фильтруем рабочие наборы, исключая те, что начинаются с 'символа'
+                        foreach (WorksetPreview worksetPrev in worksets)
+                        {
+                            if (!worksetPrev.Name.Contains(LinkWoksetSymbol))
+                            {
+                                worksetIdsToOpen.Add(worksetPrev.Id);
+                            }
+                        }
 
-    System.Windows.MessageBox.Show($"RVT экспорт завершен!\nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
+                        OpenOptions openOptions = new OpenOptions();
+                        // Настраиваем конфигурацию для закрытия всех рабочих наборов по умолчанию
+                        WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+
+                        // Устанавливаем список рабочих наборов для открытия (только те, что без символа)
+                        openConfig.Open(worksetIdsToOpen);
+                        openOptions.SetOpenWorksetsConfiguration(openConfig);
+
+                        doc = app.OpenDocumentFile(modelPath, openOptions);
+
+                        try
+                        {
+                            ExportIFC(doc, OutputFolder);
+                            true_list.AppendLine(doc.Title);
+                            try { doc.Close(false); } catch { }
+                        }
+                        catch (Exception ex)
+                        {
+                            false_list.AppendLine(doc.Title + " - " + ex.Message);
+                            try { doc.Close(false); } catch { }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        false_list.AppendLine(filePath + " - " + e.Message);
+                    }
+                }
+                else
+                {
+                    false_list.AppendLine(filePath + " - файл не найден");
+                }
+            }
+            System.Windows.MessageBox.Show($"IFC выгружены! \nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
         }
+
+        private static void ExportIFC(Document doc, string OutputFolder)
+        {
+            // Формируем путь к выходному файлу
+            string fileName = doc.Title.Replace("_" + doc.Application.Username, "");
+            string outputPath = Path.Combine(OutputFolder, fileName + ".ifc");
+
+            // Получаем подстроку имени вида из настроек
+            // string viewNameSubstring = Properties.Settings.Default.IFCViewName;
+            string viewNameSubstring = "IFC"; // Временное значение по умолчанию
+            if (string.IsNullOrEmpty(viewNameSubstring))
+            {
+                viewNameSubstring = "IFC"; // По умолчанию
+            }
+
+            // Создаем активный 3D вид для экспорта
+            View3D view3D = new FilteredElementCollector(doc)
+            .OfClass(typeof(View3D))
+         .Cast<View3D>()
+            .FirstOrDefault(v => !v.IsTemplate && v.Name.IndexOf(viewNameSubstring, StringComparison.OrdinalIgnoreCase) >= 0);
+
+            if (view3D == null)
+            {
+                throw new Exception($"Не найден 3D вид с подстрокой '{viewNameSubstring}' в имени для экспорта");
+            }
+
+            // Настройки экспорта IFC
+            using (Transaction trans = new Transaction(doc, "Export IFC"))
+            {
+                trans.Start();
+
+                // Создаем опции экспорта IFC
+                IFCExportOptions ifcOptions = new IFCExportOptions();
+                ifcOptions.FileVersion = IFCVersion.IFC2x3;
+                ifcOptions.WallAndColumnSplitting = true;
+                ifcOptions.ExportBaseQuantities = true;
+                ifcOptions.SpaceBoundaryLevel = 1;
+                ifcOptions.FilterViewId = view3D.Id;
+
+                // Экспортируем
+                doc.Export(OutputFolder, fileName, ifcOptions);
+
+                trans.Commit();
+            }
+        }
+
         private static void ExportNWC(Document doc, String OutputFolder)
         {
             // Настройки экспорта в NWC
@@ -556,7 +665,7 @@ System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути
 
                 // Ищем вид с заданным именем
                 Autodesk.Revit.DB.View targetView = collector
-                    .Cast<Autodesk.Revit.DB.View>()
+            .Cast<Autodesk.Revit.DB.View>()
                     .FirstOrDefault(v => v.Name.IndexOf(viewName, StringComparison.OrdinalIgnoreCase) >= 0 && v.IsTemplate == false);
 
                 return targetView?.Id ?? ElementId.InvalidElementId;
@@ -568,13 +677,13 @@ System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути
 
             // Берем все линки в проекте
             FilteredElementCollector collector = new FilteredElementCollector(doc)
-                        .OfClass(typeof(RevitLinkType));
+                     .OfClass(typeof(RevitLinkType));
 
             // Собираем все RevitLinkType элементы
             List<ElementId> linkIds = collector
-                .Cast<RevitLinkType>()
-                .Select(linkType => linkType.Id)
-                .ToList();
+             .Cast<RevitLinkType>()
+       .Select(linkType => linkType.Id)
+                   .ToList();
 
             // Проверяем, есть ли ссылки
             if (linkIds.Count > 0)
@@ -659,7 +768,7 @@ System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути
             using (var connection = new SQLiteConnection($"Data Source={xmlFilePath}"))
             {
                 connection.Open();
-                var command = new SQLiteCommand("SELECT Date, Test_Name, Collision_Name, Status, Pos_X, Pos_Y, Pos_Z, Model_1, Model_2 FROM Collision", connection);
+                var command = new SQLiteCommand("SELECT Date, Test_Name, Collision_Name, Status, Pos_X, Pos_Y, Pos_Z, Model_1, Model_2,Element_1, Element_2 FROM Collision", connection);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -873,7 +982,7 @@ System.Windows.MessageBox.Show($"Не найден RevitServerTool по пути
                         if (blacklist.Count > 0)
                         {
                             foreach (ElementId elementId in blacklist.Distinct().ToList())
-                            doc.Delete(elementId);
+                                doc.Delete(elementId);
                         }
                         trans.Commit();
                     }

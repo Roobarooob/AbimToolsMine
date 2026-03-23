@@ -205,5 +205,34 @@ namespace AbimToolsMine
             RvtExportPrefWin rvtExportPrefWin = new RvtExportPrefWin();
             rvtExportPrefWin.ShowDialog();
         }
+
+        private void SelectIFCPath_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedPath = folderBrowserDialog.SelectedPath;
+                IfcFilePath.Text = selectedPath;
+            }
+        }
+
+        private void ExportIFC_Click(object sender, RoutedEventArgs e)
+        {
+            var rvtFiles = rvtFilePaths.ToList();
+            if (IfcFilePath.Text != "" && IfcFilePath.Text != null)
+            {
+                BatchFunctions.RunExportIFC(BatchTools.CommandData, rvtFiles, IfcFilePath.Text);
+            }
+            else
+            {
+                TaskDialog.Show("Ошибка", "Выберите путь к папке экспорта IFC");
+            }
+        }
+
+        private void IfcPrefClick(object sender, RoutedEventArgs e)
+        {
+            IfcExportPrefWin ifcExportPrefWin = new IfcExportPrefWin();
+            ifcExportPrefWin.ShowDialog();
+        }
     }
 }

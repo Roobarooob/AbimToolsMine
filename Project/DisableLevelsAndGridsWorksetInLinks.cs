@@ -24,6 +24,8 @@ namespace AbimToolsMine
             Application app = uiapp.Application;
             Document doc = uiDoc.Document;
             string targetWorksetName = "ќбщие уровни и сетки";
+            string collisionWorksetName = "* оллизии";
+            string duplicateWorksetName = "*ƒублирование";
             List<string> successfulLinks = new List<string>();
             List<string> failedLinks = new List<string>();
             try
@@ -65,49 +67,35 @@ namespace AbimToolsMine
 
                     // «десь работа с рабочими наборами
                     List<WorksetId> lstWkSet_ToOpen = new List<WorksetId>();
-                    bool foundTargetWorkset = false;
-                    bool targetWorksetIsOpen = false;
+
 
                     ModelPath modelPath = linkDoc.GetWorksharingCentralModelPath();
+                    string localpath = linkDoc.PathName;
+                    ModelPath localModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(localpath);
                     WorksetTable worksetTable = linkDoc.GetWorksetTable();
                     IList<WorksetPreview> lstPreview = WorksharingUtils.GetUserWorksetInfo(modelPath);
 
                     foreach (WorksetPreview item in lstPreview)
                     {
                         Workset wkset = worksetTable.GetWorkset(item.Id);
-                        if (wkset!=null)
+                        if (wkset != null)
                         {
-                            string name = wkset.Name;
+                            string name = wkset.Name ?? string.Empty;
 
-                            // »щем рабочий набор, который содержит targetWorksetName
-                            if (name.Contains(targetWorksetName))
+                            // ќпредел€ем, €вл€етс€ ли ворксет целевым (тот, который нужно закрыть).
+                            // »спользуем нечувствительный к регистру поиск подстроки.
+                            bool isTargetWorkset =
+                                name.IndexOf(targetWorksetName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                name.IndexOf(collisionWorksetName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                name.IndexOf(duplicateWorksetName, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                            // ≈сли ворксет Ќ≈ целевой и он сейчас открыт Ч сохраним его Id,
+                            // чтобы затем открыть снова (то есть закрыть все, кроме этих).
+                            if (!isTargetWorkset && wkset.IsOpen)
                             {
-                                foundTargetWorkset = true;
-                                targetWorksetIsOpen = wkset.IsOpen;
-                                // Ётот рабочий набор Ќ≈ добавл€ем в список открытых
-                            }
-                            else
-                            {
-                                // ¬се остальные рабочие наборы - сохран€ем их текущее состо€ние
-                                if (wkset.IsOpen)
-                                {
-                                    lstWkSet_ToOpen.Add(wkset.Id);
-                                }
+                                lstWkSet_ToOpen.Add(wkset.Id);
                             }
                         }
-                    }
-
-                    if (!foundTargetWorkset)
-                    {
-                        failedLinks.Add(linkType.Name + " (рабочий набор не найден)");
-                        continue;
-                    }
-
-                    if (!targetWorksetIsOpen)
-                    {
-                        // –абочий набор уже закрыт
-                        successfulLinks.Add(linkType.Name + " (уже закрыт)");
-                        continue;
                     }
 
                     // ÷елевой рабочий набор открыт, нужно его закрыть

@@ -16,166 +16,228 @@ namespace AbimToolsMine
     {
         private static readonly string RoomKey = Settings.Default.FloorRoomKeyParam;
         private static readonly string GroupKey = Settings.Default.FloorRoomGroupParam;
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+
+        // Максимальная длина имени файла (без расширения) с учётом базового пути
+   private const int MaxFileNameLength = 60;
+
+  public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            UIDocument uidoc = commandData.Application.ActiveUIDocument;
-            Document doc = uidoc.Document;
+      UIDocument uidoc = commandData.Application.ActiveUIDocument;
+       Document doc = uidoc.Document;
 
-
-            List<ElementId> legends = new FilteredElementCollector(doc)
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .Where(v => v.ViewType == ViewType.DraftingView && v.Name.Contains("Пирог -"))
-                .Select(v => v.Id)
-                .ToList();
-
-            string p = Path.GetTempPath();
-            string exportFolder = p;
+// Используем короткий путь в корне диска C: чтобы избежать превышения MAX_PATH (260 символов)
+// AppData\Local гарантированно доступен на запись для любого пользователя
+string exportFolder = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "RvtFlrImg");
             Directory.CreateDirectory(exportFolder);
 
-            ImageExportOptions options = new ImageExportOptions
+    // Собираем легенды-пироги и строим маппинг: короткое имя файла → реальное имя типа пола
+   // Это решает обе проблемы:
+   //   - точки в имени (GetFileNameWithoutExtension обрезает по первой точке)
+            //   - длинные пути (используем короткий числовой ID вместо полного имени)
+            var legendViews = new FilteredElementCollector(doc)
+     .OfClass(typeof(View))
+  .Cast<View>()
+           .Where(v => v.ViewType == ViewType.DraftingView && v.Name.Contains("Пирог -"))
+        .ToList();
+
+            if (!legendViews.Any())
+   return Result.Succeeded;
+
+        // Маппинг: короткое имя файла (без расширения) → реальное имя типа пола
+            // Формат: "floor_0001", "floor_0002", ...
+            // Извлекаем имя типа пола из имени легенды вида "Пирог - <ИмяТипа>"
+    var fileNameToTypeName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+  var exportIds = new List<ElementId>();
+
+            for (int i = 0; i < legendViews.Count; i++)
             {
-                ExportRange = ExportRange.SetOfViews,
-                FilePath = Path.Combine(exportFolder, "Пол"),
+    View v = legendViews[i];
+                string shortName = $"floor_{i:D4}";
+
+    // Имя легенды ожидается вида "Пирог - <ИмяТипа>"
+          string legendPrefix = "Пирог - ";
+        string typeName = v.Name.Contains(legendPrefix)
+               ? v.Name.Substring(v.Name.IndexOf(legendPrefix, StringComparison.Ordinal) + legendPrefix.Length)
+                 : v.Name;
+
+           fileNameToTypeName[shortName] = typeName;
+    exportIds.Add(v.Id);
+        }
+
+            // Экспортируем все легенды сразу с коротким базовым именем файла "floor"
+  // Revit добавит суффикс с именем вида, но мы переименуем файлы через маппинг
+            // Используем временную папку с коротким именем
+  string tempPrefix = "fl";
+       ImageExportOptions options = new ImageExportOptions
+            {
+    ExportRange = ExportRange.SetOfViews,
+         FilePath = Path.Combine(exportFolder, tempPrefix),
                 FitDirection = FitDirectionType.Horizontal,
                 HLRandWFViewsFileType = ImageFileType.PNG,
-                ImageResolution = ImageResolution.DPI_300,
-                ZoomType = ZoomFitType.FitToPage,
-                PixelSize = 2048,
-                ShadowViewsFileType = ImageFileType.PNG
+          ImageResolution = ImageResolution.DPI_300,
+         ZoomType = ZoomFitType.FitToPage,
+    PixelSize = 2048,
+        ShadowViewsFileType = ImageFileType.PNG
             };
-
-            options.SetViewsAndSheets(legends);
-
+  options.SetViewsAndSheets(exportIds);
             doc.ExportImage(options);
 
+          // После экспорта Revit создаёт файлы вида:
+          //   "fl - Чертежный вид - Пирог - <ИмяТипа>.png"
+            // Переименовываем их в короткие имена из маппинга, используя реальное имя типа
+   string revitLegendInfix = " - Чертежный вид - Пирог - ";
 
-            string[] imageFiles = Directory.GetFiles(exportFolder, "*.png");
-            using (Transaction t = new Transaction(doc, "Присвоение изображений типам полов"))
+  foreach (var kv in fileNameToTypeName)
             {
-                t.Start();
+     string shortName  = kv.Key;   // "floor_0001"
+       string typeName   = kv.Value; // реальное имя типа пола
 
-                foreach (string filePath in imageFiles)
-                {
-                    string fileName = Path.GetFileNameWithoutExtension(filePath);
+                // Нормализуем имя типа для имени файла (как это делает Revit)
+      string normalizedTypeName = NormalizeTypeNameForFilename(typeName);
 
-                    string prefix = "Пол - Чертежный вид - Пирог - ";
-                    if (!fileName.StartsWith(prefix)) continue;
+       // Revit формирует имя файла как "<prefix><infix><normalizedTypeName>.png"
+           string expectedFileName = tempPrefix + revitLegendInfix + normalizedTypeName + ".png";
+                string expectedFilePath = Path.Combine(exportFolder, expectedFileName);
 
-                    string typeName = fileName.Substring(prefix.Length);
-                    FilteredElementCollector collector = new FilteredElementCollector(doc)
-                        .OfClass(typeof(FloorType));
+     string shortFilePath = Path.Combine(exportFolder, shortName + ".png");
 
-                    FloorType floorType = collector
-                        .Cast<FloorType>()
-                        .FirstOrDefault(f =>
-                            NormalizeTypeNameForFilename(f.Name)
-                            .Equals(typeName, StringComparison.OrdinalIgnoreCase));
+      if (File.Exists(expectedFilePath))
+    {
+             // Переименовываем в короткое имя
+    if (File.Exists(shortFilePath)) File.Delete(shortFilePath);
+    File.Move(expectedFilePath, shortFilePath);
+      }
+   }
 
-                    if (floorType == null)
-                    {
-                        File.Delete(filePath);
-                        //TaskDialog.Show("Внимание", $"Не найден тип перекрытия с именем: {typeName}");
-                        continue;
-                    }
+            // Теперь обрабатываем переименованные файлы
+       using (Transaction t = new Transaction(doc, "Присвоение изображений типам полов"))
+{
+          t.Start();
 
-                    // Проверяем, существует ли изображение с таким именем
-                    FilteredElementCollector imageCollector = new FilteredElementCollector(doc)
-                        .OfClass(typeof(ImageType));
+    foreach (var kv in fileNameToTypeName)
+    {
+          string shortName = kv.Key;
+      string typeName  = kv.Value;
+       string filePath  = Path.Combine(exportFolder, shortName + ".png");
 
-                    ImageType existingImage = imageCollector
-                        .Cast<ImageType>()
-                        .FirstOrDefault(img => img.Name.Equals(fileName + ".png", StringComparison.OrdinalIgnoreCase));
+   if (!File.Exists(filePath))
+                 continue;
 
-                    ImageType imageType;
-#if R2020
-                    ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false);
-#else
-                    ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false, ImageTypeSource.Import);
-#endif
-                    if (existingImage != null)
-                    {
-                        // Обновляем изображение, если оно уже существует
-                        existingImage.ReloadFrom(imageOptions);
-                        imageType = existingImage;
-                    }
-                    else
-                    {
-                        // Создаём новое
+          try
+              {
+           // Ищем тип пола по реальному имени (без нормализации — сравниваем напрямую)
+  FloorType floorType = new FilteredElementCollector(doc)
+      .OfClass(typeof(FloorType))
+         .Cast<FloorType>()
+  .FirstOrDefault(f => f.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase));
 
-                        imageType = ImageType.Create(doc, imageOptions);
-                    }
-
-                    // Присваиваем изображение параметру типа пола
-                    Parameter param = floorType.LookupParameter("ПРО_Изображение типоразмера");
-                    if (param != null && param.StorageType == StorageType.ElementId)
-                    {
-                        param.Set(imageType.Id);
-                    }
-                    else
-                    {
-                        TaskDialog.Show("Ошибка", $"Параметр не найден или неправильного типа у {typeName}");
-                    }
-                    File.Delete(filePath);
-                }
-                // Собираем все полы
-                var floors = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Floor))
-                    .Cast<Floor>()
-                    .Where(f =>
-                    {
-                        var roomParam = f.LookupParameter(RoomKey);
-                        var groupParam = f.LookupParameter(GroupKey);
-                        return roomParam != null && groupParam != null &&
-                               roomParam.StorageType == StorageType.String &&
-                               groupParam.StorageType == StorageType.String &&
-                               !groupParam.IsReadOnly;
-                    })
-                    .ToList();
-
-                // Группировка по типоразмеру
-                var grouped = floors
-                    .GroupBy(f => doc.GetElement(f.GetTypeId()).Name)
-                    .ToList();
-
-                foreach (var group in grouped)
-                {
-                    var floorsOfType = group.ToList();
-
-                    // Получаем уникальные RoomKey
-                    var roomKeys = floorsOfType
-                        .Select(f => f.LookupParameter(RoomKey)?.AsString())
-                        .Where(v => !string.IsNullOrWhiteSpace(v))
-                        .Distinct()
-                        .OrderBy(v => v)
-                        .ToList();
-
-                    string joinedKeys = string.Join(", ", roomKeys);
-
-                    // Записываем в каждый пол этой группы
-                    foreach (var floor in floorsOfType)
-                    {
-                        var param = floor.LookupParameter(GroupKey);
-                        if (param != null && !param.IsReadOnly && param.StorageType == StorageType.String)
-                        {
-                            param.Set(joinedKeys);
-                        }
-                    }
-                }
-                t.Commit();
-            }
-            return Result.Succeeded;
-        }
-        private string NormalizeTypeNameForFilename(string typeName)
+       if (floorType == null)
         {
-            char[] invalidChars = Path.GetInvalidFileNameChars();
+         File.Delete(filePath);
+             continue;
+       }
 
-            foreach (char c in invalidChars)
+   // Проверяем, есть ли уже изображение с таким именем в документе
+            // Ищем по короткому имени файла (floor_XXXX.png)
+             string imageNameInDoc = shortName + ".png";
+         ImageType existingImage = new FilteredElementCollector(doc)
+        .OfClass(typeof(ImageType))
+    .Cast<ImageType>()
+ .FirstOrDefault(img => img.Name.Equals(imageNameInDoc, StringComparison.OrdinalIgnoreCase));
+
+                  ImageType imageType;
+#if R2020
+             ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false);
+#else
+      ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false, ImageTypeSource.Import);
+#endif
+      if (existingImage != null)
             {
-                typeName = typeName.Replace(c, '-');
+              existingImage.ReloadFrom(imageOptions);
+          imageType = existingImage;
+         }
+   else
+    {
+                imageType = ImageType.Create(doc, imageOptions);
             }
 
-            return typeName.Trim();
+            // Присваиваем изображение параметру типа пола
+    Parameter param = floorType.LookupParameter("ПРО_Изображение типоразмера");
+            if (param != null && param.StorageType == StorageType.ElementId)
+      {
+    param.Set(imageType.Id);
+           }
+   }
+   finally
+          {
+               File.Delete(filePath);
+              }
+      }
+
+    // Собираем все полы и группируем по типоразмеру
+             var floors = new FilteredElementCollector(doc)
+   .OfClass(typeof(Floor))
+               .Cast<Floor>()
+  .Where(f =>
+            {
+   var roomParam  = f.LookupParameter(RoomKey);
+           var groupParam = f.LookupParameter(GroupKey);
+ return roomParam  != null && groupParam != null &&
+  roomParam.StorageType  == StorageType.String &&
+    groupParam.StorageType == StorageType.String &&
+ !groupParam.IsReadOnly;
+       })
+          .ToList();
+
+         var grouped = floors.GroupBy(f => doc.GetElement(f.GetTypeId()).Name).ToList();
+
+     foreach (var group in grouped)
+      {
+  var floorsOfType = group.ToList();
+
+         var roomKeys = floorsOfType
+            .Select(f => f.LookupParameter(RoomKey)?.AsString())
+        .Where(v => !string.IsNullOrWhiteSpace(v))
+       .Distinct()
+            .OrderBy(v => v)
+            .ToList();
+
+    string joinedKeys = string.Join(", ", roomKeys);
+
+     foreach (var floor in floorsOfType)
+      {
+  var param = floor.LookupParameter(GroupKey);
+                 if (param != null && !param.IsReadOnly && param.StorageType == StorageType.String)
+     param.Set(joinedKeys);
+       }
+       }
+
+              t.Commit();
+   }
+
+      // Удаляем временную папку если она пуста
+    try
+        {
+   if (Directory.Exists(exportFolder) && !Directory.EnumerateFileSystemEntries(exportFolder).Any())
+          Directory.Delete(exportFolder);
+    }
+   catch { }
+
+  return Result.Succeeded;
+        }
+
+  private string NormalizeTypeNameForFilename(string typeName)
+        {
+    char[] invalidChars = Path.GetInvalidFileNameChars();
+            foreach (char c in invalidChars)
+   typeName = typeName.Replace(c, '-');
+
+            // Revit дополнительно заменяет точку на дефис при формировании имени файла
+            typeName = typeName.Replace('.', '-');
+
+      return typeName.Trim();
         }
     }
 }

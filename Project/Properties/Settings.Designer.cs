@@ -325,7 +325,7 @@ namespace AbimToolsMine.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_СЛЖ_Слой пола")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_АР_СЛЖ_Слой пола")]
         public string FloorLayerName {
             get {
                 return ((string)(this["FloorLayerName"]));
@@ -427,6 +427,30 @@ namespace AbimToolsMine.Properties {
             }
             set {
                 this["FlWallString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string IFCExportConfig {
+            get {
+                return ((string)(this["IFCExportConfig"]));
+            }
+            set {
+                this["IFCExportConfig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Navisworks")]
+        public string IFCViewName {
+            get {
+                return ((string)(this["IFCViewName"]));
+            }
+            set {
+                this["IFCViewName"] = value;
             }
         }
     }
