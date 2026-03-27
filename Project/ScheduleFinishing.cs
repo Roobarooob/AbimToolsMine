@@ -46,7 +46,7 @@ namespace AbimToolsMine
             ProcessElements(doc, BuiltInCategory.OST_Floors, "floor", roomData);
             ProcessElements(doc, BuiltInCategory.OST_Ceilings, "ceiling", roomData);
             ProcessElements(doc, BuiltInCategory.OST_Walls, "plinth", roomData);
-
+            
             var groupingDict = new Dictionary<string, HashSet<string>>();
             var groupAreas = new Dictionary<string, Dictionary<string, Dictionary<string, double>>>();
 
@@ -212,6 +212,7 @@ namespace AbimToolsMine
                 {
                     typeKey = "wall";
                 }
+                
 
                 var roomKey = GetParamValue(el, RoomKeyParam);
                 if (string.IsNullOrEmpty(roomKey)) continue;
@@ -247,6 +248,11 @@ namespace AbimToolsMine
                     {
                         value = GetArea(el);
                     }
+                }
+                else if (category == BuiltInCategory.OST_Floors && type.LookupParameter("Комментарии к типоразмеру").AsString() == "Отделка ступеней")
+                {
+                    // Для ступеней используем ПРО_площадь
+                    value = el.LookupParameter("ПРО_Площадь").AsDouble()*0.092903;
                 }
                 else
                 {

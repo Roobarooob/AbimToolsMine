@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 using Path = System.IO.Path;
 using Settings = AbimToolsMine.Properties.Settings;
 using View = Autodesk.Revit.DB.View;
@@ -18,23 +19,23 @@ namespace AbimToolsMine
         private static readonly string GroupKey = Settings.Default.FloorRoomGroupParam;
 
         // Максимальная длина имени файла (без расширения) с учётом базового пути
-   private const int MaxFileNameLength = 60;
+        private const int MaxFileNameLength = 60;
 
-  public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-      UIDocument uidoc = commandData.Application.ActiveUIDocument;
-       Document doc = uidoc.Document;
+            UIDocument uidoc = commandData.Application.ActiveUIDocument;
+            Document doc = uidoc.Document;
 
-// Используем короткий путь в корне диска C: чтобы избежать превышения MAX_PATH (260 символов)
-// AppData\Local гарантированно доступен на запись для любого пользователя
-string exportFolder = Path.Combine(
-    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-    "RvtFlrImg");
+            // Используем короткий путь в корне диска C: чтобы избежать превышения MAX_PATH (260 символов)
+            // AppData\Local гарантированно доступен на запись для любого пользователя
+            string exportFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "RvtFlrImg");
             Directory.CreateDirectory(exportFolder);
 
-    // Собираем легенды-пироги и строим маппинг: короткое имя файла → реальное имя типа пола
-   // Это решает обе проблемы:
-   //   - точки в имени (GetFileNameWithoutExtension обрезает по первой точке)
+            // Собираем легенды-пироги и строим маппинг: короткое имя файла → реальное имя типа пола
+            // Это решает обе проблемы:
+            //   - точки в имени (GetFileNameWithoutExtension обрезает по первой точке)
             //   - длинные пути (используем короткий числовой ID вместо полного имени)
             var legendViews = new FilteredElementCollector(doc)
      .OfClass(typeof(View))
@@ -169,7 +170,41 @@ string exportFolder = Path.Combine(
       {
     param.Set(imageType.Id);
            }
-   }
+
+ // Также записываем системную площадь перекрытия в параметр "ПРО_Площадь" у каждого экземпляра пола этого типа
+ // Берём все экземпляры данного типа
+ var instances = new FilteredElementCollector(doc)
+ .OfClass(typeof(Floor))
+ .Cast<Floor>()
+ .Where(f => f.GetTypeId() == floorType.Id)
+ .ToList();
+
+ foreach (var inst in instances)
+ {
+ // Получаем системную площадь (BuiltInParameter.HOST_AREA_COMPUTED)
+ Parameter sysAreaParam = inst.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED);
+ if (sysAreaParam == null) continue;
+
+ double areaInternal = sysAreaParam.AsDouble(); // квадратные футы (внутренние единицы)
+
+ // Целевой параметр
+ Parameter targetAreaParam = inst.LookupParameter("ПРО_Площадь");
+ if (targetAreaParam == null) continue;
+
+ if (targetAreaParam.StorageType == StorageType.Double)
+ {
+ // Устанавливаем значение в внутренних единицах (Revit ожидает внутренние единицы)
+ targetAreaParam.Set(areaInternal);
+ }
+ else if (targetAreaParam.StorageType == StorageType.String)
+ {
+ // Конвертируем в квадратные метры и сохраняем строкой с2 знаками
+ double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, UnitTypeId.SquareMeters);
+ targetAreaParam.Set(Math.Round(areaM2,2).ToString(CultureInfo.InvariantCulture));
+ }
+ }
+
+ }
    finally
           {
                File.Delete(filePath);
