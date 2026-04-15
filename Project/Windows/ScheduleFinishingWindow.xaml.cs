@@ -76,6 +76,8 @@ namespace AbimToolsMine
             FloorKeyParamBox.Text = Settings.Default.FloorRoomKeyParam;
             FoorLayerNameBox.Text = Settings.Default.FloorLayerName;
             ViewTemplateNameBox.Text = Settings.Default.viewTemplateName;
+            EtageParamBox.Text = Settings.Default.EtageParam;
+            RoomGroupEtageParamBox.Text = Settings.Default.RoomGroupEtageParam;
             if (Settings.Default.NeedFloor == true)
                 NeeFloorCheckBox.IsChecked = true;
             else NeeFloorCheckBox.IsChecked = false;
@@ -129,10 +131,17 @@ namespace AbimToolsMine
             Settings.Default.FloorRoomKeyParam = FloorKeyParamBox.Text;
             Settings.Default.FloorLayerName = FoorLayerNameBox.Text;
             Settings.Default.viewTemplateName = ViewTemplateNameBox.Text;
+            Settings.Default.EtageParam = EtageParamBox.Text;
+            Settings.Default.RoomGroupEtageParam = RoomGroupEtageParamBox.Text;
 
             Settings.Default.Save();
             this.DialogResult = true;
             this.Close();
+        }
+
+        private void RoomGroupEtageParamBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
         }
     }
 }

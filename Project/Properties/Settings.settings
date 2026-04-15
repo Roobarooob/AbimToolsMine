@@ -110,5 +110,11 @@
     <Setting Name="IFCViewName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Navisworks</Value>
     </Setting>
+    <Setting Name="EtageParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Этаж</Value>
+    </Setting>
+    <Setting Name="RoomGroupEtageParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр_Поэтажная</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -453,5 +453,29 @@ namespace AbimToolsMine.Properties {
                 this["IFCViewName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Этаж")]
+        public string EtageParam {
+            get {
+                return ((string)(this["EtageParam"]));
+            }
+            set {
+                this["EtageParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Номер помещения.Гр_Поэтажная")]
+        public string RoomGroupEtageParam {
+            get {
+                return ((string)(this["RoomGroupEtageParam"]));
+            }
+            set {
+                this["RoomGroupEtageParam"] = value;
+            }
+        }
     }
 }

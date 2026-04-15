@@ -17,6 +17,8 @@ namespace AbimToolsMine
     {
         private static readonly string RoomKey = Settings.Default.FloorRoomKeyParam;
         private static readonly string GroupKey = Settings.Default.FloorRoomGroupParam;
+        private static readonly string EtageKey = Settings.Default.EtageParam;
+        private static readonly string GroupEtageKey = Settings.Default.RoomGroupEtageParam;
 
         // Максимальная длина имени файла (без расширения) с учётом базового пути
         private const int MaxFileNameLength = 60;
@@ -249,8 +251,73 @@ namespace AbimToolsMine
        }
        }
 
-              t.Commit();
+   // Поэтажная группировка:
+   // Для каждого пола берём его RoomKey, ищем помещение с таким значением,
+   // читаем у него EtageKey, затем группируем полы по (тип + этаж)
+// и записываем RoomKey через запятую в параметр GroupEtageKey
+   if (!string.IsNullOrEmpty(EtageKey) && !string.IsNullOrEmpty(GroupEtageKey))
+   {
+       // Строим словарь: значение RoomKey помещения → значение EtageParam
+       var roomKeyToEtage = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+       var rooms = new FilteredElementCollector(doc)
+        .OfCategory(BuiltInCategory.OST_Rooms)
+           .WhereElementIsNotElementType()
+           .ToList();
+
+       foreach (var room in rooms)
+       {
+   // У помещения номер хранится в системном параметре ROOM_NUMBER, а не в ПРО_Номер помещения
+      var rkParam = room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
+           var etParam = room.LookupParameter(EtageKey);
+           if (rkParam == null || etParam == null) continue;
+    string rkVal = rkParam.AsString();
+           string etVal = etParam.AsString();
+           if (string.IsNullOrWhiteSpace(rkVal) || string.IsNullOrWhiteSpace(etVal)) continue;
+  if (!roomKeyToEtage.ContainsKey(rkVal))
+             roomKeyToEtage[rkVal] = etVal;
+       }
+
+  // Для каждого экземпляра пола определяем его этаж через его собственный RoomKey
+       // floorInfo: экземпляр пола + его RoomKey + его этаж
+       var floorInfos = floors
+           .Select(f =>
+           {
+         string rkVal = f.LookupParameter(RoomKey)?.AsString() ?? "";
+          string etage = (!string.IsNullOrWhiteSpace(rkVal) &&
+                  roomKeyToEtage.TryGetValue(rkVal, out string e)) ? e : "";
+               string typeName = doc.GetElement(f.GetTypeId()).Name;
+    return new { Floor = f, RoomKeyVal = rkVal, Etage = etage, TypeName = typeName };
+           })
+      .Where(x => !string.IsNullOrWhiteSpace(x.RoomKeyVal))
+           .ToList();
+
+       // Строим словарь: (тип + этаж) → список уникальных RoomKey (отсортированных)
+       // Это будет значение для GroupEtageKey всех полов этой группы
+       var etageGroupValues = floorInfos
+   .GroupBy(x => new { x.TypeName, x.Etage })
+           .ToDictionary(
+               g => g.Key,
+               g => string.Join(", ", g
+     .Select(x => x.RoomKeyVal)
+        .Where(v => !string.IsNullOrWhiteSpace(v))
+           .Distinct()
+      .OrderBy(v => v)));
+
+       // Записываем в каждый экземпляр пола его поэтажное значение
+       foreach (var info in floorInfos)
+       {
+      var key = new { info.TypeName, info.Etage };
+       if (!etageGroupValues.TryGetValue(key, out string joinedEtageKeys)) continue;
+
+   var param = info.Floor.LookupParameter(GroupEtageKey);
+  if (param != null && !param.IsReadOnly && param.StorageType == StorageType.String)
+     param.Set(joinedEtageKeys);
+       }
    }
+   t.Commit();
+   }
+
+   TaskDialog.Show("Готово", "Параметры заполнены");
 
       // Удаляем временную папку если она пуста
     try
