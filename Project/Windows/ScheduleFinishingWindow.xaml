@@ -140,7 +140,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Параметр группы помещений:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
-                    <TextBox x:Name="FloorRoomGroupParamBox" Grid.Row="1" Grid.Column="1" Text="ПРО_ОП_Номер помещения.Гр" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="ElementRoomGroupParamBox" Grid.Row="1" Grid.Column="1" Text="ПРО_ОП_Номер помещения.Гр" VerticalContentAlignment="Center"/>
 
                     <Label Content="Параметр ключа помещения (в полах):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
                     <TextBox x:Name="FloorKeyParamBox" Grid.Row="2" Grid.Column="1" Text="ПРО_Номер помещения" VerticalContentAlignment="Center"/>

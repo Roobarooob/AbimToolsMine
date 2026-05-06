@@ -314,12 +314,12 @@ namespace AbimToolsMine.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ПРО_ОП_Номер помещения.Гр")]
-        public string FloorRoomGroupParam {
+        public string ElementRoomGroupParam {
             get {
-                return ((string)(this["FloorRoomGroupParam"]));
+                return ((string)(this["ElementRoomGroupParam"]));
             }
             set {
-                this["FloorRoomGroupParam"] = value;
+                this["ElementRoomGroupParam"] = value;
             }
         }
         

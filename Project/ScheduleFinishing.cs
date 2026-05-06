@@ -49,6 +49,7 @@ namespace AbimToolsMine
             
             var groupingDict = new Dictionary<string, HashSet<string>>();
             var groupAreas = new Dictionary<string, Dictionary<string, Dictionary<string, double>>>();
+            var processedRoomsPerGroup = new Dictionary<string, HashSet<string>>(); // roomNum already counted per group
 
             foreach (var room in rooms)
             {
@@ -63,20 +64,27 @@ namespace AbimToolsMine
                 {
                     groupingDict[groupKey] = new HashSet<string>();
                     groupAreas[groupKey] = InitGroupArea();
+                    processedRoomsPerGroup[groupKey] = new HashSet<string>();
                 }
 
                 groupingDict[groupKey].Add(roomNum);
 
-                foreach (var part in data)
+                // Добавляем площади только если этот roomNum ещё не был обработан для данной группы
+                if (!processedRoomsPerGroup[groupKey].Contains(roomNum))
                 {
-                    if (!NeedFloor && part.Key == Settings.Default.FloorNameParam)
-                        continue;
+                    processedRoomsPerGroup[groupKey].Add(roomNum);
 
-                    foreach (var entry in part.Value)
+                    foreach (var part in data)
                     {
-                        if (!groupAreas[groupKey][part.Key].ContainsKey(entry.Key))
-                            groupAreas[groupKey][part.Key][entry.Key] = 0;
-                        groupAreas[groupKey][part.Key][entry.Key] += entry.Value;
+                        if (!NeedFloor && part.Key == Settings.Default.FloorNameParam)
+                            continue;
+
+                        foreach (var entry in part.Value)
+                        {
+                            if (!groupAreas[groupKey][part.Key].ContainsKey(entry.Key))
+                                groupAreas[groupKey][part.Key][entry.Key] = 0;
+                            groupAreas[groupKey][part.Key][entry.Key] += entry.Value;
+                        }
                     }
                 }
             }

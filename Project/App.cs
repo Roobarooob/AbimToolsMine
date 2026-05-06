@@ -221,18 +221,7 @@ namespace AbimToolsMine
             );
             Pref_ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Pref_Finishing32.png"));
 
-            // Кнопка "Cоздание ведомости отделки"
-            PushButton ScheduleFinishing = CreateButton(
-                panel: pan_otd,
-                name: "ScheduleFinishing",
-                text: "Ведомость отделки",
-                command: "AbimToolsMine.ScheduleFinishing",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png",
-                toolTip: "Создание ведомости отделки по ГОСТ",
-                dllName: "AbimToolsMine.dll"
-            );
-            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png"));
-
+            
             // Кнопка "Cоздание ведомости отделки"
             PushButton FloorLegends = CreateButton(
                 panel: pan_otd,
@@ -243,19 +232,31 @@ namespace AbimToolsMine
                 toolTip: "Создание эскизов для каждого типа пола. (типы полов создаются чертёжными видами)",
                 dllName: "AbimToolsMine.dll"
             );
-            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
+            FloorLegends.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
 
             // Кнопка Ведомость полов заполнение параметров"
             PushButton LegendsToParameters = CreateButton(
                 panel: pan_otd,
                 name: "LegendsToParameter",
-                text: "Полы\nЗаполнить параметры",
+                text: "Элементы отделки\nЗаполнить параметры",
                 command: "AbimToolsMine.LegendsToParameter",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
-                toolTip: "Эскизы переходят в параметр типа пола",
+                toolTip: "Заполнение параметров номеров помещений, для каждого экземпляра полов/потолков/стен, заполнение эскизов полов",
                 dllName: "AbimToolsMine.dll"
             );
-            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+            LegendsToParameters.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+
+            // Кнопка "Cоздание ведомости отделки"
+            PushButton ScheduleFinishing = CreateButton(
+                panel: pan_otd,
+                name: "ScheduleFinishing",
+                text: "Сформировать\nВедомость отделки",
+                command: "AbimToolsMine.ScheduleFinishing",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png",
+                toolTip: "Создание ведомости отделки по ГОСТ",
+                dllName: "AbimToolsMine.dll"
+            );
+            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png"));
 
             // Кнопка заполнение параметра ПРО_Номер листа"
             PushButton SheetNumbers = CreateButton(

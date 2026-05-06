@@ -72,7 +72,7 @@ namespace AbimToolsMine
 
             //Полы
             FloorStructureCompBox.Text = Settings.Default.FloorStructureComp;
-            FloorRoomGroupParamBox.Text = Settings.Default.FloorRoomGroupParam;
+            ElementRoomGroupParamBox.Text = Settings.Default.ElementRoomGroupParam;
             FloorKeyParamBox.Text = Settings.Default.FloorRoomKeyParam;
             FoorLayerNameBox.Text = Settings.Default.FloorLayerName;
             ViewTemplateNameBox.Text = Settings.Default.viewTemplateName;
@@ -127,7 +127,7 @@ namespace AbimToolsMine
         {
             //Полы
             Settings.Default.FloorStructureComp = FloorStructureCompBox.Text;
-            Settings.Default.FloorRoomGroupParam = FloorRoomGroupParamBox.Text;
+            Settings.Default.ElementRoomGroupParam = ElementRoomGroupParamBox.Text;
             Settings.Default.FloorRoomKeyParam = FloorKeyParamBox.Text;
             Settings.Default.FloorLayerName = FoorLayerNameBox.Text;
             Settings.Default.viewTemplateName = ViewTemplateNameBox.Text;

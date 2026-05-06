@@ -74,7 +74,7 @@
     <Setting Name="FloorRoomKeyParam" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_Номер помещения</Value>
     </Setting>
-    <Setting Name="FloorRoomGroupParam" Type="System.String" Scope="User">
+    <Setting Name="ElementRoomGroupParam" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр</Value>
     </Setting>
     <Setting Name="FloorLayerName" Type="System.String" Scope="User">
