@@ -282,6 +282,18 @@ namespace AbimToolsMine
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
 
+            // Кнопка "Копировать параметр"
+            PushButton copyParam_button = CreateButton(
+                    panel: pan_gen,
+                    name: "CopyParameter",
+                    text: "Копировать\nпараметр",
+                    command: "AbimToolsMine.CopyParameterCommand",
+                    imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/CopyParam32.png",
+                    toolTip: "Перезаписать значение одного параметра в другой для выбранных или отфильтрованных элементов",
+                    dllName: "AbimToolsMine.dll"
+            );
+            copyParam_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/CopyParam16.png"));
+
         }
 
 

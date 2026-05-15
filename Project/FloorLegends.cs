@@ -27,7 +27,8 @@ namespace AbimToolsMine
             { "Утеплитель", 6 },
             { "Стяжка", 7 },
             { "Пенополистерол", 8 },
-            {"Гидроизоляция", 9 }
+            {"Гидроизоляция", 9 },
+            {"Керамзит", 10 }
         };
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -101,6 +102,7 @@ namespace AbimToolsMine
                                        lname.Contains("монолит")||lname.Contains("ж.б.") || lname.Contains("ж.-б.") || lname.Contains("ж-б") ? "Железобетон"  :
                                        lname.Contains(" бетон") ? "Бетон" :
                                        lname.Contains("сталь") ? "Сталь" :
+                                       lname.Contains("керамзит") ? "Керамзит" :
                                        "Другое";
                     if (layerType == null)
                     {

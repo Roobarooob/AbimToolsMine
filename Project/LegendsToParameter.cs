@@ -162,8 +162,12 @@ namespace AbimToolsMine
                                     targetArea.Set(areaInternal);
                                 else if (targetArea.StorageType == StorageType.String)
                                 {
-                                    double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, UnitTypeId.SquareMeters);
-                                    targetArea.Set(Math.Round(areaM2, 2).ToString(CultureInfo.InvariantCulture));
+#if R2020
+ double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, DisplayUnitType.DUT_SQUARE_METERS);
+#else
+   double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, UnitTypeId.SquareMeters);
+#endif
+         targetArea.Set(Math.Round(areaM2, 2).ToString(CultureInfo.InvariantCulture));
                                 }
                             }
                         }
