@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="AbimToolsMine.FormAssignWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Запись по формообразующему"
+        Width="420" Height="350" ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow" Background="WhiteSmoke" Topmost="True">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <GroupBox Grid.Row="0"
+              Header="Источник формообразующих"
+              Margin="0,0,0,8">
+      <StackPanel Margin="5">
+        <RadioButton x:Name="RbCurrentFile"
+                     Content="Формы в этом файле"
+                     IsChecked="True"
+                     Checked="OnSourceChanged"/>
+
+        <RadioButton x:Name="RbLinkedFile"
+                     Content="Формы в связанном файле"
+                     Margin="0,4,0,0"
+                     Checked="OnSourceChanged"/>
+
+        <ComboBox x:Name="CbLinks"
+                  Margin="16,4,0,0"
+                  Height="24"
+                  IsEnabled="False"
+                  SelectionChanged="OnLinkSelectionChanged"
+                  DisplayMemberPath="Name"/>
+      </StackPanel>
+    </GroupBox>
+
+    <Label Grid.Row="1"
+           Content="Формообразующий элемент:"
+           Margin="0,0,0,2"/>
+
+    <ComboBox Grid.Row="2"
+              x:Name="CbForms"
+              Height="24"
+              Margin="0,0,0,8"
+              DisplayMemberPath="Name"/>
+
+    <Label Grid.Row="3"
+           Content="Параметр формообразующего:"
+           Margin="0,0,0,2"/>
+
+    <TextBox Grid.Row="4"
+             x:Name="TbFormParam"
+             Height="24"
+             VerticalContentAlignment="Center"
+             Margin="0,0,0,8"
+             TextChanged="OnFormParamChanged"/>
+
+    <StackPanel Grid.Row="6"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+      <Button x:Name="BtnRun"
+              Content="Запуск"
+              Width="90"
+              Height="26"
+              Margin="0,0,8,0"
+              Click="OnRunClick"/>
+
+      <Button Content="Отмена"
+              Width="90"
+              Height="26"
+              Click="OnCancelClick"/>
+    </StackPanel>
+  </Grid>
+</Window>

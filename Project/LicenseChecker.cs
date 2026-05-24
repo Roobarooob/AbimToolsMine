@@ -43,6 +43,7 @@ namespace AbimToolsMine
                     if (result != null && result.valid)
                     {
                         SaveLicenseTimestamp(cacheFile);
+                        SaveSharedCredentials(org, code);
                         Console.WriteLine("✅ Лицензия действительна (онлайн)");
                         return true;
                     }
@@ -100,6 +101,34 @@ namespace AbimToolsMine
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Сохраняет org и code в общий файл, доступный MakeTask.
+        /// </summary>
+        private static void SaveSharedCredentials(string org, string code)
+        {
+            try
+            {
+                string cacheDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "AbimTools");
+                if (!Directory.Exists(cacheDir))
+                    Directory.CreateDirectory(cacheDir);
+
+                string path = Path.Combine(cacheDir, "shared_credentials.json");
+                string json = $"{{\"org\":\"{EscapeJson(org)}\",\"code\":\"{EscapeJson(code)}\"}}";
+                File.WriteAllText(path, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"⚠ Ошибка записи shared credentials: {ex.Message}");
+            }
+        }
+
+        private static string EscapeJson(string value)
+        {
+            return value?.Replace("\\", "\\\\").Replace("\"", "\\\"") ?? "";
         }
 
         private class LicenseResponse

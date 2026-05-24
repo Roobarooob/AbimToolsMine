@@ -137,7 +137,7 @@ namespace AbimToolsMine
 #if R2020
      ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false);
 #else
-                        ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false, ImageTypeSource.Import);
+                            ImageTypeOptions imageOptions = new ImageTypeOptions(filePath, false, ImageTypeSource.Import);
 #endif
                             if (existingImage != null) { existingImage.ReloadFrom(imageOptions); imageType = existingImage; }
                             else { imageType = ImageType.Create(doc, imageOptions); }
@@ -165,9 +165,9 @@ namespace AbimToolsMine
 #if R2020
  double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, DisplayUnitType.DUT_SQUARE_METERS);
 #else
-   double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, UnitTypeId.SquareMeters);
+                                    double areaM2 = UnitUtils.ConvertFromInternalUnits(areaInternal, UnitTypeId.SquareMeters);
 #endif
-         targetArea.Set(Math.Round(areaM2, 2).ToString(CultureInfo.InvariantCulture));
+                                    targetArea.Set(Math.Round(areaM2, 2).ToString(CultureInfo.InvariantCulture));
                                 }
                             }
                         }

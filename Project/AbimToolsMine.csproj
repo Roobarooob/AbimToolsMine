@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
       None
     </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
@@ -12,13 +12,6 @@
     <RootNamespace>AbimToolsMine</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PostBuildEvent>set "VERSION=2021"
-
-if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
-    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
-)
-
-copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2020|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,16 +22,30 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <PostBuildEvent>set "VERSION=2020"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2021|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+  <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
     <TargetFramework>net48</TargetFramework>
     <OutputPath>bin\R2021\</OutputPath>
     <DefineConstants>DEBUG;R2021</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+ <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <PostBuildEvent>set "VERSION=2021"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2022|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +56,13 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <PostBuildEvent>set "VERSION=2022"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2023|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,8 +71,15 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <OutputPath>bin\R2023\</OutputPath>
     <DefineConstants>DEBUG;R2023</DefineConstants>
     <AssemblyName>$(AssemblyName)</AssemblyName>
-    <IsPublishable>False</IsPublishable>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  <IsPublishable>False</IsPublishable>
+  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <PostBuildEvent>set "VERSION=2023"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2024|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,6 +90,13 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <PostBuildEvent>set "VERSION=2024"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'R2025|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,6 +107,13 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <IsPublishable>False</IsPublishable>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+<PostBuildEvent>set "VERSION=2025"
+
+if not exist "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools" (
+    mkdir "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools"
+)
+
+copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\APRO\AbimTools\AbimToolsMine.dll"</PostBuildEvent>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(Configuration)'=='R2020' ">
@@ -89,6 +124,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
         </Reference>
         <Reference Include="RevitAPIUI">
           <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2020\AdWindows.dll</HintPath>
           <Private>False</Private>
         </Reference>
       </ItemGroup>
@@ -103,6 +142,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
           <HintPath>C:\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2021\AdWindows.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </When>
     <When Condition=" '$(Configuration)'=='R2022' ">
@@ -113,6 +156,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
         </Reference>
         <Reference Include="RevitAPIUI">
           <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2022\AdWindows.dll</HintPath>
           <Private>False</Private>
         </Reference>
       </ItemGroup>
@@ -127,6 +174,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
           <HintPath>C:\Program Files\Autodesk\Revit 2023\RevitAPIUI.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2023\AdWindows.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </When>
     <When Condition=" '$(Configuration)'=='R2024' ">
@@ -137,6 +188,10 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
         </Reference>
         <Reference Include="RevitAPIUI">
           <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2024\AdWindows.dll</HintPath>
           <Private>False</Private>
         </Reference>
       </ItemGroup>
@@ -151,15 +206,17 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
           <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="AdWindows">
+          <HintPath>C:\Program Files\Autodesk\Revit 2025\AdWindows.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </When>
   </Choose>
   <ItemGroup>
     <None Remove="Resources\Finishing16.png" />
     <None Remove="Resources\Finishing32.png" />
-    <None Remove="Resources\FloorLegends16.png" />
     <None Remove="Resources\FloorLegends32.png" />
-    <None Remove="Resources\LegendsToParameter16.png" />
     <None Remove="Resources\LegendsToParameter32.png" />
     <None Remove="Resources\MakeLocalTask16.png" />
     <None Remove="Resources\MakeLocalTask32.png" />
@@ -174,13 +231,16 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\BatchTools16.png" />
+    <Resource Include="Resources\ElementParameters16.png" />
+    <Resource Include="Resources\FloorLegends16.png" />
+    <Resource Include="Resources\ElementParameters32.png" />
+    <Resource Include="Resources\FormAssign16.png" />
     <Resource Include="Resources\CopyParam16.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\FastFilter16.png" />
     <Resource Include="Resources\Finishing16.png" />
     <Resource Include="Resources\Finishing32.png" />
-    <Resource Include="Resources\FloorLegends16.png" />
     <Resource Include="Resources\CopyParam32.png" />
     <Resource Include="Resources\FloorLegends32.png" />
     <Resource Include="Resources\LegendsToParameter16.png" />

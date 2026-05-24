@@ -477,5 +477,65 @@ namespace AbimToolsMine.Properties {
                 this["RoomGroupEtageParam"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Секция")]
+        public string FormParamName {
+            get {
+                return ((string)(this["FormParamName"]));
+            }
+            set {
+                this["FormParamName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Предупреждение")]
+        public string WarningParam {
+            get {
+                return ((string)(this["WarningParam"]));
+            }
+            set {
+                this["WarningParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SplitByParam {
+            get {
+                return ((bool)(this["SplitByParam"]));
+            }
+            set {
+                this["SplitByParam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ПРО_Этаж")]
+        public string SplitParamName {
+            get {
+                return ((string)(this["SplitParamName"]));
+            }
+            set {
+                this["SplitParamName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoomToFloorMappings {
+            get {
+                return ((string)(this["RoomToFloorMappings"]));
+            }
+            set {
+                this["RoomToFloorMappings"] = value;
+            }
+        }
     }
 }

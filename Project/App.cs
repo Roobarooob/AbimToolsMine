@@ -1,4 +1,4 @@
-#region Namespaces
+п»ї#region Namespaces
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
@@ -15,7 +15,7 @@ namespace AbimToolsMine
     {
         private UIControlledApplication _application;
         private bool _panelsInitialized = false;
-        private string superpanel = "Плагин";
+        private string superpanel = "РџР»Р°РіРёРЅ";
 
         public RibbonPanel RibbonPanel(UIControlledApplication a, string tab, string ribbonPanelText)
         {
@@ -36,7 +36,7 @@ namespace AbimToolsMine
             }
             catch (Exception ex)
             {
-                // Логирование ошибки
+                // Р›РѕРіРёСЂРѕРІР°РЅРёРµ РѕС€РёР±РєРё
                 TaskDialog.Show("Error", ex.Message);
             }
 
@@ -58,9 +58,11 @@ namespace AbimToolsMine
             string toolTip = "",
             string longDescription = "",
             string availabilityClassName = "",
-            string dllName = "")
+            string dllName = "",
+            bool itemtext = true
+)
         {
-            // Определяем путь к DLL-файлу: если имя DLL задано, используем его, иначе берем текущую DLL
+            // РћРїСЂРµРґРµР»СЏРµРј РїСѓС‚СЊ Рє DLL-С„Р°Р№Р»Сѓ: РµСЃР»Рё РёРјСЏ DLL Р·Р°РґР°РЅРѕ, РёСЃРїРѕР»СЊР·СѓРµРј РµРіРѕ, РёРЅР°С‡Рµ Р±РµСЂРµРј С‚РµРєСѓС‰СѓСЋ DLL
             string assemblyPath;
             if (!string.IsNullOrWhiteSpace(dllName))
             {
@@ -73,19 +75,19 @@ namespace AbimToolsMine
                 assemblyPath = typeof(App).Assembly.Location;
             }
 
-            // Создаём данные кнопки
+            // РЎРѕР·РґР°С‘Рј РґР°РЅРЅС‹Рµ РєРЅРѕРїРєРё
             PushButtonData buttonData = new PushButtonData(name, text, assemblyPath, command);
 
-            // Загружаем изображение
+            // Р—Р°РіСЂСѓР¶Р°РµРј РёР·РѕР±СЂР°Р¶РµРЅРёРµ
             BitmapImage pbImage = new BitmapImage(new Uri(imageUri));
             buttonData.LargeImage = pbImage;
 
-            // Добавляем кнопку на панель
+            // Р”РѕР±Р°РІР»СЏРµРј РєРЅРѕРїРєСѓ РЅР° РїР°РЅРµР»СЊ
             PushButton button = panel.AddItem(buttonData) as PushButton;
             button.ToolTip = toolTip;
             button.LongDescription = longDescription;
 
-            // Устанавливаем класс доступности, если указан
+            // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєР»Р°СЃСЃ РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё, РµСЃР»Рё СѓРєР°Р·Р°РЅ
             if (!string.IsNullOrWhiteSpace(availabilityClassName))
             {
                 try
@@ -95,205 +97,229 @@ namespace AbimToolsMine
                 catch (Exception) { }
             }
 
+
             return button;
         }
 
         private void OnButtonCreate(UIControlledApplication application)
         {
-            var pan0 = RibbonPanel(application, "АБИМ-ПРО", superpanel);
+            var pan0 = RibbonPanel(application, "РђР‘РРњ-РџР Рћ", superpanel);
 
-            // Кнопка "Программа"
+            // РљРЅРѕРїРєР° "РџСЂРѕРіСЂР°РјРјР°"
 
             PushButton ToggleAbimPanels = CreateButton(
                 panel: pan0,
                 name: "About",
-                text: "Программа",
+                text: "РџСЂРѕРіСЂР°РјРјР°",
                 command: "AbimToolsMine.ToggleAbimPanels",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/About.png",
-                toolTip: "Настройки лицензий панелей",
+                toolTip: "РќР°СЃС‚СЂРѕР№РєРё Р»РёС†РµРЅР·РёР№ РїР°РЅРµР»РµР№",
                 longDescription: "",
                 availabilityClassName: "AbimToolsMine.CommandAvailability",
                 dllName: "AbimToolsMine.dll"
             );
 
-            var pan_bim = RibbonPanel(application, "АБИМ-ПРО", "BIM");
-            var pan_gen = RibbonPanel(application, "АБИМ-ПРО", "Общие утилиты");
-            var pan_otd = RibbonPanel(application, "АБИМ-ПРО", "Отделка и полы");
-        
+            var pan_bim = RibbonPanel(application, "РђР‘РРњ-РџР Рћ", "BIM");
+            var pan_gen = RibbonPanel(application, "РђР‘РРњ-РџР Рћ", "РћР±С‰РёРµ СѓС‚РёР»РёС‚С‹");
+            var pan_otd = RibbonPanel(application, "РђР‘РРњ-РџР Рћ", "РћС‚РґРµР»РєР° Рё РїРѕР»С‹");
 
 
-            // Кнопка "Пакетная обработка"
+
+            // РљРЅРѕРїРєР° "РџР°РєРµС‚РЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР°"
             PushButton bath_button = CreateButton(
                 panel: pan_bim,
                 name: "BatchTools",
-                text: "Пакетная\nобработка",
+                text: "РџР°РєРµС‚РЅР°СЏ\nРѕР±СЂР°Р±РѕС‚РєР°",
                 command: "AbimToolsMine.BatchTools",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/BatchTools32.png",
-                toolTip: "Инструменты автоматизированной последовательной обработки нескольких файлов Revit",
-                longDescription: "Автоматическая загрузка семейств, расстановка коллизий по XML, удаление связей из моделей",
+                toolTip: "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹ Р°РІС‚РѕРјР°С‚РёР·РёСЂРѕРІР°РЅРЅРѕР№ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕР№ РѕР±СЂР°Р±РѕС‚РєРё РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ Revit",
+                longDescription: "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ Р·Р°РіСЂСѓР·РєР° СЃРµРјРµР№СЃС‚РІ, СЂР°СЃСЃС‚Р°РЅРѕРІРєР° РєРѕР»Р»РёР·РёР№ РїРѕ XML, СѓРґР°Р»РµРЅРёРµ СЃРІСЏР·РµР№ РёР· РјРѕРґРµР»РµР№",
                 availabilityClassName: "AbimToolsMine.CommandAvailability",
                 dllName: "AbimToolsMine.dll"
             );
             bath_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
 
-            // Кнопка "Загрузить коллизии"
+            // РљРЅРѕРїРєР° "Р—Р°РіСЂСѓР·РёС‚СЊ РєРѕР»Р»РёР·РёРё"
             PushButton col_button = CreateButton(
                 panel: pan_gen,
                 name: "CollisionTools",
-                text: "Загрузить\nколлизии",
+                text: "Р—Р°РіСЂСѓР·РёС‚СЊ\nРєРѕР»Р»РёР·РёРё",
                 command: "AbimToolsMine.Collisions",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Collisions32.png",
-                toolTip: "Загрузка коллизий по XML в текущий документ\nПуть к XML должен быть прописан в параметре ПРО_Путь XML коллизий",
+                toolTip: "Р—Р°РіСЂСѓР·РєР° РєРѕР»Р»РёР·РёР№ РїРѕ XML РІ С‚РµРєСѓС‰РёР№ РґРѕРєСѓРјРµРЅС‚\nРџСѓС‚СЊ Рє XML РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РїСЂРѕРїРёСЃР°РЅ РІ РїР°СЂР°РјРµС‚СЂРµ РџР Рћ_РџСѓС‚СЊ XML РєРѕР»Р»РёР·РёР№",
                 dllName: "AbimToolsMine.dll"
             );
             col_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));
 
-            // Кнопка "БыстроФильтр"
+            // РљРЅРѕРїРєР° "Р‘С‹СЃС‚СЂРѕР¤РёР»СЊС‚СЂ"
             PushButton selector_button = CreateButton(
                 panel: pan_gen,
                 name: "FastFilter",
-                text: "БыстроФильтр",
+                text: "Р‘С‹СЃС‚СЂРѕР¤РёР»СЊС‚СЂ",
                 command: "AbimToolsMine.FastFilter",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/FastFilter32.png",
-                toolTip: "Фильтрация выбранных категорий, одной кнопкой",
+                toolTip: "Р¤РёР»СЊС‚СЂР°С†РёСЏ РІС‹Р±СЂР°РЅРЅС‹С… РєР°С‚РµРіРѕСЂРёР№, РѕРґРЅРѕР№ РєРЅРѕРїРєРѕР№",
                 dllName: "AbimToolsMine.dll"
             );
             selector_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FastFilter16.png"));
 
-            // Кнопка "Инструменты рабочих наборов"
+            // РљРЅРѕРїРєР° "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹ СЂР°Р±РѕС‡РёС… РЅР°Р±РѕСЂРѕРІ"
             PushButton workset_button = CreateButton(
                 panel: pan_bim,
                 name: "SetWorksetForLinks",
-                text: "Инструменты\nрабочих наборов",
+                text: "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹\nСЂР°Р±РѕС‡РёС… РЅР°Р±РѕСЂРѕРІ",
                 command: "AbimToolsMine.LinksWokset",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/WSName32.png",
-                toolTip: "Создание рабочих наборов для связей, фильтрация пустых рабочих наборов",
+                toolTip: "РЎРѕР·РґР°РЅРёРµ СЂР°Р±РѕС‡РёС… РЅР°Р±РѕСЂРѕРІ РґР»СЏ СЃРІСЏР·РµР№, С„РёР»СЊС‚СЂР°С†РёСЏ РїСѓСЃС‚С‹С… СЂР°Р±РѕС‡РёС… РЅР°Р±РѕСЂРѕРІ",
                 dllName: "AbimToolsMine.dll"
             );
             workset_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/WSName16.png"));
 
-            // Кнопка "Экспорт таблиц выбора"
+            // РљРЅРѕРїРєР° "Р­РєСЃРїРѕСЂС‚ С‚Р°Р±Р»РёС† РІС‹Р±РѕСЂР°"
             PushButton lookUp_button = CreateButton(
                 panel: pan_bim,
                 name: "GetLookupTable",
-                text: "Экспорт таблиц\nвыбора",
+                text: "Р­РєСЃРїРѕСЂС‚ С‚Р°Р±Р»РёС†\nРІС‹Р±РѕСЂР°",
                 command: "AbimToolsMine.GetLookUpTable",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport32.png",
-                toolTip: "Экспорт таблиц выбора из документа семейства или семейства из проекта",
+                toolTip: "Р­РєСЃРїРѕСЂС‚ С‚Р°Р±Р»РёС† РІС‹Р±РѕСЂР° РёР· РґРѕРєСѓРјРµРЅС‚Р° СЃРµРјРµР№СЃС‚РІР° РёР»Рё СЃРµРјРµР№СЃС‚РІР° РёР· РїСЂРѕРµРєС‚Р°",
                 dllName: "AbimToolsMine.dll"
             );
             lookUp_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LPTableExport16.png"));
 
-            // Кнопка "Проверка дубликатов связей"
+            // РљРЅРѕРїРєР° "РџСЂРѕРІРµСЂРєР° РґСѓР±Р»РёРєР°С‚РѕРІ СЃРІСЏР·РµР№"
             PushButton linkChecker_button = CreateButton(
                 panel: pan_bim,
                 name: "DuplicateLinkChecker",
-                text: "Проверка\nдубликатов связей",
+                text: "РџСЂРѕРІРµСЂРєР°\nРґСѓР±Р»РёРєР°С‚РѕРІ СЃРІСЏР·РµР№",
                 command: "AbimToolsMine.DuplicateLinkChecker",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/linkChecker32.png",
-                toolTip: "Проверка модели на дубликаты связей",
+                toolTip: "РџСЂРѕРІРµСЂРєР° РјРѕРґРµР»Рё РЅР° РґСѓР±Р»РёРєР°С‚С‹ СЃРІСЏР·РµР№",
                 dllName: "AbimToolsMine.dll"
             );
             linkChecker_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/linkChecker16.png"));
 
-            // Кнопка "Работа с уровнями"
-            PushButton CheckLevels = CreateButton(
-                panel: pan_bim,
-                name: "CheckLevels",
-                text: "Работа с уровнями",
-                command: "AbimToolsMine.LevelTools",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Levels32.png",
-                toolTip: "Проверка привязки и заполнение параметров уровням",
-                dllName: "AbimToolsMine.dll"
-            );
-            CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));
+            // РљРЅРѕРїРєР° "Р Р°Р±РѕС‚Р° СЃ СѓСЂРѕРІРЅСЏРјРё"
+            /* PushButton CheckLevels = CreateButton(
+                 panel: pan_bim,
+                 name: "CheckLevels",
+                 text: "Р Р°Р±РѕС‚Р° СЃ СѓСЂРѕРІРЅСЏРјРё",
+                 command: "AbimToolsMine.LevelTools",
+                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Levels32.png",
+                 toolTip: "РџСЂРѕРІРµСЂРєР° РїСЂРёРІСЏР·РєРё Рё Р·Р°РїРѕР»РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СѓСЂРѕРІРЅСЏРј",
+                 dllName: "AbimToolsMine.dll"
+             );
+             CheckLevels.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Levels16.png"));*/
 
-          
-            // Кнопка "Cоздание ведомости отделки"
+
+            // РљРЅРѕРїРєР° "CРѕР·РґР°РЅРёРµ РІРµРґРѕРјРѕСЃС‚Рё РѕС‚РґРµР»РєРё"
             PushButton Pref_ScheduleFinishing = CreateButton(
                 panel: pan_otd,
                 name: "Pref_ScheduleFinishing",
-                text: "Параметры",
+                text: "РџР°СЂР°РјРµС‚СЂС‹",
                 command: "AbimToolsMine.Pref_ScheduleFinishingWindow",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Pref_Finishing32.png",
-                toolTip: "Настройки создания ведомости отделки",
+                toolTip: "РќР°СЃС‚СЂРѕР№РєРё СЃРѕР·РґР°РЅРёСЏ РІРµРґРѕРјРѕСЃС‚Рё РѕС‚РґРµР»РєРё",
                 dllName: "AbimToolsMine.dll"
             );
             Pref_ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Pref_Finishing32.png"));
 
-            
-            // Кнопка "Cоздание ведомости отделки"
+
+            // РљРЅРѕРїРєР° "CРѕР·РґР°РЅРёРµ РІРµРґРѕРјРѕСЃС‚Рё РѕС‚РґРµР»РєРё"
             PushButton FloorLegends = CreateButton(
                 panel: pan_otd,
                 name: "FloorLegends",
-                text: "Полы\nСоздание эскизов",
+                text: "РџРѕР»С‹\nРЎРѕР·РґР°РЅРёРµ СЌСЃРєРёР·РѕРІ",
                 command: "AbimToolsMine.FloorLegends",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends32.png",
-                toolTip: "Создание эскизов для каждого типа пола. (типы полов создаются чертёжными видами)",
+                toolTip: "РЎРѕР·РґР°РЅРёРµ СЌСЃРєРёР·РѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ С‚РёРїР° РїРѕР»Р°. (С‚РёРїС‹ РїРѕР»РѕРІ СЃРѕР·РґР°СЋС‚СЃСЏ С‡РµСЂС‚С‘Р¶РЅС‹РјРё РІРёРґР°РјРё)",
                 dllName: "AbimToolsMine.dll"
             );
             FloorLegends.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
 
-            // Кнопка Ведомость полов заполнение параметров"
+       
+
+            // РљРЅРѕРїРєР° "РџРµСЂРµРґР°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РёР· РїРѕРјРµС‰РµРЅРёР№ РІ СЌР»РµРјРµРЅС‚С‹ РѕС‚РґРµР»РєРё"
+            PushButton RoomParamsToFloorBtn = CreateButton(
+                panel: pan_otd,
+                name: "RoomParamsToFloor",
+                text: "Р­Р»РµРјРµРЅС‚С‹ РѕС‚РґРµР»РєРё\nР—Р°РїРѕР»РЅРёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹",
+                command: "AbimToolsMine.RoomParamsToFloor",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
+                toolTip: "РџРµСЂРµРґР°С‡Р° РїР°СЂР°РјРµС‚СЂРѕРІ РёР· РїРѕРјРµС‰РµРЅРёР№ РІ СЌР»РµРјРµРЅС‚С‹ РѕС‚РґРµР»РєРё",
+                dllName: "AbimToolsMine.dll"
+            );
+            RoomParamsToFloorBtn.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+
+            // РљРЅРѕРїРєР° СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РІРµРґРѕРјРѕСЃС‚Рё РїРѕ СЌР»РµРјРµРЅС‚Р°Рј"
             PushButton LegendsToParameters = CreateButton(
                 panel: pan_otd,
                 name: "LegendsToParameter",
-                text: "Элементы отделки\nЗаполнить параметры",
+                text: "РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РІРµРґРѕРјРѕСЃС‚Рё\nРїРѕ СЌР»РµРјРµРЅС‚Р°Рј",
                 command: "AbimToolsMine.LegendsToParameter",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter32.png",
-                toolTip: "Заполнение параметров номеров помещений, для каждого экземпляра полов/потолков/стен, заполнение эскизов полов",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/ElementParameters32.png",
+                toolTip: "Р—Р°РїРѕР»РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РЅРѕРјРµСЂРѕРІ РїРѕРјРµС‰РµРЅРёР№, РґР»СЏ РєР°Р¶РґРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РїРѕР»РѕРІ/РїРѕС‚РѕР»РєРѕРІ/СЃС‚РµРЅ, Р·Р°РїРѕР»РЅРµРЅРёРµ СЌСЃРєРёР·РѕРІ РїРѕР»РѕРІ",
                 dllName: "AbimToolsMine.dll"
             );
-            LegendsToParameters.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendsToParameter16.png"));
+            LegendsToParameters.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/ElementParameters16.png"));
 
-            // Кнопка "Cоздание ведомости отделки"
+            // РљРЅРѕРїРєР° "РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РІРµРґРѕРјРѕСЃС‚СЊ РѕС‚РґРµР»РєРё"
             PushButton ScheduleFinishing = CreateButton(
                 panel: pan_otd,
                 name: "ScheduleFinishing",
-                text: "Сформировать\nВедомость отделки",
+                text: "РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ\nР’РµРґРѕРјРѕСЃС‚СЊ РѕС‚РґРµР»РєРё",
                 command: "AbimToolsMine.ScheduleFinishing",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png",
-                toolTip: "Создание ведомости отделки по ГОСТ",
+                toolTip: "РЎРѕР·РґР°РЅРёРµ РІРµРґРѕРјРѕСЃС‚Рё РѕС‚РґРµР»РєРё РїРѕ Р“РћРЎРў",
                 dllName: "AbimToolsMine.dll"
             );
             ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Finishing32.png"));
 
-            // Кнопка заполнение параметра ПРО_Номер листа"
-            PushButton SheetNumbers = CreateButton(
-                panel: pan_gen,
-                name: "SheetNumbers",
-                text: "Замена спецсимвола\nв номере листа",
-                command: "AbimToolsMine.SheetNumbers",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers32.png",
-                toolTip: "Удаление спецсиимвола в параметре и заполнение ПРО_Номер листа",
-                dllName: "AbimToolsMine.dll"
-            );
-            ScheduleFinishing.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers16.png"));
 
-            // Кнопка "Скрыть оси во всех связях"
+            // РљРЅРѕРїРєР° "РЎРєСЂС‹С‚СЊ РѕСЃРё РІРѕ РІСЃРµС… СЃРІСЏР·СЏС…"
             PushButton hideAxes_button = CreateButton(
                 panel: pan_gen,
                 name: "DisableLevelsAndGridsWorksetInLinks",
-                text: "Скрыть оси\nво всех связях",
+                text: "РЎРєСЂС‹С‚СЊ РѕСЃРё\nРІРѕ РІСЃРµС… СЃРІСЏР·СЏС…",
                 command: "AbimToolsMine.DisableLevelsAndGridsWorksetInLinks",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
-                toolTip: "Скрыть оси во всех связанных моделях",
+                toolTip: "РЎРєСЂС‹С‚СЊ РѕСЃРё РІРѕ РІСЃРµС… СЃРІСЏР·Р°РЅРЅС‹С… РјРѕРґРµР»СЏС…",
                 dllName: "AbimToolsMine.dll"
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
 
-            // Кнопка "Копировать параметр"
-            PushButton copyParam_button = CreateButton(
-                    panel: pan_gen,
-                    name: "CopyParameter",
-                    text: "Копировать\nпараметр",
-                    command: "AbimToolsMine.CopyParameterCommand",
-                    imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/CopyParam32.png",
-                    toolTip: "Перезаписать значение одного параметра в другой для выбранных или отфильтрованных элементов",
-                    dllName: "AbimToolsMine.dll"
-            );
-            copyParam_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/CopyParam16.png"));
+            // РљРЅРѕРїРєР° "РљРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂ"
+            var copyParamData = new PushButtonData(
+                "CopyParameter",
+                "РљРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂ",
+                typeof(App).Assembly.Location,
+                "AbimToolsMine.CopyParameterCommand")
+            {
+                ToolTip = "РџРµСЂРµР·Р°РїРёСЃР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ РѕРґРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РІ РґСЂСѓРіРѕР№ РґР»СЏ РІС‹Р±СЂР°РЅРЅС‹С… РёР»Рё РѕС‚С„РёР»СЊС‚СЂРѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ",
+                Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/CopyParam16.png"))
+            };
 
+            var formAssignData = new PushButtonData(
+                "FormAssign",
+                "Р—Р°РїРёСЃСЊ РїРѕ С„РѕСЂРјРѕРѕР±СЂР°Р·СѓСЋС‰РµРјСѓ",
+                typeof(App).Assembly.Location,
+                "AbimToolsMine.FormAssignCommand")
+            {
+                ToolTip = "РџРµСЂРµРЅРѕСЃ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР° С„РѕСЂРјРѕРѕР±СЂР°Р·СѓСЋС‰РµРіРѕ РЅР° РІСЃРµ РїРµСЂРµСЃРµРєР°СЋС‰РёРµ РµРіРѕ СЌР»РµРјРµРЅС‚С‹ РјРѕРґРµР»Рё",
+                Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FormAssign16.png")),
+            };
+
+            var sheetNumbersData = new PushButtonData(
+                "SheetNumbers",
+                "Р—Р°РјРµРЅР° СЃРїРµС†СЃРёРјРІРѕР»Р°\nРІ РЅРѕРјРµСЂРµ Р»РёСЃС‚Р°",
+                typeof(App).Assembly.Location,
+                "AbimToolsMine.SheetNumbers")
+            {
+                ToolTip = "РЈРґР°Р»РµРЅРёРµ СЃРїРµС†СЃРёРјРІРѕР»Р° РІ РїР°СЂР°РјРµС‚СЂРµ Рё Р·Р°РїРѕР»РЅРµРЅРёРµ РџР Рћ_РќРѕРјРµСЂ Р»РёСЃС‚Р°",
+                Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers16.png")),
+            };
+
+            pan_gen.AddStackedItems(copyParamData, formAssignData, sheetNumbersData);
         }
 
 
@@ -302,7 +328,7 @@ namespace AbimToolsMine
             _application = application;
             OnButtonCreate(application);
             application.ControlledApplication.DocumentOpened += OnDocumentOpened;
-            // Поставь отложенное применение:
+            // РџРѕСЃС‚Р°РІСЊ РѕС‚Р»РѕР¶РµРЅРЅРѕРµ РїСЂРёРјРµРЅРµРЅРёРµ:
             application.Idling += OnIdling_ApplyPanelVisibility;
             return Result.Succeeded;
         }
@@ -348,8 +374,8 @@ namespace AbimToolsMine
         {
             var hiddenPanels = Settings.Default.HiddenPanels ?? new System.Collections.Specialized.StringCollection();
 
-            // Пробуем получить панели из вкладки
-            var panels = app.GetRibbonPanels("АБИМ-ПРО");
+            // РџСЂРѕР±СѓРµРј РїРѕР»СѓС‡РёС‚СЊ РїР°РЅРµР»Рё РёР· РІРєР»Р°РґРєРё
+            var panels = app.GetRibbonPanels("РђР‘РРњ-РџР Рћ");
 
             foreach (var panel in panels)
             {
@@ -363,7 +389,7 @@ namespace AbimToolsMine
 
             _panelsInitialized = true;
 
-            var panels = _application.GetRibbonPanels("АБИМ-ПРО");
+            var panels = _application.GetRibbonPanels("РђР‘РРњ-РџР Рћ");
             var hiddenPanels = Settings.Default.HiddenPanels ?? new System.Collections.Specialized.StringCollection();
             string org = Settings.Default.Access_Org;
             string code = Settings.Default.Access_Code;
@@ -380,12 +406,12 @@ namespace AbimToolsMine
 
                 if (licenseValid)
                 {
-                    // Восстанавливаем видимость по настройкам
+                    // Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј РІРёРґРёРјРѕСЃС‚СЊ РїРѕ РЅР°СЃС‚СЂРѕР№РєР°Рј
                     panel.Visible = !hiddenPanels.Contains(panel.Name);
                 }
                 else
                 {
-                    // Скрываем всё кроме "Плагин"
+                    // РЎРєСЂС‹РІР°РµРј РІСЃС‘ РєСЂРѕРјРµ "РџР»Р°РіРёРЅ"
                     panel.Visible = false;
                 }
             }

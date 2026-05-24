@@ -90,18 +90,20 @@ Title="Копирование параметров"
   </Grid>
         </GroupBox>
 
-    <!-- Режим копирования -->
-        <GroupBox Grid.Row="1" Header="Режим копирования" Margin="0,0,0,8">
+    <!-- Режим обработки -->
+        <GroupBox Grid.Row="1" Header="Режим обработки" Margin="0,0,0,8">
      <StackPanel Margin="5">
             <RadioButton x:Name="RbModeWithin" Content="Копирование внутри элемента"
          IsChecked="True" Checked="OnModeChanged"/>
  <RadioButton x:Name="RbModeNested" Content="Копирование во вложенные элементы"
        Margin="0,4,0,0" Checked="OnModeChanged"/>
+      <RadioButton x:Name="RbModeFillEtage" Content="Заполнение параметра этажа"
+    Margin="0,4,0,0" Checked="OnModeChanged"/>
     </StackPanel>
         </GroupBox>
 
         <!-- Параметры -->
-        <GroupBox Grid.Row="2" Margin="0,0,0,8">
+        <GroupBox Grid.Row="2" x:Name="GbParams" Header="Параметры" Margin="0,0,0,8">
    <Grid Margin="5">
       <Grid.ColumnDefinitions>
          <ColumnDefinition Width="Auto"/>

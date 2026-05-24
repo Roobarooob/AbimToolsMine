@@ -21,6 +21,8 @@ namespace AbimToolsMine
         private static string StructureComp => Settings.Default.StructureComp;
         private static string DimType => Settings.Default.DimType;
         private static bool NeedFloor => Settings.Default.NeedFloor;
+        private static bool SplitByParam => Settings.Default.SplitByParam;
+        private static string SplitParamName => Settings.Default.SplitParamName;
 
         private static readonly Dictionary<string, (string nameParam, string valueParam)> RoomParams = new Dictionary<string, (string, string)>
         {
@@ -34,6 +36,13 @@ namespace AbimToolsMine
         private const int Divide = 2;
         private static int StructureColChars => (int)(StructureColWidthMM / 1.65);
 
+        private static string MakeRoomDataKey(string roomNum, string splitValue)
+        {
+            if (!SplitByParam || string.IsNullOrEmpty(splitValue))
+                return roomNum;
+            return roomNum + "|__split__|" + splitValue;
+        }
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
@@ -46,7 +55,7 @@ namespace AbimToolsMine
             ProcessElements(doc, BuiltInCategory.OST_Floors, "floor", roomData);
             ProcessElements(doc, BuiltInCategory.OST_Ceilings, "ceiling", roomData);
             ProcessElements(doc, BuiltInCategory.OST_Walls, "plinth", roomData);
-            
+
             var groupingDict = new Dictionary<string, HashSet<string>>();
             var groupAreas = new Dictionary<string, Dictionary<string, Dictionary<string, double>>>();
             var processedRoomsPerGroup = new Dictionary<string, HashSet<string>>(); // roomNum already counted per group
@@ -54,11 +63,17 @@ namespace AbimToolsMine
             foreach (var room in rooms)
             {
                 var roomNum = GetParamValue(room, RoomNumberParam);
-                if (string.IsNullOrEmpty(roomNum) || !roomData.ContainsKey(roomNum))
+                if (string.IsNullOrEmpty(roomNum))
                     continue;
 
-                var data = roomData[roomNum];
-                string groupKey = GetGroupKey(data);
+                string splitValue = SplitByParam ? (GetParamValue(room, SplitParamName) ?? "") : "";
+                string roomDataKey = MakeRoomDataKey(roomNum, splitValue);
+
+                if (!roomData.ContainsKey(roomDataKey))
+                    continue;
+
+                var data = roomData[roomDataKey];
+                string groupKey = GetGroupKey(data, splitValue);
 
                 if (!groupingDict.ContainsKey(groupKey))
                 {
@@ -70,9 +85,9 @@ namespace AbimToolsMine
                 groupingDict[groupKey].Add(roomNum);
 
                 // Добавляем площади только если этот roomNum ещё не был обработан для данной группы
-                if (!processedRoomsPerGroup[groupKey].Contains(roomNum))
+                if (!processedRoomsPerGroup[groupKey].Contains(roomDataKey))
                 {
-                    processedRoomsPerGroup[groupKey].Add(roomNum);
+                    processedRoomsPerGroup[groupKey].Add(roomDataKey);
 
                     foreach (var part in data)
                     {
@@ -115,11 +130,17 @@ namespace AbimToolsMine
                     }
 
                     var roomNum = GetParamValue(room, RoomNumberParam);
-                    if (string.IsNullOrEmpty(roomNum) || !roomData.ContainsKey(roomNum))
+                    if (string.IsNullOrEmpty(roomNum))
                         continue;
 
-                    var data = roomData[roomNum];
-                    var groupKey = GetGroupKey(data);
+                    string splitValue = SplitByParam ? (GetParamValue(room, SplitParamName) ?? "") : "";
+                    string roomDataKey = MakeRoomDataKey(roomNum, splitValue);
+
+                    if (!roomData.ContainsKey(roomDataKey))
+                        continue;
+
+                    var data = roomData[roomDataKey];
+                    var groupKey = GetGroupKey(data, splitValue);
 
                     if (room.LookupParameter(RoomGroupParam)?.StorageType == StorageType.String)
                     {
@@ -209,18 +230,15 @@ namespace AbimToolsMine
                 if (category == BuiltInCategory.OST_Walls)
                 {
                     bool isPlinth = typeName.Contains(PlinthString);
-
-
-                    // существующая логика плинтусов
                     if (isPlinth && typeKey != "plinth") continue;
                     if (!isPlinth && typeKey == "plinth") continue;
                 }
 
+                string currentTypeKey = typeKey;
                 if (category == BuiltInCategory.OST_Floors && typeName.Contains(FlWallString))
                 {
-                    typeKey = "wall";
+                    currentTypeKey = "wall";
                 }
-                
 
                 var roomKey = GetParamValue(el, RoomKeyParam);
                 if (string.IsNullOrEmpty(roomKey)) continue;
@@ -234,47 +252,49 @@ namespace AbimToolsMine
 
                 double value = 0;
 
-                if (typeKey == "plinth")
+                if (currentTypeKey == "plinth")
                 {
-                    // Получаем значение пользовательского параметра
                     var unitTypeParam = type.LookupParameter(DimType);
                     int unitType = (unitTypeParam != null && unitTypeParam.HasValue) ? unitTypeParam.AsInteger() : 0;
 
-                    if (unitType == 1) // по длине (площадь / высота)
+                    if (unitType == 1)
                     {
                         var areaParam = el.LookupParameter("Площадь");
                         var heightParam = el.LookupParameter("Неприсоединенная высота") ?? el.LookupParameter("Unconnected Height");
                         if (areaParam != null && areaParam.HasValue && heightParam != null && heightParam.HasValue)
                         {
-                            double area = areaParam.AsDouble(); // ft²
-                            double height = heightParam.AsDouble(); // ft
+                            double area = areaParam.AsDouble();
+                            double height = heightParam.AsDouble();
                             if (height > 0)
-                                value = Math.Round((area / height) * 0.3048, 2); // длина в метрах
+                                value = Math.Round((area / height) * 0.3048, 2);
                         }
                     }
-                    else if (unitType == 2) // по площади
+                    else if (unitType == 2)
                     {
                         value = GetArea(el);
                     }
                 }
                 else if (category == BuiltInCategory.OST_Floors && type.LookupParameter("Комментарии к типоразмеру").AsString() == "Отделка ступеней")
                 {
-                    // Для ступеней используем ПРО_площадь
-                    value = el.LookupParameter("ПРО_Площадь").AsDouble()*0.092903;
+                    value = el.LookupParameter("ПРО_Площадь").AsDouble() * 0.092903;
                 }
                 else
                 {
-                    value = (typeKey == "plinth") ? GetLength(el) : GetArea(el);
+                    value = (currentTypeKey == "plinth") ? GetLength(el) : GetArea(el);
                 }
 
-                if (!roomData.ContainsKey(roomKey))
-                    roomData[roomKey] = InitGroupArea();
+                // Read split parameter from the element to match it to the correct room
+                string splitValue = SplitByParam ? (GetParamValue(el, SplitParamName) ?? "") : "";
+                string roomDataKey = MakeRoomDataKey(roomKey, splitValue);
 
-                var targetKey = RoomParams[typeKey].Item1;
-                if (!roomData[roomKey][targetKey].ContainsKey(name))
-                    roomData[roomKey][targetKey][name] = 0;
+                if (!roomData.ContainsKey(roomDataKey))
+                    roomData[roomDataKey] = InitGroupArea();
 
-                roomData[roomKey][targetKey][name] += value;
+                var targetKey = RoomParams[currentTypeKey].Item1;
+                if (!roomData[roomDataKey][targetKey].ContainsKey(name))
+                    roomData[roomDataKey][targetKey][name] = 0;
+
+                roomData[roomDataKey][targetKey][name] += value;
             }
         }
 
@@ -301,12 +321,17 @@ namespace AbimToolsMine
             return (p != null && p.HasValue) ? Math.Round(p.AsDouble() * 0.3048, 2) : 0;
         }
 
-        private string GetGroupKey(Dictionary<string, Dictionary<string, double>> data)
+        private string GetGroupKey(Dictionary<string, Dictionary<string, double>> data, string splitValue = "")
         {
             var keys = RoomParams.Values
                 .Where(p => NeedFloor || p.nameParam != Settings.Default.FloorNameParam)
                 .SelectMany(p => data.ContainsKey(p.nameParam) ? data[p.nameParam].Keys.OrderBy(x => x) : Enumerable.Empty<string>())
                 .ToList();
+
+            // When split mode is active, include the split value so groups are separated
+            if (SplitByParam && !string.IsNullOrEmpty(splitValue))
+                keys.Add("__split__:" + splitValue);
+
             return string.Join("|", keys);
         }
 

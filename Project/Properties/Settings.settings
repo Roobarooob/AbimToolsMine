@@ -116,5 +116,20 @@
     <Setting Name="RoomGroupEtageParam" Type="System.String" Scope="User">
       <Value Profile="(Default)">ПРО_ОП_Номер помещения.Гр_Поэтажная</Value>
     </Setting>
+    <Setting Name="FormParamName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Номер корпуса</Value>
+    </Setting>
+    <Setting Name="WarningParam" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Предупреждение</Value>
+    </Setting>
+    <Setting Name="SplitByParam" Type="System.Boolean" Scope="User">
+    <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SplitParamName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ПРО_Этаж</Value>
+    </Setting>
+    <Setting Name="RoomToFloorMappings" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -43,6 +43,7 @@ namespace AbimToolsMine
         public bool OnlyEmpty { get; private set; }
         // true — копировать из родителя во вложенные субэлементы
         public bool NestedMode { get; private set; }
+        public bool FillEtageMode { get; private set; }
 
         private readonly Document _doc;
         private readonly UIDocument _uidoc;
@@ -63,7 +64,13 @@ namespace AbimToolsMine
         {
             var names = new List<string>();
             foreach (Category cat in _doc.Settings.Categories)
+            {
+                // Пропускаем импорты DWG и другие файловые импорты
+                if (cat.Name.Contains(".dwg")) continue;
+                if (cat.Name.Contains(".dxf")) continue;
+                if (cat.Name.Contains(".dgn")) continue;
                 names.Add(cat.Name);
+            }
             names.Sort();
 
             foreach (var name in names)
@@ -124,53 +131,73 @@ namespace AbimToolsMine
         private void OnModeChanged(object sender, RoutedEventArgs e)
         {
             if (LblFromParam == null) return;
-            bool nested = RbModeNested.IsChecked == true;
 
-            LblFromParam.Content = nested ? "Параметр:" : "Из параметра:";
+            bool nested    = RbModeNested.IsChecked == true;
+            bool fillEtage = RbModeFillEtage.IsChecked == true;
 
-            System.Windows.Visibility toVisibility = nested
-                ? System.Windows.Visibility.Collapsed
-                : System.Windows.Visibility.Visible;
-            LblToParam.Visibility = toVisibility;
-            TbToParam.Visibility  = toVisibility;
+            // Подпись первого поля
+            if (fillEtage)
+                LblFromParam.Content = "Параметр этажа:";
+else if (nested)
+           LblFromParam.Content = "Параметр:";
+    else
+       LblFromParam.Content = "Из параметра:";
+
+       // Поле "В параметр" — только в режиме "внутри элемента"
+      System.Windows.Visibility toVisibility = (!nested && !fillEtage)
+                ? System.Windows.Visibility.Visible
+              : System.Windows.Visibility.Collapsed;
+      LblToParam.Visibility = toVisibility;
+       TbToParam.Visibility  = toVisibility;
+
+    // Чекбокс "Только незаполненные" — не нужен в режиме этажа
+     if (CbOnlyEmpty != null)
+ CbOnlyEmpty.Visibility = fillEtage
+            ? System.Windows.Visibility.Collapsed
+     : System.Windows.Visibility.Visible;
+
+            // Подставляем дефолтное значение параметра этажа
+        if (fillEtage && TbFromParam != null && string.IsNullOrWhiteSpace(TbFromParam.Text))
+         TbFromParam.Text = FillFloorParam.EtageParamName;
         }
 
         private void OnExecuteClick(object sender, RoutedEventArgs e)
         {
-            NestedMode = RbModeNested.IsChecked == true;
-            FromParam  = TbFromParam.Text.Trim();
-            ToParam    = NestedMode ? TbFromParam.Text.Trim() : TbToParam.Text.Trim();
- OnlyEmpty  = CbOnlyEmpty.IsChecked == true;
-  UseSelection = RbSelection.IsChecked == true;
+            NestedMode    = RbModeNested.IsChecked == true;
+   FillEtageMode = RbModeFillEtage.IsChecked == true;
+   FromParam     = TbFromParam.Text.Trim();
+            ToParam  = NestedMode ? TbFromParam.Text.Trim() : TbToParam.Text.Trim();
+            OnlyEmpty     = CbOnlyEmpty.IsChecked == true;
+ UseSelection  = RbSelection.IsChecked == true;
 
-  if (string.IsNullOrWhiteSpace(FromParam))
-            {
-                MessageBox.Show("Укажите имя параметра.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-    }
+            if (string.IsNullOrWhiteSpace(FromParam))
+        {
+ MessageBox.Show("Укажите имя параметра.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+   return;
+        }
 
-      if (!NestedMode && string.IsNullOrWhiteSpace(ToParam))
-            {
+            if (!NestedMode && !FillEtageMode && string.IsNullOrWhiteSpace(ToParam))
+        {
         MessageBox.Show("Укажите имена обоих параметров.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-     return;
+                return;
             }
 
-  if (!UseSelection)
-{
-       SelectedCategories = _allCategoryItems
-      .Where(i => i.IsChecked)
-      .Select(i => i.Category)
-.ToList();
+         if (!UseSelection)
+            {
+ SelectedCategories = _allCategoryItems
+           .Where(i => i.IsChecked)
+         .Select(i => i.Category)
+              .ToList();
 
-       if (SelectedCategories.Count == 0)
-           {
-            MessageBox.Show("Выберите хотя бы одну категорию.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-     return;
-       }
-   }
+  if (SelectedCategories.Count == 0)
+         {
+      MessageBox.Show("Выберите хотя бы одну категорию.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+              return;
+           }
+    }
 
-            DialogResult = true;
-            Close();
+DialogResult = true;
+  Close();
         }
 
         private void OnCancelClick(object sender, RoutedEventArgs e)

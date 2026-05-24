@@ -81,6 +81,10 @@ namespace AbimToolsMine
             if (Settings.Default.NeedFloor == true)
                 NeeFloorCheckBox.IsChecked = true;
             else NeeFloorCheckBox.IsChecked = false;
+
+            SplitByParamCheckBox.IsChecked = Settings.Default.SplitByParam;
+            SplitParamNameBox.Text = Settings.Default.SplitParamName;
+            SplitParamNameBox.IsEnabled = Settings.Default.SplitByParam;
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)
@@ -119,6 +123,9 @@ namespace AbimToolsMine
                 Settings.Default.NeedFloor = true;
             else Settings.Default.NeedFloor = false;
 
+            Settings.Default.SplitByParam = SplitByParamCheckBox.IsChecked == true;
+            Settings.Default.SplitParamName = SplitParamNameBox.Text;
+
             Settings.Default.Save();
             this.DialogResult = true;
             this.Close();
@@ -142,6 +149,12 @@ namespace AbimToolsMine
         private void RoomGroupEtageParamBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
 
+        }
+
+        private void SplitByParamCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (SplitParamNameBox != null)
+                SplitParamNameBox.IsEnabled = SplitByParamCheckBox.IsChecked == true;
         }
     }
 }
