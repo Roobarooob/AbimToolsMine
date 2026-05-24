@@ -128,20 +128,26 @@ namespace AbimToolsMine
                 if (instanceToTypeMismatch)
                 {
                     var byType = allElements
-                         .GroupBy(el => el.GetTypeId())
-                         .Where(g => g.Key != ElementId.InvalidElementId);
+          .GroupBy(el => el.GetTypeId())
+    .Where(g => g.Key != ElementId.InvalidElementId);
 
                     foreach (var grp in byType)
                     {
                         Element firstInst = grp.First();
-                        Parameter fp = FindParam(firstInst, fromName);
+                        // »щем через FindParamOnInstanceOrType Ч как в предпроверке
+                        Parameter fp = FindParamOnInstanceOrType(doc, firstInst, fromName);
                         if (fp == null) continue;
 
                         ElementType elType = doc.GetElement(grp.Key) as ElementType;
                         if (elType == null) continue;
 
-                        Parameter tp = FindParam(elType, toName);
+                        // —начала пробуем на типе, затем на экземпл€ре
+                        Parameter tp = elType.LookupParameter(toName)
+                            ?? FindParamOnInstanceOrType(doc, firstInst, toName);
                         if (tp == null || tp.IsReadOnly) continue;
+
+                        // ѕровер€ем совместимость типов хранени€ пр€мо здесь
+                        if (fp.StorageType != tp.StorageType) continue;
 
                         if (onlyEmpty && !IsEmpty(tp)) { skipped++; continue; }
 
@@ -261,12 +267,12 @@ namespace AbimToolsMine
             if (el is Duct) return true;
             var bic = el.Category?.Id;
             if (bic == null) return false;
-            long id = bic.Value;
-            return id == (long)BuiltInCategory.OST_DuctCurves
-     || id == (long)BuiltInCategory.OST_DuctFitting
-      || id == (long)BuiltInCategory.OST_DuctAccessory
-      || id == (long)BuiltInCategory.OST_DuctTerminal
-     || id == (long)BuiltInCategory.OST_FlexDuctCurves;
+            int id = bic.IntegerValue;
+     return id == (int)BuiltInCategory.OST_DuctCurves
+     || id == (int)BuiltInCategory.OST_DuctFitting
+      || id == (int)BuiltInCategory.OST_DuctAccessory
+      || id == (int)BuiltInCategory.OST_DuctTerminal
+     || id == (int)BuiltInCategory.OST_FlexDuctCurves;
         }
 
         private static bool IsPipeElement(Element el)
@@ -274,11 +280,11 @@ namespace AbimToolsMine
             if (el is Pipe) return true;
             var bic = el.Category?.Id;
             if (bic == null) return false;
-            long id = bic.Value;
-            return id == (long)BuiltInCategory.OST_PipeCurves
-     || id == (long)BuiltInCategory.OST_PipeFitting
-|| id == (long)BuiltInCategory.OST_PipeAccessory
-     || id == (long)BuiltInCategory.OST_FlexPipeCurves;
+        int id = bic.IntegerValue;
+            return id == (int)BuiltInCategory.OST_PipeCurves
+     || id == (int)BuiltInCategory.OST_PipeFitting
+|| id == (int)BuiltInCategory.OST_PipeAccessory
+     || id == (int)BuiltInCategory.OST_FlexPipeCurves;
         }
 
         private static Parameter FindParam(Element el, string name)

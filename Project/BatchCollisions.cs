@@ -757,15 +757,15 @@ namespace AbimToolsMine
 
         }
         //Анализировать xml и расставить коллизии
-        public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string xmlFilePath)
+        public static int AnalyzeAndPlace(Document doc, string username, FamilySymbol familySymbol, string DBFilePath)
         {
-            // var xmlFileDate = File.GetLastWriteTime(xmlFilePath);
+            // var xmlFileDate = File.GetLastWriteTime(DBFilePath);
 
-            // XDocument xmlDoc = XDocument.Load(xmlFilePath);
+            // XDocument xmlDoc = XDocument.Load(DBFilePath);
             int count = 0;
             var clashResults = new List<ClashResult>();
 
-            using (var connection = new SQLiteConnection($"Data Source={xmlFilePath}"))
+            using (var connection = new SQLiteConnection($"Data Source={DBFilePath}"))
             {
                 connection.Open();
                 var command = new SQLiteCommand("SELECT Date, Test_Name, Collision_Name, Status, Pos_X, Pos_Y, Pos_Z, Model_1, Model_2,Element_1, Element_2 FROM Collision", connection);
