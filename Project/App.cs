@@ -300,6 +300,18 @@ namespace AbimToolsMine
             );
             alignBySheets_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/AlignBySheets16.png"));
 
+            // Кнопка "Соединить смежные параллельные стены"
+            PushButton joinAdjacentWalls_button = CreateButton(
+                panel: pan_gen,
+                name: "JoinAdjacentParallelWalls",
+                text: "Соединить\nсмежные стены",
+                command: "AbimToolsMine.JoinAdjacentParallelWalls",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
+                toolTip: "Соединение параллельных смежных стен на активном виде",
+                dllName: "AbimToolsMine.dll"
+            );
+            joinAdjacentWalls_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
+
             // Кнопка "Копировать параметр"
             var copyParamData = new PushButtonData(
                 "CopyParameter",
