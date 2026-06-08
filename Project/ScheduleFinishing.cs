@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Settings = AbimToolsMine.Properties.Settings;
 
@@ -276,7 +277,7 @@ namespace AbimToolsMine
                 }
                 else if (category == BuiltInCategory.OST_Floors && type.LookupParameter("Комментарии к типоразмеру").AsString() == "Отделка ступеней")
                 {
-                    value = el.LookupParameter("ПРО_Площадь").AsDouble() * 0.092903;
+                    value = GetFloorArea(el);
                 }
                 else
                 {
@@ -311,8 +312,56 @@ namespace AbimToolsMine
 
         private double GetArea(Element e)
         {
-            var p = e.LookupParameter("Площадь");
-            return (p != null && p.HasValue) ? Math.Round(p.AsDouble() * 0.092903, 2) : 0;
+            return ReadAreaInSquareMeters(e);
+        }
+
+        private double GetFloorArea(Element e)
+        {
+            return ReadAreaInSquareMeters(e);
+        }
+
+        private double ReadAreaInSquareMeters(Element e)
+        {
+            if (TryReadAreaParameter(e.LookupParameter("ПРО_Площадь"), out double area))
+                return area;
+
+            if (TryReadAreaParameter(e.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED), out area))
+                return area;
+
+            if (TryReadAreaParameter(e.LookupParameter("Площадь"), out area))
+                return area;
+
+            return 0;
+        }
+
+        private bool TryReadAreaParameter(Parameter parameter, out double area)
+        {
+            area = 0;
+
+            if (parameter == null || !parameter.HasValue)
+                return false;
+
+            if (parameter.StorageType == StorageType.Double)
+            {
+                area = Math.Round(parameter.AsDouble() * 0.092903, 2);
+                return true;
+            }
+
+            if (parameter.StorageType == StorageType.String)
+            {
+                string raw = parameter.AsString();
+                if (string.IsNullOrWhiteSpace(raw))
+                    return false;
+
+                if (double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out area) ||
+                    double.TryParse(raw, NumberStyles.Float, CultureInfo.CurrentCulture, out area))
+                {
+                    area = Math.Round(area, 2);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private double GetLength(Element e)

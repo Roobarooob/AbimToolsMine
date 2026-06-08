@@ -237,7 +237,7 @@ namespace AbimToolsMine
             );
             FloorLegends.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FloorLegends16.png"));
 
-       
+
 
             // Кнопка "Передать параметры из помещений в элементы отделки"
             PushButton RoomParamsToFloorBtn = CreateButton(
@@ -287,6 +287,18 @@ namespace AbimToolsMine
                 dllName: "AbimToolsMine.dll"
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
+
+            // Кнопка "Выравнивание по листам"
+            PushButton alignBySheets_button = CreateButton(
+                panel: pan_gen,
+                name: "AlignBySheets",
+                text: "Выравнивание\nпо листам",
+                command: "AbimToolsMine.AlignBySheets",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/AlignBySheets32.png",
+                toolTip: "Выравнивание viewport планов этажей и потолков по пересечению выбранных осей относительно эталонного листа",
+                dllName: "AbimToolsMine.dll"
+            );
+            alignBySheets_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/AlignBySheets16.png"));
 
             // Кнопка "Копировать параметр"
             var copyParamData = new PushButtonData(
