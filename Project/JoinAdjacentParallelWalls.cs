@@ -11,7 +11,9 @@ namespace AbimToolsMine
     public class JoinAdjacentParallelWalls : IExternalCommand
     {
         private const double ParallelTolerance = 1e-6;
+        private const double PerpendicularTolerance = 0.001;
         private const double TouchTolerance = 5.0 / 304.8;
+        private const double EndTouchTolerance = 20.0 / 304.8;
         private const double MinLengthOverlap = 50.0 / 304.8;
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -26,6 +28,8 @@ namespace AbimToolsMine
 
             int checkedPairs = 0;
             int joinedPairs = 0;
+            int joinedParallelPairs = 0;
+            int joinedPerpendicularPairs = 0;
             int errorPairs = 0;
 
             try
@@ -34,7 +38,7 @@ namespace AbimToolsMine
                 int totalPairs = walls.Count * (walls.Count - 1) / 2;
                 progress.UpdateProgress("Подготовка проверки пар стен...", 0, totalPairs);
 
-                using (Transaction transaction = new Transaction(doc, "Соединение смежных параллельных стен"))
+                using (Transaction transaction = new Transaction(doc, "Соединение смежных стен"))
                 {
                     transaction.Start();
 
@@ -63,23 +67,31 @@ namespace AbimToolsMine
                                 if (firstWall.LevelId != secondWall.LevelId)
                                     continue;
 
-                                if (!AreWallsParallel(firstLine, secondLine))
-                                    continue;
-
                                 if (JoinGeometryUtils.AreElementsJoined(doc, firstWall, secondWall))
                                     continue;
 
-                                if (!AreWallsTouching(firstWall, secondWall, firstLine, secondLine))
-                                    continue;
+                                bool isParallelTouching = AreWallsParallelTouching(firstWall, secondWall, firstLine, secondLine);
+                                bool isPerpendicularTouching = !isParallelTouching &&
+                                    AreWallsPerpendicularTouching(firstWall, secondWall, firstLine, secondLine);
 
-                                if (!HaveLengthOverlap(firstLine, secondLine))
+                                bool shouldJoin = isParallelTouching || isPerpendicularTouching;
+                                if (!shouldJoin)
                                     continue;
 
                                 bool joined = TryJoinWalls(doc, firstWall, secondWall, out bool hasError);
                                 if (joined)
+                                {
                                     joinedPairs++;
+
+                                    if (isParallelTouching)
+                                        joinedParallelPairs++;
+                                    else if (isPerpendicularTouching)
+                                        joinedPerpendicularPairs++;
+                                }
                                 else if (hasError)
+                                {
                                     errorPairs++;
+                                }
                             }
                             catch
                             {
@@ -98,8 +110,10 @@ namespace AbimToolsMine
                     "Соединение стен",
                     $"Найдено стен: {walls.Count}\n" +
                     $"Проверено пар: {checkedPairs}\n" +
-                    $"Успешно соединено: {joinedPairs}\n" +
-                    $"Пропущено из-за ошибок: {errorPairs}");
+                    $"Соединено параллельных пар: {joinedParallelPairs}\n" +
+                    $"Соединено перпендикулярных пар: {joinedPerpendicularPairs}\n" +
+                    $"Всего соединено: {joinedPairs}\n" +
+                    $"Ошибок: {errorPairs}");
 
                 return Result.Succeeded;
             }
@@ -119,6 +133,13 @@ namespace AbimToolsMine
                 .WhereElementIsNotElementType()
                 .Cast<Wall>()
                 .ToList();
+        }
+
+        private static bool AreWallsParallelTouching(Wall firstWall, Wall secondWall, Line firstLine, Line secondLine)
+        {
+            return AreWallsParallel(firstLine, secondLine) &&
+                AreWallsTouching(firstWall, secondWall, firstLine, secondLine) &&
+                HaveLengthOverlap(firstLine, secondLine);
         }
 
         private static bool AreWallsParallel(Line firstLine, Line secondLine)
@@ -158,6 +179,109 @@ namespace AbimToolsMine
 
             double overlap = Math.Min(firstMax, secondMax) - Math.Max(firstMin, secondMin);
             return overlap >= MinLengthOverlap;
+        }
+
+        private static bool AreWallsPerpendicularTouching(Wall firstWall, Wall secondWall, Line firstLine, Line secondLine)
+        {
+            XYZ firstDirection = GetHorizontalDirection(firstLine);
+            XYZ secondDirection = GetHorizontalDirection(secondLine);
+
+            if (firstDirection == null || secondDirection == null)
+                return false;
+
+            if (Math.Abs(firstDirection.DotProduct(secondDirection)) >= PerpendicularTolerance)
+                return false;
+
+            return HasAnyEndCapTouchingWallBody(firstLine, firstWall.Width, secondLine, secondWall.Width) ||
+                HasAnyEndCapTouchingWallBody(secondLine, secondWall.Width, firstLine, firstWall.Width);
+        }
+
+        private static bool HasAnyEndCapTouchingWallBody(
+            Line sourceLine,
+            double sourceWallWidth,
+            Line targetLine,
+            double targetWallWidth)
+        {
+            XYZ sourceDirection = GetHorizontalDirection(sourceLine);
+            XYZ targetDirection = GetHorizontalDirection(targetLine);
+            if (sourceDirection == null || targetDirection == null)
+                return false;
+
+            XYZ sourcePerpendicular = new XYZ(-sourceDirection.Y, sourceDirection.X, 0.0);
+            XYZ targetPerpendicular = new XYZ(-targetDirection.Y, targetDirection.X, 0.0);
+            double halfSourceWallWidth = sourceWallWidth / 2.0;
+            double halfTargetWallWidth = targetWallWidth / 2.0;
+
+            GetProjectionInterval(targetLine, targetDirection, out double targetMin, out double targetMax);
+
+            foreach (XYZ endPoint in GetLineEndPoints(sourceLine))
+            {
+                if (IsEndCapTouchingWallBody(
+                    endPoint,
+                    sourcePerpendicular,
+                    halfSourceWallWidth,
+                    targetLine,
+                    targetDirection,
+                    targetPerpendicular,
+                    targetMin,
+                    targetMax,
+                    halfTargetWallWidth))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsEndCapTouchingWallBody(
+            XYZ endPoint,
+            XYZ sourcePerpendicular,
+            double halfSourceWallWidth,
+            Line targetLine,
+            XYZ targetDirection,
+            XYZ targetPerpendicular,
+            double targetMin,
+            double targetMax,
+            double halfTargetWallWidth)
+        {
+            XYZ firstCapPoint = endPoint + sourcePerpendicular * halfSourceWallWidth;
+            XYZ secondCapPoint = endPoint - sourcePerpendicular * halfSourceWallWidth;
+            XYZ targetOffset = endPoint - targetLine.GetEndPoint(0);
+            double signedDistanceToCenterLine = targetOffset.DotProduct(targetPerpendicular);
+            double distanceToCenterLine = Math.Abs(signedDistanceToCenterLine);
+
+            if (distanceToCenterLine > halfTargetWallWidth + EndTouchTolerance)
+                return false;
+
+            GetPointProjectionInterval(firstCapPoint, secondCapPoint, targetDirection, out double capMin, out double capMax);
+            if (!IntervalsTouchOrOverlap(capMin, capMax, targetMin, targetMax, EndTouchTolerance))
+                return false;
+
+            GetPointProjectionInterval(firstCapPoint, secondCapPoint, targetPerpendicular, out double capSideMin, out double capSideMax);
+            double targetSide = targetLine.GetEndPoint(0).DotProduct(targetPerpendicular);
+            double targetSideMin = targetSide - halfTargetWallWidth;
+            double targetSideMax = targetSide + halfTargetWallWidth;
+
+            return IntervalsTouchOrOverlap(capSideMin, capSideMax, targetSideMin, targetSideMax, EndTouchTolerance);
+        }
+
+        private static IEnumerable<XYZ> GetLineEndPoints(Line line)
+        {
+            yield return line.GetEndPoint(0);
+            yield return line.GetEndPoint(1);
+        }
+
+        private static void GetPointProjectionInterval(XYZ firstPoint, XYZ secondPoint, XYZ direction, out double min, out double max)
+        {
+            double first = firstPoint.DotProduct(direction);
+            double second = secondPoint.DotProduct(direction);
+
+            min = Math.Min(first, second);
+            max = Math.Max(first, second);
+        }
+
+        private static bool IntervalsTouchOrOverlap(double firstMin, double firstMax, double secondMin, double secondMax, double tolerance)
+        {
+            return Math.Min(firstMax, secondMax) >= Math.Max(firstMin, secondMin) - tolerance;
         }
 
         private static bool TryJoinWalls(Document doc, Wall firstWall, Wall secondWall, out bool hasError)
