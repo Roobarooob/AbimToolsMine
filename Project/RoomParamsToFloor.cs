@@ -1,4 +1,4 @@
-using Autodesk.Revit.Attributes;
+п»їusing Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
@@ -12,10 +12,10 @@ namespace AbimToolsMine
     public class RoomParamsToFloor : IExternalCommand
     {
         private const double SampleStepFt = 1.0;
-        // ~1 м в футах
+        // ~1 Рј РІ С„СѓС‚Р°С…
         private const double ZOffsetFt = 3.28084;
 
-        // Смещения для поиска помещения со стороны стены: 20, 50, 100, 200, 400, 500 мм
+        // РЎРјРµС‰РµРЅРёСЏ РґР»СЏ РїРѕРёСЃРєР° РїРѕРјРµС‰РµРЅРёСЏ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ СЃС‚РµРЅС‹: 20, 50, 100, 200, 400, 500 РјРј
         private static readonly double[] WallOffsetsFt = new double[]
         {
   20  / 304.8,
@@ -31,7 +31,7 @@ namespace AbimToolsMine
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
 
-            // Трёхфазный цикл: окно ? выбор помещений ? окно снова
+            // РўСЂС‘С…С„Р°Р·РЅС‹Р№ С†РёРєР»: РѕРєРЅРѕ ? РІС‹Р±РѕСЂ РїРѕРјРµС‰РµРЅРёР№ ? РѕРєРЅРѕ СЃРЅРѕРІР°
             List<ElementId> preselectedRooms = null;
             RoomParamsToFloorWin win;
 
@@ -40,29 +40,29 @@ namespace AbimToolsMine
                 win = preselectedRooms != null
              ? new RoomParamsToFloorWin(uidoc, preselectedRooms)
              : new RoomParamsToFloorWin(uidoc);
-                win.Owner = System.Windows.Application.Current?.MainWindow;
+                RevitWindowOwner.SetOwner(win, commandData.Application);
                 win.ShowDialog();
 
                 if (win.NeedRoomPick)
                 {
-                    // Пользователь нажал "Выбрать на виде" — делаем выбор без модального окна
+                    // РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶Р°Р» "Р’С‹Р±СЂР°С‚СЊ РЅР° РІРёРґРµ" вЂ” РґРµР»Р°РµРј РІС‹Р±РѕСЂ Р±РµР· РјРѕРґР°Р»СЊРЅРѕРіРѕ РѕРєРЅР°
                     try
                     {
                         IList<Reference> refs = uidoc.Selection.PickObjects(
                         Autodesk.Revit.UI.Selection.ObjectType.Element,
                                    new RoomSelectionFilter(),
-                          "Выберите помещения и нажмите Готово");
+                          "Р’С‹Р±РµСЂРёС‚Рµ РїРѕРјРµС‰РµРЅРёСЏ Рё РЅР°Р¶РјРёС‚Рµ Р“РѕС‚РѕРІРѕ");
                         preselectedRooms = refs.Select(r => r.ElementId).ToList();
                     }
                     catch
                     {
-                        // Отмена — возвращаемся в окно без изменений
+                        // РћС‚РјРµРЅР° вЂ” РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ РІ РѕРєРЅРѕ Р±РµР· РёР·РјРµРЅРµРЅРёР№
                         preselectedRooms = preselectedRooms ?? new List<ElementId>();
                     }
-                    continue; // открываем окно снова
+                    continue; // РѕС‚РєСЂС‹РІР°РµРј РѕРєРЅРѕ СЃРЅРѕРІР°
                 }
 
-                // Пользователь нажал Запустить (true) или Закрыть (false/null)
+                // РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶Р°Р» Р—Р°РїСѓСЃС‚РёС‚СЊ (true) РёР»Рё Р—Р°РєСЂС‹С‚СЊ (false/null)
                 if (win.DialogResult != true)
                     return Result.Cancelled;
 
@@ -76,11 +76,11 @@ namespace AbimToolsMine
 
             if (!mappings.Any())
             {
-                TaskDialog.Show("Предупреждение", "Не задано ни одного соответствия параметров.");
+                TaskDialog.Show("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", "РќРµ Р·Р°РґР°РЅРѕ РЅРё РѕРґРЅРѕРіРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ.");
                 return Result.Cancelled;
             }
 
-            // Все помещения модели — для поиска
+            // Р’СЃРµ РїРѕРјРµС‰РµРЅРёСЏ РјРѕРґРµР»Рё вЂ” РґР»СЏ РїРѕРёСЃРєР°
       var allRooms = new FilteredElementCollector(doc)
       .OfCategory(BuiltInCategory.OST_Rooms)
       .WhereElementIsNotElementType()
@@ -90,18 +90,18 @@ namespace AbimToolsMine
 
             if (!allRooms.Any())
       {
-      TaskDialog.Show("Предупреждение", "В проекте не найдено помещений.");
+      TaskDialog.Show("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", "Р’ РїСЂРѕРµРєС‚Рµ РЅРµ РЅР°Р№РґРµРЅРѕ РїРѕРјРµС‰РµРЅРёР№.");
     return Result.Cancelled;
      }
 
- // allowedIds: null = все помещения, иначе — только выбранные
+ // allowedIds: null = РІСЃРµ РїРѕРјРµС‰РµРЅРёСЏ, РёРЅР°С‡Рµ вЂ” С‚РѕР»СЊРєРѕ РІС‹Р±СЂР°РЅРЅС‹Рµ
      HashSet<ElementId> allowedIds = null;
     if (win.SelectedRoomIds != null && win.SelectedRoomIds.Count > 0)
  {
         allowedIds = new HashSet<ElementId>(win.SelectedRoomIds);
        if (!allRooms.Any(r => allowedIds.Contains(r.Id)))
         {
-           TaskDialog.Show("Предупреждение", "Ни одно из выбранных помещений не найдено.");
+           TaskDialog.Show("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", "РќРё РѕРґРЅРѕ РёР· РІС‹Р±СЂР°РЅРЅС‹С… РїРѕРјРµС‰РµРЅРёР№ РЅРµ РЅР°Р№РґРµРЅРѕ.");
     return Result.Cancelled;
   }
     }
@@ -112,23 +112,23 @@ namespace AbimToolsMine
 IncludeNonVisibleObjects = true
             };
 
- // ?? Сбор целевых элементов ????????????????????????????????????????????
-       // Если помещения выбраны — используем пространственную предфильтрацию:
-  // для каждого помещения расширяем BBox на 500 мм и берём только ближайшие элементы.
-    // Если "все помещения" — обычный полный сбор.
+ // ?? РЎР±РѕСЂ С†РµР»РµРІС‹С… СЌР»РµРјРµРЅС‚РѕРІ ????????????????????????????????????????????
+       // Р•СЃР»Рё РїРѕРјРµС‰РµРЅРёСЏ РІС‹Р±СЂР°РЅС‹ вЂ” РёСЃРїРѕР»СЊР·СѓРµРј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµРЅРЅСѓСЋ РїСЂРµРґС„РёР»СЊС‚СЂР°С†РёСЋ:
+  // РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕРјРµС‰РµРЅРёСЏ СЂР°СЃС€РёСЂСЏРµРј BBox РЅР° 500 РјРј Рё Р±РµСЂС‘Рј С‚РѕР»СЊРєРѕ Р±Р»РёР¶Р°Р№С€РёРµ СЌР»РµРјРµРЅС‚С‹.
+    // Р•СЃР»Рё "РІСЃРµ РїРѕРјРµС‰РµРЅРёСЏ" вЂ” РѕР±С‹С‡РЅС‹Р№ РїРѕР»РЅС‹Р№ СЃР±РѕСЂ.
             var allTargets = new List<(FinishingCategory cat, Element el)>();
 
         if (allowedIds == null)
         {
-   // Режим "все помещения" — собираем все целевые элементы
+   // Р РµР¶РёРј "РІСЃРµ РїРѕРјРµС‰РµРЅРёСЏ" вЂ” СЃРѕР±РёСЂР°РµРј РІСЃРµ С†РµР»РµРІС‹Рµ СЌР»РµРјРµРЅС‚С‹
      foreach (FinishingCategory category in win.SelectedCategories)
    foreach (Element el in GetTargets(doc, category))
   allTargets.Add((category, el));
             }
  else
          {
-     // Режим "выбранные помещения" — пространственная предфильтрация
-                const double toleranceFt = 500.0 / 304.8; // 500 мм в футах
+     // Р РµР¶РёРј "РІС‹Р±СЂР°РЅРЅС‹Рµ РїРѕРјРµС‰РµРЅРёСЏ" вЂ” РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµРЅРЅР°СЏ РїСЂРµРґС„РёР»СЊС‚СЂР°С†РёСЏ
+                const double toleranceFt = 500.0 / 304.8; // 500 РјРј РІ С„СѓС‚Р°С…
             var processedIds = new HashSet<ElementId>();
          var selectedRooms = allRooms.Where(r => allowedIds.Contains(r.Id)).ToList();
 
@@ -137,7 +137,7 @@ IncludeNonVisibleObjects = true
        BoundingBoxXYZ bb = selectedRoom.get_BoundingBox(null);
          if (bb == null) continue;
 
-     // Расширяем BBox на toleranceFt по XY (Z не трогаем — этажи разные)
+     // Р Р°СЃС€РёСЂСЏРµРј BBox РЅР° toleranceFt РїРѕ XY (Z РЅРµ С‚СЂРѕРіР°РµРј вЂ” СЌС‚Р°Р¶Рё СЂР°Р·РЅС‹Рµ)
 var outline = new Outline(
             new XYZ(bb.Min.X - toleranceFt, bb.Min.Y - toleranceFt, bb.Min.Z),
          new XYZ(bb.Max.X + toleranceFt, bb.Max.Y + toleranceFt, bb.Max.Z));
@@ -148,7 +148,7 @@ var outline = new Outline(
       {
                 foreach (Element el in GetTargetsWithFilter(doc, category, bbFilter))
    {
-  // processedIds.Add возвращает true если элемент добавлен впервые
+  // processedIds.Add РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё СЌР»РµРјРµРЅС‚ РґРѕР±Р°РІР»РµРЅ РІРїРµСЂРІС‹Рµ
            if (processedIds.Add(el.Id))
         allTargets.Add((category, el));
 }
@@ -160,10 +160,10 @@ var outline = new Outline(
             int current = 0;
 
      var progress = new ProgressWindow();
-     progress.Owner = System.Windows.Application.Current?.MainWindow;
+     RevitWindowOwner.SetOwner(progress, commandData.Application);
      progress.Show();
 
-            using (Transaction t = new Transaction(doc, "Передача параметров из помещений в элементы отделки"))
+            using (Transaction t = new Transaction(doc, "РџРµСЂРµРґР°С‡Р° РїР°СЂР°РјРµС‚СЂРѕРІ РёР· РїРѕРјРµС‰РµРЅРёР№ РІ СЌР»РµРјРµРЅС‚С‹ РѕС‚РґРµР»РєРё"))
             {
       t.Start();
 
@@ -173,12 +173,12 @@ var outline = new Outline(
           Element el = pair.el;
 
             current++;
-            progress.UpdateProgress($"Обработка {current} из {total}...", current, total);
+            progress.UpdateProgress($"РћР±СЂР°Р±РѕС‚РєР° {current} РёР· {total}...", current, total);
 
  Room room = FindRoomForElement(el, category, allRooms, geomOptions);
     if (room == null) continue;
 
-  // Если задан фильтр — пропускаем элементы "чужих" помещений
+  // Р•СЃР»Рё Р·Р°РґР°РЅ С„РёР»СЊС‚СЂ вЂ” РїСЂРѕРїСѓСЃРєР°РµРј СЌР»РµРјРµРЅС‚С‹ "С‡СѓР¶РёС…" РїРѕРјРµС‰РµРЅРёР№
      if (allowedIds != null && !allowedIds.Contains(room.Id)) continue;
 
                   foreach (var mapping in mappings)
@@ -195,7 +195,7 @@ var outline = new Outline(
    catch { }
          }
 
-       // WallSweep для стен
+       // WallSweep РґР»СЏ СЃС‚РµРЅ
         if (category == FinishingCategory.Walls)
        {
          foreach (ElementId depId in el.GetDependentElements(null))
@@ -219,7 +219,7 @@ var outline = new Outline(
       }
 
      progress.Close();
-         TaskDialog.Show("Готово", "Данные успешно записаны.");
+         TaskDialog.Show("Р“РѕС‚РѕРІРѕ", "Р”Р°РЅРЅС‹Рµ СѓСЃРїРµС€РЅРѕ Р·Р°РїРёСЃР°РЅС‹.");
    return Result.Succeeded;
   }
 
@@ -241,7 +241,7 @@ var outline = new Outline(
                 .Where(e =>
               {
                   ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
-                  return et != null && et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase);
+                  return et != null && et.Name.StartsWith("Р’Рћ РЎС‚РµРЅР°", StringComparison.OrdinalIgnoreCase);
               })
                     .ToList();
 
@@ -254,15 +254,15 @@ var outline = new Outline(
                      {
                          ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
                          return et != null && (
-                        et.Name.StartsWith("ВО Пол", StringComparison.OrdinalIgnoreCase) ||
-            et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase));
+                        et.Name.StartsWith("Р’Рћ РџРѕР»", StringComparison.OrdinalIgnoreCase) ||
+            et.Name.StartsWith("Р’Рћ РЎС‚РµРЅР°", StringComparison.OrdinalIgnoreCase));
                      })
                    .ToList();
             }
         }
 
 /// <summary>
-    /// То же что GetTargets, но с дополнительным пространственным фильтром BBox.
+    /// РўРѕ Р¶Рµ С‡С‚Рѕ GetTargets, РЅРѕ СЃ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµРЅРЅС‹Рј С„РёР»СЊС‚СЂРѕРј BBox.
   /// </summary>
         private static List<Element> GetTargetsWithFilter(
         Document doc, FinishingCategory category, BoundingBoxIntersectsFilter bbFilter)
@@ -285,7 +285,7 @@ var outline = new Outline(
     .Where(e =>
   {
       ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
-      return et != null && et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase);
+      return et != null && et.Name.StartsWith("Р’Рћ РЎС‚РµРЅР°", StringComparison.OrdinalIgnoreCase);
      })
          .ToList();
 
@@ -299,14 +299,14 @@ var outline = new Outline(
   {
     ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
       return et != null && (
-         et.Name.StartsWith("ВО Пол",   StringComparison.OrdinalIgnoreCase) ||
-    et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase));
+         et.Name.StartsWith("Р’Рћ РџРѕР»",   StringComparison.OrdinalIgnoreCase) ||
+    et.Name.StartsWith("Р’Рћ РЎС‚РµРЅР°", StringComparison.OrdinalIgnoreCase));
 })
   .ToList();
      }
         }
 
-        // ?? Диспетчер поиска помещения по категории ??????????????????????????????
+        // ?? Р”РёСЃРїРµС‚С‡РµСЂ РїРѕРёСЃРєР° РїРѕРјРµС‰РµРЅРёСЏ РїРѕ РєР°С‚РµРіРѕСЂРёРё ??????????????????????????????
 
         private static Room FindRoomForElement(Element el, FinishingCategory category,
        List<Room> rooms, Options opt)
@@ -321,7 +321,7 @@ var outline = new Outline(
         }
 
         /// <summary>
-        /// Пол: сэмплируем горизонтальные грани, смещаемся ВВЕРХ (+Z) в помещение.
+        /// РџРѕР»: СЃСЌРјРїР»РёСЂСѓРµРј РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Рµ РіСЂР°РЅРё, СЃРјРµС‰Р°РµРјСЃСЏ Р’Р’Р•Р РҐ (+Z) РІ РїРѕРјРµС‰РµРЅРёРµ.
         /// </summary>
         private static Room FindRoomForFloor(Element el, List<Room> rooms, Options opt)
         {
@@ -338,7 +338,7 @@ var outline = new Outline(
                     PlanarFace pf = face as PlanarFace;
                     if (pf == null || Math.Abs(pf.FaceNormal.Z) < 0.9) continue;
 
-                    // Верхняя грань (нормаль вверх) ? смещаемся чуть вверх
+                    // Р’РµСЂС…РЅСЏСЏ РіСЂР°РЅСЊ (РЅРѕСЂРјР°Р»СЊ РІРІРµСЂС…) ? СЃРјРµС‰Р°РµРјСЃСЏ С‡СѓС‚СЊ РІРІРµСЂС…
                     double offset = pf.FaceNormal.Z > 0 ? ZOffsetFt : -ZOffsetFt;
                     Room found = SampleFaceForRoom(pf, rooms, offset);
                     if (found != null) return found;
@@ -348,7 +348,7 @@ var outline = new Outline(
         }
 
         /// <summary>
-        /// Потолок: сэмплируем горизонтальные грани, смещаемся ВНИЗ (-Z) в помещение.
+        /// РџРѕС‚РѕР»РѕРє: СЃСЌРјРїР»РёСЂСѓРµРј РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Рµ РіСЂР°РЅРё, СЃРјРµС‰Р°РµРјСЃСЏ Р’РќРР— (-Z) РІ РїРѕРјРµС‰РµРЅРёРµ.
         /// </summary>
         private static Room FindRoomForCeiling(Element el, List<Room> rooms, Options opt)
         {
@@ -365,7 +365,7 @@ var outline = new Outline(
                     PlanarFace pf = face as PlanarFace;
                     if (pf == null || Math.Abs(pf.FaceNormal.Z) < 0.9) continue;
 
-                    // Нижняя грань (нормаль вниз) ? смещаемся ещё ниже в помещение
+                    // РќРёР¶РЅСЏСЏ РіСЂР°РЅСЊ (РЅРѕСЂРјР°Р»СЊ РІРЅРёР·) ? СЃРјРµС‰Р°РµРјСЃСЏ РµС‰С‘ РЅРёР¶Рµ РІ РїРѕРјРµС‰РµРЅРёРµ
                     double offset = pf.FaceNormal.Z < 0 ? -ZOffsetFt : ZOffsetFt;
                     Room found = SampleFaceForRoom(pf, rooms, offset);
                     if (found != null) return found;
@@ -375,7 +375,7 @@ var outline = new Outline(
         }
 
         /// <summary>
-        /// Стена: вычисляем нормаль из LocationCurve, пробуем обе стороны на 6 смещениях.
+        /// РЎС‚РµРЅР°: РІС‹С‡РёСЃР»СЏРµРј РЅРѕСЂРјР°Р»СЊ РёР· LocationCurve, РїСЂРѕР±СѓРµРј РѕР±Рµ СЃС‚РѕСЂРѕРЅС‹ РЅР° 6 СЃРјРµС‰РµРЅРёСЏС….
         /// </summary>
         private static Room FindRoomForWall(Element el, List<Room> rooms, Options opt)
         {
@@ -389,10 +389,10 @@ var outline = new Outline(
             XYZ p0 = curve.GetEndPoint(0);
             XYZ p1 = curve.GetEndPoint(1);
 
-            // Середина стены
+            // РЎРµСЂРµРґРёРЅР° СЃС‚РµРЅС‹
             XYZ mid = p0.Add(p1).Multiply(0.5);
 
-            // Горизонтальная нормаль (перпендикуляр к оси стены в плане)
+            // Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ РЅРѕСЂРјР°Р»СЊ (РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂ Рє РѕСЃРё СЃС‚РµРЅС‹ РІ РїР»Р°РЅРµ)
             XYZ dir = p1.Subtract(p0).Normalize();
             XYZ normal = new XYZ(-dir.Y, dir.X, 0).Normalize();
 
@@ -415,7 +415,7 @@ var outline = new Outline(
             return null;
         }
 
-        // ?? Сэмплирование граней ?????????????????????????????????????????????????
+        // ?? РЎСЌРјРїР»РёСЂРѕРІР°РЅРёРµ РіСЂР°РЅРµР№ ?????????????????????????????????????????????????
 
         private static Room SampleFaceForRoom(PlanarFace face, List<Room> rooms, double zOffset)
         {
@@ -445,15 +445,15 @@ var outline = new Outline(
             return null;
         }
 
-        // ?? Утилиты ??????????????????????????????????????????????????????????????
+        // ?? РЈС‚РёР»РёС‚С‹ ??????????????????????????????????????????????????????????????
 
         private static string GetParamStringValue(Element element, string paramName)
         {
             Parameter p = element.LookupParameter(paramName);
 
-            if (p == null && paramName == "Номер")
+            if (p == null && paramName == "РќРѕРјРµСЂ")
                 p = element.get_Parameter(BuiltInParameter.ROOM_NUMBER);
-            if (p == null && paramName == "Имя")
+            if (p == null && paramName == "РРјСЏ")
                 p = element.get_Parameter(BuiltInParameter.ROOM_NAME);
 
             if (p == null) return null;

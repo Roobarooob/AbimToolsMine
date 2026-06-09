@@ -22,7 +22,7 @@ namespace AbimToolsMine
             Document doc = uidoc.Document;
 
             var progress = new ProgressWindow();
-            progress.Owner = System.Windows.Application.Current?.MainWindow;
+            RevitWindowOwner.SetOwner(progress, commandData.Application);
             progress.Show();
             progress.UpdateProgress("Сбор стен на активном виде...", 0, 1);
 

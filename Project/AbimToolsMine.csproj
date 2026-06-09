@@ -235,6 +235,8 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <Resource Include="Resources\ElementParameters16.png" />
     <Resource Include="Resources\FloorLegends16.png" />
     <Resource Include="Resources\ElementParameters32.png" />
+    <Resource Include="Resources\JoinAdjacentParallelWalls16.png" />
+    <Resource Include="Resources\JoinAdjacentParallelWalls32.png" />
     <Resource Include="Resources\FormAssign16.png" />
     <Resource Include="Resources\CopyParam16.png" />
   </ItemGroup>

@@ -306,11 +306,11 @@ namespace AbimToolsMine
                 name: "JoinAdjacentParallelWalls",
                 text: "Соединить\nсмежные стены",
                 command: "AbimToolsMine.JoinAdjacentParallelWalls",
-                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/JoinAdjacentParallelWalls32.png",
                 toolTip: "Соединение параллельных смежных стен на активном виде",
                 dllName: "AbimToolsMine.dll"
             );
-            joinAdjacentWalls_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
+            joinAdjacentWalls_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/JoinAdjacentParallelWalls16.png"));
 
             // Кнопка "Копировать параметр"
             var copyParamData = new PushButtonData(
