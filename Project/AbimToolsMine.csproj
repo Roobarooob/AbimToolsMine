@@ -217,6 +217,8 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <None Remove="Resources\Finishing16.png" />
     <None Remove="Resources\Finishing32.png" />
     <None Remove="Resources\FloorLegends32.png" />
+    <None Remove="Resources\LegendComponentTitles16.png" />
+    <None Remove="Resources\LegendComponentTitles32.png" />
     <None Remove="Resources\LegendsToParameter32.png" />
     <None Remove="Resources\MakeLocalTask16.png" />
     <None Remove="Resources\MakeLocalTask32.png" />
@@ -232,6 +234,8 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
   <ItemGroup>
     <Resource Include="Resources\AlignBySheets16.png" />
     <Resource Include="Resources\BatchTools16.png" />
+    <Resource Include="Resources\ShaftMarks16.png" />
+    <Resource Include="Resources\ShaftMarks32.png" />
     <Resource Include="Resources\ElementParameters16.png" />
     <Resource Include="Resources\FloorLegends16.png" />
     <Resource Include="Resources\ElementParameters32.png" />
@@ -246,6 +250,8 @@ copy "$(TargetDir)AbimToolsMine.dll" "%AppData%\Autodesk\REVIT\Addins\%VERSION%\
     <Resource Include="Resources\Finishing32.png" />
     <Resource Include="Resources\CopyParam32.png" />
     <Resource Include="Resources\FloorLegends32.png" />
+    <Resource Include="Resources\LegendComponentTitles16.png" />
+    <Resource Include="Resources\LegendComponentTitles32.png" />
     <Resource Include="Resources\LegendsToParameter16.png" />
     <Resource Include="Resources\LegendsToParameter32.png" />
   </ItemGroup>

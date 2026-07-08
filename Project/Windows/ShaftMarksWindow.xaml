@@ -1,0 +1,53 @@
+<Window x:Class="AbimToolsMine.ShaftMarksWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Марки по шахтам" Height="540" Width="560"
+        WindowStartupLocation="CenterOwner" MinHeight="430" MinWidth="480">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Параметр для текста марки" Margin="0,0,0,5"/>
+        <TextBox x:Name="ParameterNameBox" Grid.Row="1" Height="27"
+                 VerticalContentAlignment="Center"/>
+
+        <TextBlock Grid.Row="2" Text="Тип текста" Margin="0,10,0,5"/>
+        <ComboBox x:Name="TextTypeBox" Grid.Row="3" Height="27" DisplayMemberPath="Name"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,12,0,8">
+            <RadioButton x:Name="CurrentViewRadio" Content="Текущий вид" Margin="0,0,22,0"
+                         Checked="Mode_Changed"/>
+            <RadioButton x:Name="SelectedViewsRadio" Content="Выбранные виды"
+                         Checked="Mode_Changed"/>
+        </StackPanel>
+
+        <TextBox x:Name="SearchBox" Grid.Row="5" Height="28" Margin="0,0,0,7"
+                 VerticalContentAlignment="Center" TextChanged="SearchBox_TextChanged"
+                 ToolTip="Поиск по имени вида"/>
+
+        <Border Grid.Row="6" BorderBrush="#BDBDBD" BorderThickness="1">
+            <ListBox x:Name="ViewsList" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding DisplayName}"
+                                  Margin="5,3"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Расставить" Width="105" Margin="0,0,8,0" IsDefault="True"
+                    Click="OkButton_Click"/>
+            <Button Content="Отмена" Width="90" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -19,8 +19,6 @@ namespace AbimToolsMine
 
         public RibbonPanel RibbonPanel(UIControlledApplication a, string tab, string ribbonPanelText)
         {
-            RibbonPanel ribbonPanel = null;
-
             try
             {
                 a.CreateRibbonTab(tab);
@@ -30,20 +28,29 @@ namespace AbimToolsMine
 
             }
 
+            RibbonPanel ribbonPanel = a.GetRibbonPanels(tab)
+                .FirstOrDefault(p => p.Name == ribbonPanelText);
+
+            if (ribbonPanel != null)
+            {
+                return ribbonPanel;
+            }
+
             try
             {
                 ribbonPanel = a.CreateRibbonPanel(tab, ribbonPanelText);
             }
             catch (Exception ex)
             {
-                // Логирование ошибки
-                TaskDialog.Show("Error", ex.Message);
-            }
+                // Панель могла быть создана другим загружаемым модулем между проверкой
+                // и вызовом CreateRibbonPanel. Такое совпадение не является ошибкой.
+                ribbonPanel = a.GetRibbonPanels(tab)
+                    .FirstOrDefault(p => p.Name == ribbonPanelText);
 
-            if (ribbonPanel == null)
-            {
-                List<RibbonPanel> panels = a.GetRibbonPanels(tab);
-                ribbonPanel = panels.FirstOrDefault(p => p.Name == ribbonPanelText);
+                if (ribbonPanel == null)
+                {
+                    TaskDialog.Show("Error", ex.Message);
+                }
             }
 
             return ribbonPanel;
@@ -263,6 +270,8 @@ namespace AbimToolsMine
             );
             LegendsToParameters.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/ElementParameters16.png"));
 
+
+
             // Кнопка "Сформировать ведомость отделки"
             PushButton ScheduleFinishing = CreateButton(
                 panel: pan_otd,
@@ -312,6 +321,29 @@ namespace AbimToolsMine
             );
             joinAdjacentWalls_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/JoinAdjacentParallelWalls16.png"));
 
+            // Кнопка "Заголовки в легендах"
+            PushButton LegendComponentTitles = CreateButton(
+                panel: pan_gen,
+                name: "LegendComponentTitles",
+                text: "Заголовки\nв легендах",
+                command: "AbimToolsMine.LegendComponentTitles",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/LegendComponentTitles32.png",
+                toolTip: "Создание текстовых заголовков над компонентами активной легенды по параметру отображаемого типоразмера",
+                dllName: "AbimToolsMine.dll"
+            );
+            LegendComponentTitles.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/LegendComponentTitles16.png"));
+
+            PushButton shaftMarksButton = CreateButton(
+                panel: pan_gen,
+                name: "ShaftMarks",
+                text: "Марки\nпо шахтам",
+                command: "AbimToolsMine.ShaftMarks",
+                imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/ShaftMarks32.png",
+                toolTip: "Расстановка текстовых меток на видимых проёмах для шахт по выбранному параметру",
+                dllName: "AbimToolsMine.dll"
+            );
+            shaftMarksButton.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/ShaftMarks16.png"));
+
             // Кнопка "Копировать параметр"
             var copyParamData = new PushButtonData(
                 "CopyParameter",
@@ -332,6 +364,8 @@ namespace AbimToolsMine
                 ToolTip = "Перенос значения параметра формообразующего на все пересекающие его элементы модели",
                 Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/FormAssign16.png")),
             };
+
+
 
             var sheetNumbersData = new PushButtonData(
                 "SheetNumbers",

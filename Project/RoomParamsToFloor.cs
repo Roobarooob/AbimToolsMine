@@ -323,54 +323,83 @@ var outline = new Outline(
         /// <summary>
         /// Пол: сэмплируем горизонтальные грани, смещаемся ВВЕРХ (+Z) в помещение.
         /// </summary>
-        private static Room FindRoomForFloor(Element el, List<Room> rooms, Options opt)
+        private static Room FindRoomForFloor(
+            Element el,
+            List<Room> rooms,
+            Options opt)
         {
             GeometryElement geom = el.get_Geometry(opt);
-            if (geom == null) return null;
+            if (geom == null)
+                return null;
 
             foreach (GeometryObject gObj in geom)
             {
                 Solid solid = gObj as Solid;
-                if (solid == null || solid.Volume <= 0) continue;
+                if (solid == null || solid.Volume <= 0)
+                    continue;
 
                 foreach (Face face in solid.Faces)
                 {
                     PlanarFace pf = face as PlanarFace;
-                    if (pf == null || Math.Abs(pf.FaceNormal.Z) < 0.9) continue;
+                    if (pf == null)
+                        continue;
 
-                    // Верхняя грань (нормаль вверх) ? смещаемся чуть вверх
-                    double offset = pf.FaceNormal.Z > 0 ? ZOffsetFt : -ZOffsetFt;
-                    Room found = SampleFaceForRoom(pf, rooms, offset);
-                    if (found != null) return found;
+                    // Только верхняя горизонтальная грань пола
+                    if (pf.FaceNormal.Z < 0.9)
+                        continue;
+
+                    Room found = SampleFaceForRoom(
+                        pf,
+                        rooms,
+                        ZOffsetFt);
+
+                    if (found != null)
+                        return found;
                 }
             }
+
             return null;
         }
 
         /// <summary>
         /// Потолок: сэмплируем горизонтальные грани, смещаемся ВНИЗ (-Z) в помещение.
         /// </summary>
-        private static Room FindRoomForCeiling(Element el, List<Room> rooms, Options opt)
+        private static Room FindRoomForCeiling(
+            Element el,
+            List<Room> rooms,
+            Options opt)
         {
             GeometryElement geom = el.get_Geometry(opt);
-            if (geom == null) return null;
+            if (geom == null)
+                return null;
 
             foreach (GeometryObject gObj in geom)
             {
                 Solid solid = gObj as Solid;
-                if (solid == null || solid.Volume <= 0) continue;
+                if (solid == null || solid.Volume <= 0)
+                    continue;
 
                 foreach (Face face in solid.Faces)
                 {
                     PlanarFace pf = face as PlanarFace;
-                    if (pf == null || Math.Abs(pf.FaceNormal.Z) < 0.9) continue;
+                    if (pf == null)
+                        continue;
 
-                    // Нижняя грань (нормаль вниз) ? смещаемся ещё ниже в помещение
-                    double offset = pf.FaceNormal.Z < 0 ? -ZOffsetFt : ZOffsetFt;
-                    Room found = SampleFaceForRoom(pf, rooms, offset);
-                    if (found != null) return found;
+                    // Только нижняя горизонтальная грань потолка
+                    if (pf.FaceNormal.Z > -0.9)
+                        continue;
+
+                    // Всегда смещаем точки вниз по мировой оси Z
+                    Room found = SampleFaceForRoom(
+                        pf,
+                        rooms,
+                        -ZOffsetFt);
+
+                    if (found != null)
+                        return found;
                 }
             }
+
             return null;
         }
 
