@@ -1,4 +1,4 @@
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
@@ -26,7 +26,7 @@ namespace AbimToolsMine
 
             if (activeView == null || activeView.ViewType != ViewType.Legend)
             {
-                TaskDialog.Show("Заголовки в легендах", "Активный вид должен быть видом легенды.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "РђРєС‚РёРІРЅС‹Р№ РІРёРґ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІРёРґРѕРј Р»РµРіРµРЅРґС‹.");
                 return Result.Cancelled;
             }
             List<Element> legendComponents = uidoc.Selection.GetElementIds()
@@ -36,7 +36,7 @@ namespace AbimToolsMine
            
             if (!legendComponents.Any())
             {
-                TaskDialog.Show("Заголовки в легендах", "В текущем выборе не найдено компонентов активной легенды.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "Р’ С‚РµРєСѓС‰РµРј РІС‹Р±РѕСЂРµ РЅРµ РЅР°Р№РґРµРЅРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р°РєС‚РёРІРЅРѕР№ Р»РµРіРµРЅРґС‹.");
                 return Result.Cancelled;
             }
 
@@ -48,7 +48,7 @@ namespace AbimToolsMine
 
             if (!textNoteTypes.Any())
             {
-                TaskDialog.Show("Заголовки в легендах", "В проекте не найден тип текста.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "Р’ РїСЂРѕРµРєС‚Рµ РЅРµ РЅР°Р№РґРµРЅ С‚РёРї С‚РµРєСЃС‚Р°.");
                 return Result.Cancelled;
             }
 
@@ -71,20 +71,20 @@ namespace AbimToolsMine
             string parameterName = window.ParameterName;
             if (string.IsNullOrWhiteSpace(parameterName))
             {
-                TaskDialog.Show("Заголовки в легендах", "Не задано имя параметра.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "РќРµ Р·Р°РґР°РЅРѕ РёРјСЏ РїР°СЂР°РјРµС‚СЂР°.");
                 return Result.Cancelled;
             }
 
             if (!TryParseMillimeters(window.OffsetText, out double offsetMillimeters))
             {
-                TaskDialog.Show("Заголовки в легендах", "Отступ должен быть числом в миллиметрах.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "РћС‚СЃС‚СѓРї РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ С‡РёСЃР»РѕРј РІ РјРёР»Р»РёРјРµС‚СЂР°С….");
                 return Result.Cancelled;
             }
 
             ElementId textNoteTypeId = window.SelectedTextNoteTypeId;
             if (textNoteTypeId == ElementId.InvalidElementId)
             {
-                TaskDialog.Show("Заголовки в легендах", "Не выбран тип текстовой метки.");
+                TaskDialog.Show("Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…", "РќРµ РІС‹Р±СЂР°РЅ С‚РёРї С‚РµРєСЃС‚РѕРІРѕР№ РјРµС‚РєРё.");
                 return Result.Cancelled;
             }
 
@@ -93,7 +93,7 @@ namespace AbimToolsMine
             int createdCount = 0;
             int skippedCount = 0;
 
-            using (Transaction transaction = new Transaction(doc, "Заголовки в легендах"))
+            using (Transaction transaction = new Transaction(doc, "Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…"))
             {
                 transaction.Start();
 
@@ -139,8 +139,8 @@ namespace AbimToolsMine
             }
 
             TaskDialog.Show(
-                "Заголовки в легендах",
-                $"Создано заголовков: {createdCount}\nПропущено компонентов: {skippedCount}");
+                "Р—Р°РіРѕР»РѕРІРєРё РІ Р»РµРіРµРЅРґР°С…",
+                $"РЎРѕР·РґР°РЅРѕ Р·Р°РіРѕР»РѕРІРєРѕРІ: {createdCount}\nРџСЂРѕРїСѓС‰РµРЅРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ: {skippedCount}");
 
             return Result.Succeeded;
         }
@@ -326,16 +326,12 @@ namespace AbimToolsMine
 
         private static double MmToInternal(double millimeters)
         {
-#if R2020
-            return UnitUtils.ConvertToInternalUnits(millimeters, DisplayUnitType.DUT_MILLIMETERS);
-#else
             return UnitUtils.ConvertToInternalUnits(millimeters, UnitTypeId.Millimeters);
-#endif
         }
 
         private static long GetElementIdValue(ElementId id)
         {
-#if R2024 || R2025
+#if R2024 || R2025 || R2026
             return id.Value;
 #else
             return id.IntegerValue;

@@ -138,33 +138,6 @@ namespace AbimToolsMine
                     var columnHeader = sizeTable.GetColumnHeader(index);
                     string str3 = "";
                     string str5 = "";
-#if R2020
-                    str3 = columnHeader.UnitType.ToString();
-                    str5 = columnHeader.DisplayUnitType.ToString();
-                     string str4;
-                    try
-                    {
-                        str4 = str3.Remove(0, 3); // Обрезаем первые 3 символа
-                    }
-                    catch
-                    {
-                        str4 = str3 + "_ОШИБКА!!!";
-                    }
-                    string str6;
-                    try
-                    {
-                        str6 = str5.Remove(0, 4); // Обрезаем первые 4 символа
-                    }
-                    catch
-                    {
-                        str6 = str5 + "_ОШИБКА!!!";
-                    }
-                                        // Формируем строку для заголовка, включая имя и unitType
-
-                    return $"{columnHeader.Name}##{str4}##{str6}";
-                })) + "\n";
-#else
-
                     str3 = columnHeader.GetSpecTypeId().TypeId;
                     str5 = columnHeader.GetUnitTypeId().TypeId;
                     string str4;
@@ -199,10 +172,6 @@ namespace AbimToolsMine
                     }
                     else { return ""; }
                 })) + "\n";
-#endif
-
-
-
             // Формирование данных таблицы
             for (int i = 0; i < sizeTable.NumberOfRows; i++)
             {

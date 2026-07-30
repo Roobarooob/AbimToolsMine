@@ -1,4 +1,4 @@
-using Autodesk.Revit.Attributes;
+п»їusing Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace AbimToolsMine
 
             if (value == null)
             {
-                TaskDialog.Show("Ошибка", $"Не удалось получить значение параметра '{formParamName}' из формообразующего.");
+                TaskDialog.Show("РћС€РёР±РєР°", $"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° '{formParamName}' РёР· С„РѕСЂРјРѕРѕР±СЂР°Р·СѓСЋС‰РµРіРѕ.");
                 return Result.Failed;
             }
 
@@ -57,7 +57,7 @@ namespace AbimToolsMine
 
             if (formSolids.Count == 0)
             {
-                TaskDialog.Show("Ошибка", "Не найдена геометрия (solids) формообразующего элемента.");
+                TaskDialog.Show("РћС€РёР±РєР°", "РќРµ РЅР°Р№РґРµРЅР° РіРµРѕРјРµС‚СЂРёСЏ (solids) С„РѕСЂРјРѕРѕР±СЂР°Р·СѓСЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р°.");
                 return Result.Failed;
             }
 
@@ -67,7 +67,7 @@ namespace AbimToolsMine
             // --- Write parameter to intersecting elements ---
             int matched = 0;
 
-            using (Transaction t = new Transaction(doc, "Запись по формообразующему"))
+            using (Transaction t = new Transaction(doc, "Р—Р°РїРёСЃСЊ РїРѕ С„РѕСЂРјРѕРѕР±СЂР°Р·СѓСЋС‰РµРјСѓ"))
             {
                 t.Start();
 
@@ -97,7 +97,7 @@ namespace AbimToolsMine
                 t.Commit();
             }
 
-            TaskDialog.Show("Готово", $"Обработано элементов: {matched}");
+            TaskDialog.Show("Р“РѕС‚РѕРІРѕ", $"РћР±СЂР°Р±РѕС‚Р°РЅРѕ СЌР»РµРјРµРЅС‚РѕРІ: {matched}");
             return Result.Succeeded;
         }
 
@@ -122,7 +122,11 @@ namespace AbimToolsMine
                 if (cat.CategoryType != CategoryType.Model) continue;
 
                 // Skip categories known to be non-volumetric (rooms, spaces, areas, levels, grids, etc.)
-                BuiltInCategory bic = (BuiltInCategory)(int)cat.Id.IntegerValue;
+#if R2026
+                BuiltInCategory bic = (BuiltInCategory)(int)cat.Id.Value;
+#else
+                BuiltInCategory bic = (BuiltInCategory)cat.Id.IntegerValue;
+#endif
                 if (IsNonVolumetricCategory(bic)) continue;
 
                 result.Add(el);

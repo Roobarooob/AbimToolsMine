@@ -1,4 +1,4 @@
-using Autodesk.Revit.Attributes;
+п»їusing Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
@@ -21,7 +21,7 @@ namespace AbimToolsMine
             if (win.ShowDialog() != true)
                 return Result.Cancelled;
 
-            // ?? Собираем элементы ??????????????????????????????????????????????????
+            // ?? РЎРѕР±РёСЂР°РµРј СЌР»РµРјРµРЅС‚С‹ ??????????????????????????????????????????????????
             IEnumerable<Element> rawElements;
 
             if (win.UseSelection)
@@ -29,7 +29,7 @@ namespace AbimToolsMine
                 var ids = uidoc.Selection.GetElementIds();
                 if (ids.Count == 0)
                 {
-                    TaskDialog.Show("Предупреждение", "Нет выбранных элементов.");
+                    TaskDialog.Show("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", "РќРµС‚ РІС‹Р±СЂР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ.");
                     return Result.Cancelled;
                 }
                 rawElements = ids.Select(id => doc.GetElement(id));
@@ -49,11 +49,11 @@ namespace AbimToolsMine
 
             if (allElements.Count == 0)
             {
-                TaskDialog.Show("Предупреждение", "Не найдено ни одного элемента.");
+                TaskDialog.Show("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", "РќРµ РЅР°Р№РґРµРЅРѕ РЅРё РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°.");
                 return Result.Cancelled;
             }
 
-            // ?? Маршрутизация по режиму ????????????????????????????????????????????
+            // ?? РњР°СЂС€СЂСѓС‚РёР·Р°С†РёСЏ РїРѕ СЂРµР¶РёРјСѓ ????????????????????????????????????????????
             if (win.NestedMode)
                 return ExecuteNestedMode(doc, allElements, win.FromParam, win.OnlyEmpty);
             else if (win.FillEtageMode)
@@ -62,11 +62,11 @@ namespace AbimToolsMine
                 return ExecuteWithinMode(doc, allElements, win.FromParam, win.ToParam, win.OnlyEmpty);
         }
 
-        // ?? Режим: копирование внутри элемента ????????????????????????????????????
+        // ?? Р РµР¶РёРј: РєРѕРїРёСЂРѕРІР°РЅРёРµ РІРЅСѓС‚СЂРё СЌР»РµРјРµРЅС‚Р° ????????????????????????????????????
         private Result ExecuteWithinMode(Document doc, List<Element> allElements,
                 string fromName, string toName, bool onlyEmpty)
         {
-            // Проверки (до транзакции)
+            // РџСЂРѕРІРµСЂРєРё (РґРѕ С‚СЂР°РЅР·Р°РєС†РёРё)
             Parameter fromParam = null;
             Parameter toParam = null;
 
@@ -79,22 +79,22 @@ namespace AbimToolsMine
 
             if (fromParam == null)
             {
-                TaskDialog.Show("Ошибка", $"Параметр «{fromName}» не найден ни у одного из элементов. Операция отменена.");
+                TaskDialog.Show("РћС€РёР±РєР°", $"РџР°СЂР°РјРµС‚СЂ В«{fromName}В» РЅРµ РЅР°Р№РґРµРЅ РЅРё Сѓ РѕРґРЅРѕРіРѕ РёР· СЌР»РµРјРµРЅС‚РѕРІ. РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°.");
                 return Result.Cancelled;
             }
             if (toParam == null)
             {
-                TaskDialog.Show("Ошибка", $"Параметр «{toName}» не найден ни у одного из элементов. Операция отменена.");
+                TaskDialog.Show("РћС€РёР±РєР°", $"РџР°СЂР°РјРµС‚СЂ В«{toName}В» РЅРµ РЅР°Р№РґРµРЅ РЅРё Сѓ РѕРґРЅРѕРіРѕ РёР· СЌР»РµРјРµРЅС‚РѕРІ. РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°.");
                 return Result.Cancelled;
             }
 
             if (fromParam.StorageType != toParam.StorageType)
             {
-                TaskDialog.Show("Ошибка",
-                $"Тип данных параметров не совпадает.\n" +
-              $"«{fromName}»: {fromParam.StorageType}\n" +
-                    $"«{toName}»: {toParam.StorageType}\n\n" +
-                       "Операция отменена.");
+                TaskDialog.Show("РћС€РёР±РєР°",
+                $"РўРёРї РґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РЅРµ СЃРѕРІРїР°РґР°РµС‚.\n" +
+              $"В«{fromName}В»: {fromParam.StorageType}\n" +
+                    $"В«{toName}В»: {toParam.StorageType}\n\n" +
+                       "РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°.");
                 return Result.Cancelled;
             }
 
@@ -104,14 +104,14 @@ namespace AbimToolsMine
 
             if (instanceToTypeMismatch)
             {
-                var dlg = new TaskDialog("Предупреждение")
+                var dlg = new TaskDialog("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ")
                 {
                     MainContent =
-             $"Параметр «{fromName}» является параметром экземпляра, " +
-                   $"а «{toName}» — параметром типа.\n\n" +
-               "Для каждого типоразмера будет использовано значение из первого найденного экземпляра. " +
-           "Остальные экземпляры этого типоразмера будут пропущены.\n\n" +
-                   "Продолжить?",
+             $"РџР°СЂР°РјРµС‚СЂ В«{fromName}В» СЏРІР»СЏРµС‚СЃСЏ РїР°СЂР°РјРµС‚СЂРѕРј СЌРєР·РµРјРїР»СЏСЂР°, " +
+                   $"Р° В«{toName}В» вЂ” РїР°СЂР°РјРµС‚СЂРѕРј С‚РёРїР°.\n\n" +
+               "Р”Р»СЏ РєР°Р¶РґРѕРіРѕ С‚РёРїРѕСЂР°Р·РјРµСЂР° Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅРѕ Р·РЅР°С‡РµРЅРёРµ РёР· РїРµСЂРІРѕРіРѕ РЅР°Р№РґРµРЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР°. " +
+           "РћСЃС‚Р°Р»СЊРЅС‹Рµ СЌРєР·РµРјРїР»СЏСЂС‹ СЌС‚РѕРіРѕ С‚РёРїРѕСЂР°Р·РјРµСЂР° Р±СѓРґСѓС‚ РїСЂРѕРїСѓС‰РµРЅС‹.\n\n" +
+                   "РџСЂРѕРґРѕР»Р¶РёС‚СЊ?",
                     CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No
                 };
                 if (dlg.Show() != TaskDialogResult.Yes)
@@ -121,7 +121,7 @@ namespace AbimToolsMine
             int copied = 0;
             int skipped = 0;
 
-            using (Transaction trans = new Transaction(doc, "Копировать параметр"))
+            using (Transaction trans = new Transaction(doc, "РљРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂ"))
             {
                 trans.Start();
 
@@ -134,19 +134,19 @@ namespace AbimToolsMine
                     foreach (var grp in byType)
                     {
                         Element firstInst = grp.First();
-                        // Ищем через FindParamOnInstanceOrType — как в предпроверке
+                        // РС‰РµРј С‡РµСЂРµР· FindParamOnInstanceOrType вЂ” РєР°Рє РІ РїСЂРµРґРїСЂРѕРІРµСЂРєРµ
                         Parameter fp = FindParamOnInstanceOrType(doc, firstInst, fromName);
                         if (fp == null) continue;
 
                         ElementType elType = doc.GetElement(grp.Key) as ElementType;
                         if (elType == null) continue;
 
-                        // Сначала пробуем на типе, затем на экземпляре
+                        // РЎРЅР°С‡Р°Р»Р° РїСЂРѕР±СѓРµРј РЅР° С‚РёРїРµ, Р·Р°С‚РµРј РЅР° СЌРєР·РµРјРїР»СЏСЂРµ
                         Parameter tp = elType.LookupParameter(toName)
                             ?? FindParamOnInstanceOrType(doc, firstInst, toName);
                         if (tp == null || tp.IsReadOnly) continue;
 
-                        // Проверяем совместимость типов хранения прямо здесь
+                        // РџСЂРѕРІРµСЂСЏРµРј СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ С‚РёРїРѕРІ С…СЂР°РЅРµРЅРёСЏ РїСЂСЏРјРѕ Р·РґРµСЃСЊ
                         if (fp.StorageType != tp.StorageType) continue;
 
                         if (onlyEmpty && !IsEmpty(tp)) { skipped++; continue; }
@@ -172,15 +172,15 @@ namespace AbimToolsMine
                 trans.Commit();
             }
 
-            TaskDialog.Show("Готово", $"Скопировано: {copied}\nПропущено: {skipped}");
+            TaskDialog.Show("Р“РѕС‚РѕРІРѕ", $"РЎРєРѕРїРёСЂРѕРІР°РЅРѕ: {copied}\nРџСЂРѕРїСѓС‰РµРЅРѕ: {skipped}");
             return Result.Succeeded;
         }
 
-        // ?? Режим: копирование из родителя во вложенные субэлементы ??????????????
+        // ?? Р РµР¶РёРј: РєРѕРїРёСЂРѕРІР°РЅРёРµ РёР· СЂРѕРґРёС‚РµР»СЏ РІРѕ РІР»РѕР¶РµРЅРЅС‹Рµ СЃСѓР±СЌР»РµРјРµРЅС‚С‹ ??????????????
         private Result ExecuteNestedMode(Document doc, List<Element> allElements,
           string paramName, bool onlyEmpty)
         {
-            // Проверяем, что параметр вообще существует хотя бы у одного родителя
+            // РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ РїР°СЂР°РјРµС‚СЂ РІРѕРѕР±С‰Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ С…РѕС‚СЏ Р±С‹ Сѓ РѕРґРЅРѕРіРѕ СЂРѕРґРёС‚РµР»СЏ
             Parameter sampleParam = null;
             foreach (var el in allElements)
             {
@@ -190,8 +190,8 @@ namespace AbimToolsMine
 
             if (sampleParam == null)
             {
-                TaskDialog.Show("Ошибка",
-          $"Параметр «{paramName}» не найден ни у одного из родительских элементов. Операция отменена.");
+                TaskDialog.Show("РћС€РёР±РєР°",
+          $"РџР°СЂР°РјРµС‚СЂ В«{paramName}В» РЅРµ РЅР°Р№РґРµРЅ РЅРё Сѓ РѕРґРЅРѕРіРѕ РёР· СЂРѕРґРёС‚РµР»СЊСЃРєРёС… СЌР»РµРјРµРЅС‚РѕРІ. РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°.");
                 return Result.Cancelled;
             }
 
@@ -199,7 +199,7 @@ namespace AbimToolsMine
             int skipped = 0;
             int noSubs = 0;
 
-            using (Transaction trans = new Transaction(doc, "Копировать параметр во вложенные"))
+            using (Transaction trans = new Transaction(doc, "РљРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂ РІРѕ РІР»РѕР¶РµРЅРЅС‹Рµ"))
             {
                 trans.Start();
 
@@ -210,7 +210,7 @@ namespace AbimToolsMine
 
                     bool anythingProcessed = false;
 
-                    // 1. Субэлементы вложенных семейств (FamilyInstance)
+                    // 1. РЎСѓР±СЌР»РµРјРµРЅС‚С‹ РІР»РѕР¶РµРЅРЅС‹С… СЃРµРјРµР№СЃС‚РІ (FamilyInstance)
                     FamilyInstance fi = parent as FamilyInstance;
                     if (fi != null)
                     {
@@ -231,8 +231,8 @@ namespace AbimToolsMine
                         }
                     }
 
-                    // 2. Изоляция — через GetDependentElements без фильтра класса,
-                    //    затем проверяем категорию результата
+                    // 2. РР·РѕР»СЏС†РёСЏ вЂ” С‡РµСЂРµР· GetDependentElements Р±РµР· С„РёР»СЊС‚СЂР° РєР»Р°СЃСЃР°,
+                    //    Р·Р°С‚РµРј РїСЂРѕРІРµСЂСЏРµРј РєР°С‚РµРіРѕСЂРёСЋ СЂРµР·СѓР»СЊС‚Р°С‚Р°
                     if (IsDuctElement(parent) || IsPipeElement(parent))
                     {
                         foreach (ElementId depId in parent.GetDependentElements(null))
@@ -255,19 +255,23 @@ namespace AbimToolsMine
                 trans.Commit();
             }
 
-            TaskDialog.Show("Готово",
-        $"Скопировано: {copied}\nПропущено: {skipped}\nБез субэлементов: {noSubs}");
+            TaskDialog.Show("Р“РѕС‚РѕРІРѕ",
+        $"РЎРєРѕРїРёСЂРѕРІР°РЅРѕ: {copied}\nРџСЂРѕРїСѓС‰РµРЅРѕ: {skipped}\nР‘РµР· СЃСѓР±СЌР»РµРјРµРЅС‚РѕРІ: {noSubs}");
             return Result.Succeeded;
         }
 
-        // ?? Вспомогательные методы ????????????????????????????????????????????????
+        // ?? Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹ ????????????????????????????????????????????????
 
         private static bool IsDuctElement(Element el)
         {
             if (el is Duct) return true;
             var bic = el.Category?.Id;
             if (bic == null) return false;
+#if R2026
+            int id = (int)bic.Value;
+#else
             int id = bic.IntegerValue;
+#endif
      return id == (int)BuiltInCategory.OST_DuctCurves
      || id == (int)BuiltInCategory.OST_DuctFitting
       || id == (int)BuiltInCategory.OST_DuctAccessory
@@ -280,7 +284,11 @@ namespace AbimToolsMine
             if (el is Pipe) return true;
             var bic = el.Category?.Id;
             if (bic == null) return false;
+#if R2026
+        int id = (int)bic.Value;
+#else
         int id = bic.IntegerValue;
+#endif
             return id == (int)BuiltInCategory.OST_PipeCurves
      || id == (int)BuiltInCategory.OST_PipeFitting
 || id == (int)BuiltInCategory.OST_PipeAccessory
@@ -294,7 +302,7 @@ namespace AbimToolsMine
         }
 
         /// <summary>
-        /// Ищет параметр сначала на экземпляре, затем на его типоразмере.
+        /// РС‰РµС‚ РїР°СЂР°РјРµС‚СЂ СЃРЅР°С‡Р°Р»Р° РЅР° СЌРєР·РµРјРїР»СЏСЂРµ, Р·Р°С‚РµРј РЅР° РµРіРѕ С‚РёРїРѕСЂР°Р·РјРµСЂРµ.
         /// </summary>
         private static Parameter FindParamOnInstanceOrType(Document doc, Element el, string name)
         {
@@ -321,7 +329,7 @@ namespace AbimToolsMine
                     return p.AsElementId() == ElementId.InvalidElementId;
                 case StorageType.Integer:
                 case StorageType.Double:
-                    return false; // числовые никогда не «пустые»
+                    return false; // С‡РёСЃР»РѕРІС‹Рµ РЅРёРєРѕРіРґР° РЅРµ В«РїСѓСЃС‚С‹РµВ»
                 default:
                     return true;
             }

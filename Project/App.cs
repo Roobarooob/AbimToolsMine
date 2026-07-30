@@ -69,6 +69,19 @@ namespace AbimToolsMine
             bool itemtext = true
 )
         {
+            // OnStartup can be called more than once when the same add-in is
+            // discovered through several manifests/loaders. Reuse the button
+            // already created during the first call instead of asking Revit to
+            // register the same globally unique ribbon item name again.
+            PushButton button = panel.GetItems()
+                .OfType<PushButton>()
+                .FirstOrDefault(item => item.Name == name);
+
+            if (button != null)
+            {
+                return button;
+            }
+
             // Определяем путь к DLL-файлу: если имя DLL задано, используем его, иначе берем текущую DLL
             string assemblyPath;
             if (!string.IsNullOrWhiteSpace(dllName))
@@ -90,7 +103,24 @@ namespace AbimToolsMine
             buttonData.LargeImage = pbImage;
 
             // Добавляем кнопку на панель
-            PushButton button = panel.AddItem(buttonData) as PushButton;
+            try
+            {
+                button = panel.AddItem(buttonData) as PushButton;
+            }
+            catch (ArgumentException)
+            {
+                // Защита от редкого случая, когда второй запуск успел добавить
+                // кнопку между проверкой выше и AddItem.
+                button = panel.GetItems()
+                    .OfType<PushButton>()
+                    .FirstOrDefault(item => item.Name == name);
+
+                if (button == null)
+                {
+                    throw;
+                }
+            }
+
             button.ToolTip = toolTip;
             button.LongDescription = longDescription;
 
@@ -146,7 +176,7 @@ namespace AbimToolsMine
             );
             bath_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/BatchTools16.png"));
 
-            // Кнопка "Загрузить коллизии"
+           /* // Кнопка "Загрузить коллизии"
             PushButton col_button = CreateButton(
                 panel: pan_gen,
                 name: "CollisionTools",
@@ -156,7 +186,7 @@ namespace AbimToolsMine
                 toolTip: "Загрузка коллизий по XML в текущий документ\nПуть к XML должен быть прописан в параметре ПРО_Путь XML коллизий",
                 dllName: "AbimToolsMine.dll"
             );
-            col_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));
+            col_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Collisions16.png"));*/
 
             // Кнопка "БыстроФильтр"
             PushButton selector_button = CreateButton(
@@ -289,10 +319,10 @@ namespace AbimToolsMine
             PushButton hideAxes_button = CreateButton(
                 panel: pan_gen,
                 name: "DisableLevelsAndGridsWorksetInLinks",
-                text: "Скрыть оси\nво всех связях",
+                text: "Скрыть лишнее\nво всех связях",
                 command: "AbimToolsMine.DisableLevelsAndGridsWorksetInLinks",
                 imageUri: "pack://application:,,,/AbimToolsMine;component/Resources/Osi32.png",
-                toolTip: "Скрыть оси во всех связанных моделях",
+                toolTip: "Инструмент для скрытия осей, коллизий, во всех связанных моделях",
                 dllName: "AbimToolsMine.dll"
             );
             hideAxes_button.Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/Osi16.png"));
@@ -377,7 +407,28 @@ namespace AbimToolsMine
                 Image = new BitmapImage(new Uri("pack://application:,,,/AbimToolsMine;component/Resources/SheetNumbers16.png")),
             };
 
-            pan_gen.AddStackedItems(copyParamData, formAssignData, sheetNumbersData);
+            var stackedItemNames = new[] { "CopyParameter", "FormAssign", "SheetNumbers" };
+            bool stackedItemsAlreadyExist = pan_gen.GetItems()
+                .Any(item => stackedItemNames.Contains(item.Name));
+
+            if (!stackedItemsAlreadyExist)
+            {
+                try
+                {
+                    pan_gen.AddStackedItems(copyParamData, formAssignData, sheetNumbersData);
+                }
+                catch (ArgumentException)
+                {
+                    // Аналогичная защита для одновременной повторной инициализации.
+                    bool itemsWereAdded = pan_gen.GetItems()
+                        .Any(item => stackedItemNames.Contains(item.Name));
+
+                    if (!itemsWereAdded)
+                    {
+                        throw;
+                    }
+                }
+            }
         }
 
 

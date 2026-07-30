@@ -1,0 +1,24 @@
+{
+  "project": "Project/AbimToolsMine.csproj",
+  "assemblyName": "AbimToolsMine",
+  "versions": [
+    "R2021",
+    "R2022",
+    "R2023",
+    "R2024",
+    "R2025",
+    "R2026"
+  ],
+  "artifactsDirectory": "artifacts/AbimToolsMine",
+  "sftp": {
+    "host": "5.188.200.137",
+    "port": 222,
+    "username": "sftp_user",
+    "password": "RRtt1MsgoF",
+    "remoteRoot": "/upload/AbimToolsData",
+    "hostKeyFingerprints": [
+      "SHA256:9BC4qFhswNulOFSGwBA7KRVWYoIxyC26pJ99F+lGO1Q",
+      "SHA256:PlUIKG1kRujNj/rBCpJKqojsZggFbXxltuPjF31yazs"
+    ]
+  }
+}
