@@ -27,6 +27,7 @@ Title="Копирование параметров"
      <RowDefinition Height="Auto"/>
    <RowDefinition Height="Auto"/>
              <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
    </Grid.RowDefinitions>
 
        <RadioButton Grid.Row="0" x:Name="RbAllCategories" Content="Все элементы категории"
@@ -84,7 +85,13 @@ Title="Копирование параметров"
 
         <RadioButton Grid.Row="4" x:Name="RbSelection" Content="Выбранные элементы"
     Margin="0,6,0,0" Checked="RbSource_Checked"/>
-    <TextBlock Grid.Row="5" x:Name="TbSelectionCount"
+    <Button Grid.Row="5" x:Name="BtnSelectActiveView"
+        Content="Выбрать все на активном виде"
+        Margin="16,4,0,0" Padding="10,3"
+        HorizontalAlignment="Left"
+        IsEnabled="{Binding IsChecked, ElementName=RbSelection}"
+        Click="OnSelectActiveViewClick"/>
+    <TextBlock Grid.Row="6" x:Name="TbSelectionCount"
         Margin="16,2,0,0" FontStyle="Italic" Foreground="Gray" FontSize="11"
               Text="Выбрано элементов: 0"/>
   </Grid>

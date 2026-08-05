@@ -1,4 +1,4 @@
-using Autodesk.Revit.DB;
+п»їusing Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,18 +37,20 @@ namespace AbimToolsMine
     {
         // Result filled before window closes
         public bool UseSelection { get; private set; }
+        public List<ElementId> SelectedElementIds { get; private set; } = new List<ElementId>();
         public List<Category> SelectedCategories { get; private set; } = new List<Category>();
         public string FromParam { get; private set; }
         public string ToParam { get; private set; }
         public bool OnlyEmpty { get; private set; }
-        // true — копировать из родителя во вложенные субэлементы
+        // true вЂ” РєРѕРїРёСЂРѕРІР°С‚СЊ РёР· СЂРѕРґРёС‚РµР»СЏ РІРѕ РІР»РѕР¶РµРЅРЅС‹Рµ СЃСѓР±СЌР»РµРјРµРЅС‚С‹
         public bool NestedMode { get; private set; }
         public bool FillEtageMode { get; private set; }
 
         private readonly Document _doc;
         private readonly UIDocument _uidoc;
+        private bool _useActiveViewElements;
 
-        // Полный список всех категорий
+        // РџРѕР»РЅС‹Р№ СЃРїРёСЃРѕРє РІСЃРµС… РєР°С‚РµРіРѕСЂРёР№
         private readonly List<CategoryItem> _allCategoryItems = new List<CategoryItem>();
 
         public CopyParameterWin(ExternalCommandData commandData)
@@ -65,7 +67,7 @@ namespace AbimToolsMine
             var names = new List<string>();
             foreach (Category cat in _doc.Settings.Categories)
             {
-                // Пропускаем импорты DWG и другие файловые импорты
+                // РџСЂРѕРїСѓСЃРєР°РµРј РёРјРїРѕСЂС‚С‹ DWG Рё РґСЂСѓРіРёРµ С„Р°Р№Р»РѕРІС‹Рµ РёРјРїРѕСЂС‚С‹
                 if (cat.Name.Contains(".dwg")) continue;
                 if (cat.Name.Contains(".dxf")) continue;
                 if (cat.Name.Contains(".dgn")) continue;
@@ -106,8 +108,8 @@ namespace AbimToolsMine
                 .ToList();
 
             TbSelectedSummary.Text = checked_.Count == 0
-                ? "Выбрано: нет"
-                : "Выбрано: " + string.Join(", ", checked_);
+                ? "Р’С‹Р±СЂР°РЅРѕ: РЅРµС‚"
+                : "Р’С‹Р±СЂР°РЅРѕ: " + string.Join(", ", checked_);
         }
 
         private void OnCategoryFilterChanged(object sender, TextChangedEventArgs e)
@@ -135,28 +137,28 @@ namespace AbimToolsMine
             bool nested    = RbModeNested.IsChecked == true;
             bool fillEtage = RbModeFillEtage.IsChecked == true;
 
-            // Подпись первого поля
+            // РџРѕРґРїРёСЃСЊ РїРµСЂРІРѕРіРѕ РїРѕР»СЏ
             if (fillEtage)
-                LblFromParam.Content = "Параметр этажа:";
+                LblFromParam.Content = "РџР°СЂР°РјРµС‚СЂ СЌС‚Р°Р¶Р°:";
 else if (nested)
-           LblFromParam.Content = "Параметр:";
+           LblFromParam.Content = "РџР°СЂР°РјРµС‚СЂ:";
     else
-       LblFromParam.Content = "Из параметра:";
+       LblFromParam.Content = "РР· РїР°СЂР°РјРµС‚СЂР°:";
 
-       // Поле "В параметр" — только в режиме "внутри элемента"
+       // РџРѕР»Рµ "Р’ РїР°СЂР°РјРµС‚СЂ" вЂ” С‚РѕР»СЊРєРѕ РІ СЂРµР¶РёРјРµ "РІРЅСѓС‚СЂРё СЌР»РµРјРµРЅС‚Р°"
       System.Windows.Visibility toVisibility = (!nested && !fillEtage)
                 ? System.Windows.Visibility.Visible
               : System.Windows.Visibility.Collapsed;
       LblToParam.Visibility = toVisibility;
        TbToParam.Visibility  = toVisibility;
 
-    // Чекбокс "Только незаполненные" — не нужен в режиме этажа
+    // Р§РµРєР±РѕРєСЃ "РўРѕР»СЊРєРѕ РЅРµР·Р°РїРѕР»РЅРµРЅРЅС‹Рµ" вЂ” РЅРµ РЅСѓР¶РµРЅ РІ СЂРµР¶РёРјРµ СЌС‚Р°Р¶Р°
      if (CbOnlyEmpty != null)
  CbOnlyEmpty.Visibility = fillEtage
             ? System.Windows.Visibility.Collapsed
      : System.Windows.Visibility.Visible;
 
-            // Подставляем дефолтное значение параметра этажа
+            // РџРѕРґСЃС‚Р°РІР»СЏРµРј РґРµС„РѕР»С‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° СЌС‚Р°Р¶Р°
         if (fillEtage && TbFromParam != null && string.IsNullOrWhiteSpace(TbFromParam.Text))
          TbFromParam.Text = FillFloorParam.EtageParamName;
         }
@@ -170,15 +172,18 @@ else if (nested)
             OnlyEmpty     = CbOnlyEmpty.IsChecked == true;
  UseSelection  = RbSelection.IsChecked == true;
 
+            if (UseSelection && !_useActiveViewElements)
+                SelectedElementIds = _uidoc.Selection.GetElementIds().ToList();
+
             if (string.IsNullOrWhiteSpace(FromParam))
         {
- MessageBox.Show("Укажите имя параметра.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+ MessageBox.Show("РЈРєР°Р¶РёС‚Рµ РёРјСЏ РїР°СЂР°РјРµС‚СЂР°.", "РћС€РёР±РєР°", MessageBoxButton.OK, MessageBoxImage.Warning);
    return;
         }
 
             if (!NestedMode && !FillEtageMode && string.IsNullOrWhiteSpace(ToParam))
         {
-        MessageBox.Show("Укажите имена обоих параметров.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        MessageBox.Show("РЈРєР°Р¶РёС‚Рµ РёРјРµРЅР° РѕР±РѕРёС… РїР°СЂР°РјРµС‚СЂРѕРІ.", "РћС€РёР±РєР°", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -191,7 +196,7 @@ else if (nested)
 
   if (SelectedCategories.Count == 0)
          {
-      MessageBox.Show("Выберите хотя бы одну категорию.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+      MessageBox.Show("Р’С‹Р±РµСЂРёС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РєР°С‚РµРіРѕСЂРёСЋ.", "РћС€РёР±РєР°", MessageBoxButton.OK, MessageBoxImage.Warning);
               return;
            }
     }
@@ -209,7 +214,35 @@ DialogResult = true;
         private void LoadSelectionCount()
         {
             int count = _uidoc.Selection.GetElementIds().Count;
-            TbSelectionCount.Text = "Выбрано элементов: " + count;
+            TbSelectionCount.Text = "Р’С‹Р±СЂР°РЅРѕ СЌР»РµРјРµРЅС‚РѕРІ: " + count;
+        }
+
+        private void OnSelectActiveViewClick(object sender, RoutedEventArgs e)
+        {
+            RbSelection.IsChecked = true;
+
+            try
+            {
+                SelectedElementIds = new FilteredElementCollector(_doc, _doc.ActiveView.Id)
+                    .WhereElementIsNotElementType()
+                    .ToElementIds()
+                    .ToList();
+
+                _useActiveViewElements = true;
+                TbSelectionCount.Text =
+                    $"Р’С‹Р±СЂР°РЅРѕ СЌР»РµРјРµРЅС‚РѕРІ: {SelectedElementIds.Count} (Р°РєС‚РёРІРЅС‹Р№ РІРёРґ)";
+            }
+            catch (Autodesk.Revit.Exceptions.ArgumentException)
+            {
+                SelectedElementIds.Clear();
+                _useActiveViewElements = true;
+                TbSelectionCount.Text = "Р’С‹Р±СЂР°РЅРѕ СЌР»РµРјРµРЅС‚РѕРІ: 0";
+                MessageBox.Show(
+                    "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР±СЂР°С‚СЊ СЌР»РµРјРµРЅС‚С‹ РЅР° Р°РєС‚РёРІРЅРѕРј РІРёРґРµ.",
+                    "РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
     }
 }

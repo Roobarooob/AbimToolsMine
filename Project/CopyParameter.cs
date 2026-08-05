@@ -26,7 +26,7 @@ namespace AbimToolsMine
 
             if (win.UseSelection)
             {
-                var ids = uidoc.Selection.GetElementIds();
+                var ids = win.SelectedElementIds;
                 if (ids.Count == 0)
                 {
                     TaskDialog.Show("Предупреждение", "Нет выбранных элементов.");
