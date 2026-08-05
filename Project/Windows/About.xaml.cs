@@ -25,9 +25,10 @@ namespace AbimToolsMine
 
     public partial class AboutWindow : Window
     {
-        private string superpanel = "Плагин";
+        private const string SuperPanel = "Плагин";
         private readonly UIApplication _uiApp;
         private readonly Dictionary<string, RibbonPanel> _panelMap = new Dictionary<string, RibbonPanel>();
+        private bool _isUpdatingPanelSelection;
 
         public AboutWindow(UIApplication uiApp)
         {
@@ -43,15 +44,17 @@ namespace AbimToolsMine
             bool licenseValid = LicenseChecker.IsLicenseValid(Org.Text, Code.Text);
             if (licenseValid)
             {
-                EnableCheckboxesAndApplyPanelVisibility(); // разрешить и синхронизировать
+                EnableCheckboxesAndApplyPanelVisibility();
                 Check_Label.Content = "Лицензия активна";
                 Check_Label.Foreground = Brushes.Green;
+                SetLicenseStatusBackground(true);
             }
             else
             {
-                DisableCheckboxesAndHidePanels(); // заблокировать и скрыть панели
+                DisableCheckboxesAndHidePanels();
                 Check_Label.Content = "Лицензия не активна";
                 Check_Label.Foreground = Brushes.Red;
+                SetLicenseStatusBackground(false);
             }
         }
 
@@ -59,7 +62,18 @@ namespace AbimToolsMine
         {
             if (sender is CheckBox cb && cb.Content is string panelName && _panelMap.TryGetValue(panelName, out var panel))
             {
-                SetRibbonPanelVisibility(panel, cb.IsChecked == true);
+                bool isSuperPanel = panelName == SuperPanel;
+                SetRibbonPanelVisibility(panel, isSuperPanel || cb.IsChecked == true);
+
+                if (isSuperPanel && cb.IsChecked != true)
+                {
+                    cb.IsChecked = true;
+                }
+
+                if (!_isUpdatingPanelSelection)
+                {
+                    SavePanelVisibilitySettings();
+                }
             }
         }
         public static List<RibbonPanel> FindAbimPanels(UIApplication app)
@@ -79,16 +93,16 @@ namespace AbimToolsMine
 
             foreach (var panel in FindAbimPanels(_uiApp))
             {
-                bool isVisible = !hiddenPanels.Contains(panel.Name);
+                bool isSuperPanel = panel.Name == SuperPanel;
+                bool isVisible = isSuperPanel || !hiddenPanels.Contains(panel.Name);
                 panel.Visible = isVisible;
 
                 var checkbox = new CheckBox
                 {
                     Content = panel.Name,
-                    IsChecked = isVisible,
-                    Margin = new Thickness(0, 2, 0, 2)
+                    IsChecked = isVisible
                 };
-                if (checkbox.Content.ToString() == superpanel)
+                if (isSuperPanel)
                 {
                     checkbox.IsChecked = true;
                     checkbox.IsEnabled = false;
@@ -103,11 +117,26 @@ namespace AbimToolsMine
         private void SavePanelVisibilitySettings()
         {
             var hiddenPanels = new System.Collections.Specialized.StringCollection();
-            foreach (var kvp in _panelMap)
+            foreach (var item in CheckboxContainer.Items)
             {
-                if (!kvp.Value.Visible)
+                if (!(item is CheckBox cb) || !(cb.Content is string panelName))
                 {
-                    hiddenPanels.Add(kvp.Key);
+                    continue;
+                }
+
+                if (panelName == SuperPanel)
+                {
+                    cb.IsChecked = true;
+                    if (_panelMap.TryGetValue(panelName, out var superPanel))
+                    {
+                        superPanel.Visible = true;
+                    }
+                    continue;
+                }
+
+                if (cb.IsChecked != true)
+                {
+                    hiddenPanels.Add(panelName);
                 }
             }
             Settings.Default.Access_Org = Org.Text;
@@ -128,23 +157,76 @@ namespace AbimToolsMine
             {
                 Check_Label.Content = "Лицензия активна";
                 Check_Label.Foreground = Brushes.Green;
-                EnableCheckboxesAndApplyPanelVisibility();  // ✅
+                SetLicenseStatusBackground(true);
+                EnableCheckboxesAndApplyPanelVisibility();
             }
             else
             {
                 Check_Label.Content = "Лицензия не активна";
                 Check_Label.Foreground = Brushes.Red;
-                DisableCheckboxesAndHidePanels();  // ❌
+                SetLicenseStatusBackground(false);
+                DisableCheckboxesAndHidePanels();
+            }
+
+            SavePanelVisibilitySettings();
+        }
+
+        private void EnableAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetAllOptionalPanelsVisibility(true);
+        }
+
+        private void DisableAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetAllOptionalPanelsVisibility(false);
+        }
+
+        private void SetAllOptionalPanelsVisibility(bool visible)
+        {
+            _isUpdatingPanelSelection = true;
+            try
+            {
+                foreach (var item in CheckboxContainer.Items)
+                {
+                    if (item is CheckBox cb &&
+                        cb.Content is string panelName &&
+                        panelName != SuperPanel &&
+                        cb.IsEnabled)
+                    {
+                        cb.IsChecked = visible;
+                    }
+                }
+            }
+            finally
+            {
+                _isUpdatingPanelSelection = false;
+            }
+
+            SavePanelVisibilitySettings();
+        }
+
+        private void SetLicenseStatusBackground(bool isValid)
+        {
+            if (Check_Label.Parent is Border statusBorder)
+            {
+                statusBorder.Background = new SolidColorBrush(
+                    (System.Windows.Media.Color)ColorConverter.ConvertFromString(isValid ? "#EFFAF3" : "#FFF3F3"));
+                statusBorder.BorderBrush = new SolidColorBrush(
+                    (System.Windows.Media.Color)ColorConverter.ConvertFromString(isValid ? "#B9E5C8" : "#FFC9C9"));
             }
         }
+
         private void DisableCheckboxesAndHidePanels()
         {
+            EnableAllButton.IsEnabled = false;
+            DisableAllButton.IsEnabled = false;
+
             foreach (var item in CheckboxContainer.Items)
             {
                 if (item is CheckBox cb)
                 {
                     string name = cb.Content?.ToString();
-                    if (name != superpanel)
+                    if (name != SuperPanel)
                     {
                         cb.IsEnabled = false;
 
@@ -153,18 +235,34 @@ namespace AbimToolsMine
                             SetRibbonPanelVisibility(panel, false);
                         }
                     }
+                    else if (_panelMap.TryGetValue(name, out var superPanel))
+                    {
+                        cb.IsChecked = true;
+                        SetRibbonPanelVisibility(superPanel, true);
+                    }
                 }
             }
         }
         private void EnableCheckboxesAndApplyPanelVisibility()
         {
+            EnableAllButton.IsEnabled = true;
+            DisableAllButton.IsEnabled = true;
+
             foreach (var item in CheckboxContainer.Items)
             {
                 if (item is CheckBox cb)
                 {
                     string name = cb.Content?.ToString();
-                    if (name == superpanel)
-                        continue; // Пропускаем "Плагин"
+                    if (name == SuperPanel)
+                    {
+                        cb.IsChecked = true;
+                        cb.IsEnabled = false;
+                        if (_panelMap.TryGetValue(name, out var superPanel))
+                        {
+                            SetRibbonPanelVisibility(superPanel, true);
+                        }
+                        continue;
+                    }
 
                     cb.IsEnabled = true;
 

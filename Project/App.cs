@@ -488,7 +488,7 @@ namespace AbimToolsMine
 
             foreach (var panel in panels)
             {
-                panel.Visible = !hiddenPanels.Contains(panel.Name);
+                panel.Visible = panel.Name == "Плагин" || !hiddenPanels.Contains(panel.Name);
             }
         }
         private void OnIdling_ApplyPanelVisibility(object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e)
