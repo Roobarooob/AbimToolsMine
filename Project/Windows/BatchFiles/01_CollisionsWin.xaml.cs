@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -219,13 +220,26 @@ namespace AbimToolsMine
         private void ExportIFC_Click(object sender, RoutedEventArgs e)
         {
             var rvtFiles = rvtFilePaths.ToList();
-            if (IfcFilePath.Text != "" && IfcFilePath.Text != null)
+            if (!Directory.Exists(IfcFilePath.Text))
             {
-                BatchFunctions.RunExportIFC(BatchTools.CommandData, rvtFiles, IfcFilePath.Text);
+                TaskDialog.Show("Ошибка", "Выберите существующую папку экспорта IFC");
+                return;
             }
-            else
+
+            string configPath = Properties.Settings.Default.IFCExportConfig;
+            if (!string.IsNullOrWhiteSpace(configPath) && !File.Exists(configPath))
             {
-                TaskDialog.Show("Ошибка", "Выберите путь к папке экспорта IFC");
+                TaskDialog.Show("Ошибка", "Выбранный файл JSON-конфигурации IFC не найден. Проверьте параметры экспорта IFC.");
+                return;
+            }
+
+            try
+            {
+                BatchFunctions.RunExportIFC(BatchTools.CommandData, rvtFiles, IfcFilePath.Text, configPath);
+            }
+            catch (Exception ex)
+            {
+                TaskDialog.Show("Ошибка экспорта IFC", ex.Message);
             }
         }
 

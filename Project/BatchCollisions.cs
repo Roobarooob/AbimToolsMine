@@ -522,14 +522,24 @@ namespace AbimToolsMine
 
             System.Windows.MessageBox.Show($"RVT экспорт завершен!\nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
         }
-        public static void RunExportIFC(ExternalCommandData commandData, List<string> filePaths, string OutputFolder)
+        public static void RunExportIFC(
+            ExternalCommandData commandData,
+            List<string> filePaths,
+            string outputFolder,
+            string configPath)
         {
             UIApplication uiapp = commandData.Application;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
             var true_list = new StringBuilder();
             var false_list = new StringBuilder();
 
             Application app = uiapp.Application;
+            if (!Directory.Exists(outputFolder))
+            {
+                throw new DirectoryNotFoundException($"Папка экспорта IFC не найдена: {outputFolder}");
+            }
+
+            IfcExportConfigurationLoader configuration = IfcExportConfigurationLoader.Load(app, configPath);
+
             foreach (string filePath in filePaths)
             {
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
@@ -539,32 +549,35 @@ namespace AbimToolsMine
                     // Настройте параметры открытия документа с закрытыми рабочими наборами
                     try
                     {
-                        // Получаем информацию о всех пользовательских рабочих наборах в проекте перед открытием
-                        IList<WorksetPreview> worksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
-                        IList<WorksetId> worksetIdsToOpen = new List<WorksetId>();
+                        OpenOptions openOptions = new OpenOptions();
+                        bool isWorkshared = modelPath.ServerPath;
 
-                        // Фильтруем рабочие наборы, исключая те, что начинаются с 'символа'
-                        foreach (WorksetPreview worksetPrev in worksets)
+                        if (!isWorkshared)
                         {
-                            if (!worksetPrev.Name.Contains(LinkWoksetSymbol))
+                            using (BasicFileInfo fileInfo = BasicFileInfo.Extract(filePath))
                             {
-                                worksetIdsToOpen.Add(worksetPrev.Id);
+                                isWorkshared = fileInfo.IsWorkshared;
                             }
                         }
 
-                        OpenOptions openOptions = new OpenOptions();
-                        // Настраиваем конфигурацию для закрытия всех рабочих наборов по умолчанию
-                        WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+                        if (isWorkshared)
+                        {
+                            IList<WorksetPreview> worksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
+                            IList<WorksetId> worksetIdsToOpen = worksets
+                                .Where(workset => !workset.Name.Contains(LinkWoksetSymbol))
+                                .Select(workset => workset.Id)
+                                .ToList();
 
-                        // Устанавливаем список рабочих наборов для открытия (только те, что без символа)
-                        openConfig.Open(worksetIdsToOpen);
-                        openOptions.SetOpenWorksetsConfiguration(openConfig);
+                            WorksetConfiguration openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+                            openConfig.Open(worksetIdsToOpen);
+                            openOptions.SetOpenWorksetsConfiguration(openConfig);
+                        }
 
                         doc = app.OpenDocumentFile(modelPath, openOptions);
 
                         try
                         {
-                            ExportIFC(doc, OutputFolder);
+                            ExportIFC(doc, outputFolder, configuration);
                             true_list.AppendLine(doc.Title);
                             try { doc.Close(false); } catch { }
                         }
@@ -587,46 +600,62 @@ namespace AbimToolsMine
             System.Windows.MessageBox.Show($"IFC выгружены! \nУспешно обработаны:\n{true_list}\nНе обработаны:\n{false_list}");
         }
 
-        private static void ExportIFC(Document doc, string OutputFolder)
+        private static void ExportIFC(
+            Document doc,
+            string outputFolder,
+            IfcExportConfigurationLoader configuration)
         {
-            // Формируем путь к выходному файлу
             string fileName = doc.Title.Replace("_" + doc.Application.Username, "");
-            string outputPath = Path.Combine(OutputFolder, fileName + ".ifc");
+            ElementId viewId = ElementId.InvalidElementId;
 
-            // Получаем подстроку имени вида из настроек
-            // string viewNameSubstring = Properties.Settings.Default.IFCViewName;
-            string viewNameSubstring = "IFC"; // Временное значение по умолчанию
-            if (string.IsNullOrEmpty(viewNameSubstring))
+            if (configuration == null || configuration.RequiresView)
             {
-                viewNameSubstring = "IFC"; // По умолчанию
+                string viewNameSubstring = Properties.Settings.Default.IFCViewName;
+                if (string.IsNullOrWhiteSpace(viewNameSubstring))
+                {
+                    viewNameSubstring = "IFC";
+                }
+
+                View3D view3D = new FilteredElementCollector(doc)
+                    .OfClass(typeof(View3D))
+                    .Cast<View3D>()
+                    .FirstOrDefault(view =>
+                        !view.IsTemplate &&
+                        view.Name.IndexOf(viewNameSubstring, StringComparison.OrdinalIgnoreCase) >= 0);
+
+                if (view3D == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Не найден 3D-вид с подстрокой '{viewNameSubstring}' в имени для экспорта.");
+                }
+
+                viewId = view3D.Id;
             }
 
-            // Создаем активный 3D вид для экспорта
-            View3D view3D = new FilteredElementCollector(doc)
-            .OfClass(typeof(View3D))
-         .Cast<View3D>()
-            .FirstOrDefault(v => !v.IsTemplate && v.Name.IndexOf(viewNameSubstring, StringComparison.OrdinalIgnoreCase) >= 0);
-
-            if (view3D == null)
-            {
-                throw new Exception($"Не найден 3D вид с подстрокой '{viewNameSubstring}' в имени для экспорта");
-            }
-
-            // Настройки экспорта IFC
             using (Transaction trans = new Transaction(doc, "Export IFC"))
             {
                 trans.Start();
 
-                // Создаем опции экспорта IFC
-                IFCExportOptions ifcOptions = new IFCExportOptions();
-                ifcOptions.FileVersion = IFCVersion.IFC2x3;
-                ifcOptions.WallAndColumnSplitting = true;
-                ifcOptions.ExportBaseQuantities = true;
-                ifcOptions.SpaceBoundaryLevel = 1;
-                ifcOptions.FilterViewId = view3D.Id;
+                using (IFCExportOptions ifcOptions = new IFCExportOptions())
+                {
+                    if (configuration != null)
+                    {
+                        configuration.UpdateOptions(ifcOptions, viewId);
+                    }
+                    else
+                    {
+                        ifcOptions.FileVersion = IFCVersion.IFC2x3;
+                        ifcOptions.WallAndColumnSplitting = true;
+                        ifcOptions.ExportBaseQuantities = true;
+                        ifcOptions.SpaceBoundaryLevel = 1;
+                        ifcOptions.FilterViewId = viewId;
+                    }
 
-                // Экспортируем
-                doc.Export(OutputFolder, fileName, ifcOptions);
+                    if (!doc.Export(outputFolder, fileName, ifcOptions))
+                    {
+                        throw new InvalidOperationException("Revit вернул ошибку при экспорте IFC.");
+                    }
+                }
 
                 trans.Commit();
             }
