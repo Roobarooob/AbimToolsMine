@@ -33,18 +33,19 @@ namespace AbimToolsMine
 
             // Трёхфазный цикл: окно ? выбор помещений ? окно снова
             List<ElementId> preselectedRooms = null;
+            List<FinishingCategory> preselectedCategories = null;
             RoomParamsToFloorWin win;
 
             while (true)
             {
-                win = preselectedRooms != null
-             ? new RoomParamsToFloorWin(uidoc, preselectedRooms)
-             : new RoomParamsToFloorWin(uidoc);
+                win = new RoomParamsToFloorWin(uidoc, preselectedRooms, preselectedCategories);
                 RevitWindowOwner.SetOwner(win, commandData.Application);
                 win.ShowDialog();
 
                 if (win.NeedRoomPick)
                 {
+                    preselectedCategories = win.SelectedCategories;
+
                     // Пользователь нажал "Выбрать на виде" — делаем выбор без модального окна
                     try
                     {
@@ -81,147 +82,159 @@ namespace AbimToolsMine
             }
 
             // Все помещения модели — для поиска
-      var allRooms = new FilteredElementCollector(doc)
-      .OfCategory(BuiltInCategory.OST_Rooms)
-      .WhereElementIsNotElementType()
-.Cast<Room>()
-      .Where(r => r.Area > 0)
- .ToList();
+            var allRooms = new FilteredElementCollector(doc)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WhereElementIsNotElementType()
+      .Cast<Room>()
+            .Where(r => r.Area > 0)
+       .ToList();
 
             if (!allRooms.Any())
-      {
-      TaskDialog.Show("Предупреждение", "В проекте не найдено помещений.");
-    return Result.Cancelled;
-     }
+            {
+                TaskDialog.Show("Предупреждение", "В проекте не найдено помещений.");
+                return Result.Cancelled;
+            }
 
- // allowedIds: null = все помещения, иначе — только выбранные
-     HashSet<ElementId> allowedIds = null;
-    if (win.SelectedRoomIds != null && win.SelectedRoomIds.Count > 0)
- {
-        allowedIds = new HashSet<ElementId>(win.SelectedRoomIds);
-       if (!allRooms.Any(r => allowedIds.Contains(r.Id)))
-        {
-           TaskDialog.Show("Предупреждение", "Ни одно из выбранных помещений не найдено.");
-    return Result.Cancelled;
-  }
-    }
+            // allowedIds: null = все помещения, иначе — только выбранные
+            HashSet<ElementId> allowedIds = null;
+            if (win.SelectedRoomIds != null && win.SelectedRoomIds.Count > 0)
+            {
+                allowedIds = new HashSet<ElementId>(win.SelectedRoomIds);
+                if (!allRooms.Any(r => allowedIds.Contains(r.Id)))
+                {
+                    TaskDialog.Show("Предупреждение", "Ни одно из выбранных помещений не найдено.");
+                    return Result.Cancelled;
+                }
+            }
 
             var geomOptions = new Options
             {
-       ComputeReferences = true,
-IncludeNonVisibleObjects = true
+                ComputeReferences = true,
+                IncludeNonVisibleObjects = true
             };
 
- // ?? Сбор целевых элементов ????????????????????????????????????????????
-       // Если помещения выбраны — используем пространственную предфильтрацию:
-  // для каждого помещения расширяем BBox на 500 мм и берём только ближайшие элементы.
-    // Если "все помещения" — обычный полный сбор.
+            // ?? Сбор целевых элементов ????????????????????????????????????????????
+            // Если помещения выбраны — используем пространственную предфильтрацию:
+            // для каждого помещения расширяем BBox на 500 мм и берём только ближайшие элементы.
+            // Если "все помещения" — обычный полный сбор.
             var allTargets = new List<(FinishingCategory cat, Element el)>();
 
-        if (allowedIds == null)
-        {
-   // Режим "все помещения" — собираем все целевые элементы
-     foreach (FinishingCategory category in win.SelectedCategories)
-   foreach (Element el in GetTargets(doc, category))
-  allTargets.Add((category, el));
+            if (allowedIds == null)
+            {
+                // Режим "все помещения" — собираем все целевые элементы
+                foreach (FinishingCategory category in win.SelectedCategories)
+                    foreach (Element el in GetTargets(doc, category))
+                        allTargets.Add((category, el));
             }
- else
-         {
-     // Режим "выбранные помещения" — пространственная предфильтрация
+            else
+            {
+                // Режим "выбранные помещения" — пространственная предфильтрация
                 const double toleranceFt = 500.0 / 304.8; // 500 мм в футах
-            var processedIds = new HashSet<ElementId>();
-         var selectedRooms = allRooms.Where(r => allowedIds.Contains(r.Id)).ToList();
+                var processedIds = new HashSet<ElementId>();
+                var selectedRooms = allRooms.Where(r => allowedIds.Contains(r.Id)).ToList();
 
-       foreach (Room selectedRoom in selectedRooms)
-    {
-       BoundingBoxXYZ bb = selectedRoom.get_BoundingBox(null);
-         if (bb == null) continue;
+                foreach (Room selectedRoom in selectedRooms)
+                {
+                    BoundingBoxXYZ bb = selectedRoom.get_BoundingBox(null);
+                    if (bb == null) continue;
 
-     // Расширяем BBox на toleranceFt по XY (Z не трогаем — этажи разные)
-var outline = new Outline(
-            new XYZ(bb.Min.X - toleranceFt, bb.Min.Y - toleranceFt, bb.Min.Z),
-         new XYZ(bb.Max.X + toleranceFt, bb.Max.Y + toleranceFt, bb.Max.Z));
+                    // Для стен расширяем BBox только по XY, чтобы не захватывать
+                    // стены соседних этажей.
+                    var wallOutline = new Outline(
+                                new XYZ(bb.Min.X - toleranceFt, bb.Min.Y - toleranceFt, bb.Min.Z),
+                             new XYZ(bb.Max.X + toleranceFt, bb.Max.Y + toleranceFt, bb.Max.Z));
 
-         var bbFilter = new BoundingBoxIntersectsFilter(outline);
+                    // Пол и потолок могут находиться ниже/выше границ помещения,
+                    // поэтому для них дополнительно расширяем BBox по Z на 500 мм.
+                    var horizontalOutline = new Outline(
+                                new XYZ(bb.Min.X - toleranceFt, bb.Min.Y - toleranceFt, bb.Min.Z - toleranceFt),
+                             new XYZ(bb.Max.X + toleranceFt, bb.Max.Y + toleranceFt, bb.Max.Z + toleranceFt));
 
-        foreach (FinishingCategory category in win.SelectedCategories)
-      {
-                foreach (Element el in GetTargetsWithFilter(doc, category, bbFilter))
-   {
-  // processedIds.Add возвращает true если элемент добавлен впервые
-           if (processedIds.Add(el.Id))
-        allTargets.Add((category, el));
-}
-      }
-    }
-  }
+                    var wallBbFilter = new BoundingBoxIntersectsFilter(wallOutline);
+                    var horizontalBbFilter = new BoundingBoxIntersectsFilter(horizontalOutline);
 
-       int total   = allTargets.Count;
+                    foreach (FinishingCategory category in win.SelectedCategories)
+                    {
+                        BoundingBoxIntersectsFilter bbFilter = category == FinishingCategory.Walls
+                            ? wallBbFilter
+                            : horizontalBbFilter;
+
+                        foreach (Element el in GetTargetsWithFilter(doc, category, bbFilter))
+                        {
+                            // processedIds.Add возвращает true если элемент добавлен впервые
+                            if (processedIds.Add(el.Id))
+                                allTargets.Add((category, el));
+                        }
+                    }
+                }
+            }
+
+            int total = allTargets.Count;
             int current = 0;
 
-     var progress = new ProgressWindow();
-     RevitWindowOwner.SetOwner(progress, commandData.Application);
-     progress.Show();
+            var progress = new ProgressWindow();
+            RevitWindowOwner.SetOwner(progress, commandData.Application);
+            progress.Show();
 
             using (Transaction t = new Transaction(doc, "Передача параметров из помещений в элементы отделки"))
             {
-      t.Start();
+                t.Start();
 
-          foreach (var pair in allTargets)
+                foreach (var pair in allTargets)
                 {
-      FinishingCategory category = pair.cat;
-          Element el = pair.el;
+                    FinishingCategory category = pair.cat;
+                    Element el = pair.el;
 
-            current++;
-            progress.UpdateProgress($"Обработка {current} из {total}...", current, total);
+                    current++;
+                    progress.UpdateProgress($"Обработка {current} из {total}...", current, total);
 
- Room room = FindRoomForElement(el, category, allRooms, geomOptions);
-    if (room == null) continue;
+                    Room room = FindRoomForElement(el, category, allRooms, geomOptions);
+                    if (room == null) continue;
 
-  // Если задан фильтр — пропускаем элементы "чужих" помещений
-     if (allowedIds != null && !allowedIds.Contains(room.Id)) continue;
+                    // Если задан фильтр — пропускаем элементы "чужих" помещений
+                    if (allowedIds != null && !allowedIds.Contains(room.Id)) continue;
 
-                  foreach (var mapping in mappings)
-               {
- string value = GetParamStringValue(room, mapping.SourceParam);
-    if (value == null) continue;
-     Parameter tp = el.LookupParameter(mapping.TargetParam);
-     if (tp == null || tp.IsReadOnly) continue;
-            try
-           {
-    if (tp.StorageType == StorageType.String) tp.Set(value);
-          else tp.SetValueString(value);
-      }
-   catch { }
-         }
+                    foreach (var mapping in mappings)
+                    {
+                        string value = GetParamStringValue(room, mapping.SourceParam);
+                        if (value == null) continue;
+                        Parameter tp = el.LookupParameter(mapping.TargetParam);
+                        if (tp == null || tp.IsReadOnly) continue;
+                        try
+                        {
+                            if (tp.StorageType == StorageType.String) tp.Set(value);
+                            else tp.SetValueString(value);
+                        }
+                        catch { }
+                    }
 
-       // WallSweep для стен
-        if (category == FinishingCategory.Walls)
-       {
-         foreach (ElementId depId in el.GetDependentElements(null))
-             {
-       WallSweep sweep = doc.GetElement(depId) as WallSweep;
-          if (sweep == null) continue;
-        foreach (var mapping in mappings)
-  {
-          string value = GetParamStringValue(room, mapping.SourceParam);
-         if (value == null) continue;
-      Parameter tp = sweep.LookupParameter(mapping.TargetParam);
-            if (tp == null || tp.IsReadOnly) continue;
-  try { if (tp.StorageType == StorageType.String) tp.Set(value); else tp.SetValueString(value); }
-                catch { }
-    }
-    }
-              }
-         } // foreach allTargets
+                    // WallSweep для стен
+                    if (category == FinishingCategory.Walls)
+                    {
+                        foreach (ElementId depId in el.GetDependentElements(null))
+                        {
+                            WallSweep sweep = doc.GetElement(depId) as WallSweep;
+                            if (sweep == null) continue;
+                            foreach (var mapping in mappings)
+                            {
+                                string value = GetParamStringValue(room, mapping.SourceParam);
+                                if (value == null) continue;
+                                Parameter tp = sweep.LookupParameter(mapping.TargetParam);
+                                if (tp == null || tp.IsReadOnly) continue;
+                                try { if (tp.StorageType == StorageType.String) tp.Set(value); else tp.SetValueString(value); }
+                                catch { }
+                            }
+                        }
+                    }
+                } // foreach allTargets
 
-    t.Commit();
-      }
+                t.Commit();
+            }
 
-     progress.Close();
-         TaskDialog.Show("Готово", "Данные успешно записаны.");
-   return Result.Succeeded;
-  }
+            progress.Close();
+            TaskDialog.Show("Готово", "Данные успешно записаны.");
+            return Result.Succeeded;
+        }
 
         private static List<Element> GetTargets(Document doc, FinishingCategory category)
         {
@@ -261,49 +274,49 @@ var outline = new Outline(
             }
         }
 
-/// <summary>
-    /// То же что GetTargets, но с дополнительным пространственным фильтром BBox.
-  /// </summary>
+        /// <summary>
+        /// То же что GetTargets, но с дополнительным пространственным фильтром BBox.
+        /// </summary>
         private static List<Element> GetTargetsWithFilter(
         Document doc, FinishingCategory category, BoundingBoxIntersectsFilter bbFilter)
         {
- switch (category)
-     {
-          case FinishingCategory.Ceilings:
-    return new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_Ceilings)
-            .WherePasses(bbFilter)
- .WhereElementIsNotElementType()
-      .Cast<Element>().ToList();
+            switch (category)
+            {
+                case FinishingCategory.Ceilings:
+                    return new FilteredElementCollector(doc)
+                                .OfCategory(BuiltInCategory.OST_Ceilings)
+                            .WherePasses(bbFilter)
+                 .WhereElementIsNotElementType()
+                      .Cast<Element>().ToList();
 
-       case FinishingCategory.Walls:
-  return new FilteredElementCollector(doc)
- .OfCategory(BuiltInCategory.OST_Walls)
-         .WherePasses(bbFilter)
-   .WhereElementIsNotElementType()
-     .Cast<Element>()
-    .Where(e =>
-  {
-      ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
-      return et != null && et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase);
-     })
-         .ToList();
+                case FinishingCategory.Walls:
+                    return new FilteredElementCollector(doc)
+                   .OfCategory(BuiltInCategory.OST_Walls)
+                           .WherePasses(bbFilter)
+                     .WhereElementIsNotElementType()
+                       .Cast<Element>()
+                      .Where(e =>
+                    {
+                        ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
+                        return et != null && et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase);
+                    })
+                           .ToList();
 
-     default: // Floors
-  return new FilteredElementCollector(doc)
-       .OfCategory(BuiltInCategory.OST_Floors)
-  .WherePasses(bbFilter)
-.WhereElementIsNotElementType()
-  .Cast<Element>()
-       .Where(e =>
-  {
-    ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
-      return et != null && (
-         et.Name.StartsWith("ВО Пол",   StringComparison.OrdinalIgnoreCase) ||
-    et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase));
-})
-  .ToList();
-     }
+                default: // Floors
+                    return new FilteredElementCollector(doc)
+                         .OfCategory(BuiltInCategory.OST_Floors)
+                    .WherePasses(bbFilter)
+                  .WhereElementIsNotElementType()
+                    .Cast<Element>()
+                         .Where(e =>
+                    {
+                        ElementType et = doc.GetElement(e.GetTypeId()) as ElementType;
+                        return et != null && (
+                           et.Name.StartsWith("ВО Пол", StringComparison.OrdinalIgnoreCase) ||
+                      et.Name.StartsWith("ВО Стена", StringComparison.OrdinalIgnoreCase));
+                    })
+                    .ToList();
+            }
         }
 
         // ?? Диспетчер поиска помещения по категории ??????????????????????????????
@@ -497,9 +510,9 @@ var outline = new Outline(
             }
         }
         private class RoomSelectionFilter : Autodesk.Revit.UI.Selection.ISelectionFilter
-    {
-        public bool AllowElement(Element elem) => elem is Room;
-        public bool AllowReference(Reference reference, XYZ position) => false;
-    }
-} // class RoomParamsToFloor
+        {
+            public bool AllowElement(Element elem) => elem is Room;
+            public bool AllowReference(Reference reference, XYZ position) => false;
+        }
+    } // class RoomParamsToFloor
 } // namespace

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -14,19 +14,19 @@ namespace AbimToolsMine
 {
     public partial class RoomParamsToFloorWin : Window
     {
-    private readonly UIDocument _uidoc;
+        private readonly UIDocument _uidoc;
 
         /// <summary>
-  /// Категории, которые нужно обработать. Заполняется при нажатии "Запустить".
+  /// РљР°С‚РµРіРѕСЂРёРё, РєРѕС‚РѕСЂС‹Рµ РЅСѓР¶РЅРѕ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ. Р—Р°РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРё РЅР°Р¶Р°С‚РёРё "Р—Р°РїСѓСЃС‚РёС‚СЊ".
  /// </summary>
         public List<FinishingCategory> SelectedCategories { get; private set; }
 
-        /// <summary>Список выбранных помещений. Null = все помещения.</summary>
+        /// <summary>РЎРїРёСЃРѕРє РІС‹Р±СЂР°РЅРЅС‹С… РїРѕРјРµС‰РµРЅРёР№. Null = РІСЃРµ РїРѕРјРµС‰РµРЅРёСЏ.</summary>
       public List<ElementId> SelectedRoomIds { get; set; }
 
      /// <summary>
-     /// True — пользователь нажал "Выбрать на виде", окно закрылось без результата.
-        /// Команда должна сделать PickObjects и снова открыть окно.
+     /// True вЂ” РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶Р°Р» "Р’С‹Р±СЂР°С‚СЊ РЅР° РІРёРґРµ", РѕРєРЅРѕ Р·Р°РєСЂС‹Р»РѕСЃСЊ Р±РµР· СЂРµР·СѓР»СЊС‚Р°С‚Р°.
+        /// РљРѕРјР°РЅРґР° РґРѕР»Р¶РЅР° СЃРґРµР»Р°С‚СЊ PickObjects Рё СЃРЅРѕРІР° РѕС‚РєСЂС‹С‚СЊ РѕРєРЅРѕ.
         /// </summary>
       public bool NeedRoomPick { get; private set; }
   
@@ -35,10 +35,10 @@ namespace AbimToolsMine
 
   public static readonly List<RoomParamMapping> DefaultMappings = new List<RoomParamMapping>
         {
-            new RoomParamMapping("Номер",       "ПРО_Номер помещения"),
-         new RoomParamMapping("ПРО_Этаж",        "ПРО_Этаж"),
-            new RoomParamMapping("ПРО_Секция",          "ПРО_Секция"),
-     new RoomParamMapping("ПРО_Группа спецификации", "ПРО_Группа спецификации"),
+            new RoomParamMapping("РќРѕРјРµСЂ",       "РџР Рћ_РќРѕРјРµСЂ РїРѕРјРµС‰РµРЅРёСЏ"),
+         new RoomParamMapping("РџР Рћ_Р­С‚Р°Р¶",        "РџР Рћ_Р­С‚Р°Р¶"),
+            new RoomParamMapping("РџР Рћ_РЎРµРєС†РёСЏ",          "РџР Рћ_РЎРµРєС†РёСЏ"),
+     new RoomParamMapping("РџР Рћ_Р“СЂСѓРїРїР° СЃРїРµС†РёС„РёРєР°С†РёРё", "РџР Рћ_Р“СЂСѓРїРїР° СЃРїРµС†РёС„РёРєР°С†РёРё"),
     };
 
      public RoomParamsToFloorWin(UIDocument uidoc)
@@ -51,29 +51,38 @@ namespace AbimToolsMine
         }
 
         /// <summary>
-        /// Конструктор для повторного открытия с уже выбранными помещениями.
+        /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ РїРѕРІС‚РѕСЂРЅРѕРіРѕ РѕС‚РєСЂС‹С‚РёСЏ СЃ СѓР¶Рµ РІС‹Р±СЂР°РЅРЅС‹РјРё РїРѕРјРµС‰РµРЅРёСЏРјРё.
         /// </summary>
-       public RoomParamsToFloorWin(UIDocument uidoc, List<ElementId> preselectedRooms)
-   : this(uidoc)
+        public RoomParamsToFloorWin(UIDocument uidoc, List<ElementId> preselectedRooms)
+            : this(uidoc, preselectedRooms, null)
         {
-   if (preselectedRooms != null && preselectedRooms.Count > 0)
-   {
-     SelectedRoomIds = preselectedRooms;
-            // Ставим режим "выбранные" после загрузки компонентов
-        Loaded += (s, e) =>
-       {
-    RbSelectedRooms.IsChecked = true;  // триггернет OnRoomModeChanged
-     UpdateRoomCountLabel();
-};
-   }
         }
 
-    // ?? Маппинг ??????????????????????????????????????????????????????????????
+        public RoomParamsToFloorWin(
+            UIDocument uidoc,
+            List<ElementId> preselectedRooms,
+            ICollection<FinishingCategory> preselectedCategories)
+            : this(uidoc)
+        {
+            ApplySelectedCategories(preselectedCategories);
+
+            if (preselectedRooms != null)
+            {
+                SelectedRoomIds = preselectedRooms.ToList();
+                Loaded += (s, e) =>
+                {
+                    RbSelectedRooms.IsChecked = true;
+                    UpdateRoomCountLabel();
+                };
+            }
+        }
+
+    // ?? РњР°РїРїРёРЅРі ??????????????????????????????????????????????????????????????
 
         private void OnRowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            // Откладываем сохранение на следующий цикл диспетчера —
-      // чтобы DataGrid успел зафиксировать значение в модели
+            // РћС‚РєР»Р°РґС‹РІР°РµРј СЃРѕС…СЂР°РЅРµРЅРёРµ РЅР° СЃР»РµРґСѓСЋС‰РёР№ С†РёРєР» РґРёСЃРїРµС‚С‡РµСЂР° вЂ”
+      // С‡С‚РѕР±С‹ DataGrid СѓСЃРїРµР» Р·Р°С„РёРєСЃРёСЂРѕРІР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ РІ РјРѕРґРµР»Рё
      Dispatcher.BeginInvoke(new System.Action(SaveMappings),
      System.Windows.Threading.DispatcherPriority.Background);
         }
@@ -108,53 +117,68 @@ Mappings.Add(new RoomParamMapping(m.SourceParam, m.TargetParam));
     Settings.Default.Save();
         }
 
-        // ?? Режим помещений ???????????????????????????????????????????????????????
+        // ?? Р РµР¶РёРј РїРѕРјРµС‰РµРЅРёР№ ???????????????????????????????????????????????????????
 
         private void OnRoomModeChanged(object sender, RoutedEventArgs e)
         {
-    if (PanelRoomPick == null) return;
-            PanelRoomPick.Visibility = RbSelectedRooms.IsChecked == true
-         ? System.Windows.Visibility.Visible
-      : System.Windows.Visibility.Collapsed;
-     }
+            if (PanelRoomPick == null) return;
+
+            bool selectedRoomsMode = RbSelectedRooms.IsChecked == true;
+            PanelRoomPick.Visibility = selectedRoomsMode
+                ? System.Windows.Visibility.Visible
+                : System.Windows.Visibility.Collapsed;
+
+            if (!selectedRoomsMode) return;
+
+            if (SelectedRoomIds == null || SelectedRoomIds.Count == 0)
+            {
+                List<ElementId> roomsFromCurrentSelection = _uidoc.Selection
+                    .GetElementIds()
+                    .Where(id => _uidoc.Document.GetElement(id) is Room)
+                    .ToList();
+
+                if (roomsFromCurrentSelection.Count > 0)
+                    SelectedRoomIds = roomsFromCurrentSelection;
+            }
+
+            UpdateRoomCountLabel();
+        }
 
      private void OnPickRoomsClick(object sender, RoutedEventArgs e)
   {
-            // Закрываем окно без DialogResult (null) — команда перехватит это
-      // как сигнал "нужно сделать выбор помещений"
+            // Р—Р°РєСЂС‹РІР°РµРј РѕРєРЅРѕ Р±РµР· DialogResult (null) вЂ” РєРѕРјР°РЅРґР° РїРµСЂРµС…РІР°С‚РёС‚ СЌС‚Рѕ
+      // РєР°Рє СЃРёРіРЅР°Р» "РЅСѓР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РІС‹Р±РѕСЂ РїРѕРјРµС‰РµРЅРёР№"
+            SelectedCategories = GetSelectedCategories();
             NeedRoomPick = true;
-            Close(); // DialogResult остаётся null
+            Close(); // DialogResult РѕСЃС‚Р°С‘С‚СЃСЏ null
       }
 
  private void UpdateRoomCountLabel()
         {
   if (SelectedRoomIds == null || SelectedRoomIds.Count == 0)
-      TbRoomCount.Text = "Помещения не выбраны";
+      TbRoomCount.Text = "РџРѕРјРµС‰РµРЅРёСЏ РЅРµ РІС‹Р±СЂР°РЅС‹";
             else
-           TbRoomCount.Text = $"Выбрано помещений: {SelectedRoomIds.Count}";
+           TbRoomCount.Text = $"Р’С‹Р±СЂР°РЅРѕ РїРѕРјРµС‰РµРЅРёР№: {SelectedRoomIds.Count}";
      }
 
-     // ?? Запуск ???????????????????????????????????????????????????????????????
+     // ?? Р—Р°РїСѓСЃРє ???????????????????????????????????????????????????????????????
 
         private void OnRunClick(object sender, RoutedEventArgs e)
         {
-   // Проверяем что хотя бы одна категория выбрана
-            var categories = new List<FinishingCategory>();
-          if (CbFloors.IsChecked == true)   categories.Add(FinishingCategory.Floors);
-            if (CbCeilings.IsChecked == true) categories.Add(FinishingCategory.Ceilings);
-            if (CbWalls.IsChecked == true)    categories.Add(FinishingCategory.Walls);
+   // РџСЂРѕРІРµСЂСЏРµРј С‡С‚Рѕ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РєР°С‚РµРіРѕСЂРёСЏ РІС‹Р±СЂР°РЅР°
+            List<FinishingCategory> categories = GetSelectedCategories();
 
             if (categories.Count == 0)
    {
-        TbStatus.Text = "Выберите хотя бы одну категорию элементов.";
+        TbStatus.Text = "Р’С‹Р±РµСЂРёС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РєР°С‚РµРіРѕСЂРёСЋ СЌР»РµРјРµРЅС‚РѕРІ.";
                 return;
             }
 
-            // Проверяем выбор помещений
+            // РџСЂРѕРІРµСЂСЏРµРј РІС‹Р±РѕСЂ РїРѕРјРµС‰РµРЅРёР№
     if (RbSelectedRooms.IsChecked == true &&
               (SelectedRoomIds == null || SelectedRoomIds.Count == 0))
             {
-    TbStatus.Text = "Выберите помещения перед запуском.";
+    TbStatus.Text = "Р’С‹Р±РµСЂРёС‚Рµ РїРѕРјРµС‰РµРЅРёСЏ РїРµСЂРµРґ Р·Р°РїСѓСЃРєРѕРј.";
                 return;
             }
 
@@ -172,16 +196,34 @@ Mappings.Add(new RoomParamMapping(m.SourceParam, m.TargetParam));
             Mappings.Clear();
      foreach (var m in DefaultMappings)
          Mappings.Add(new RoomParamMapping(m.SourceParam, m.TargetParam));
-    TbStatus.Text = "Сброшено к значениям по умолчанию.";
+    TbStatus.Text = "РЎР±СЂРѕС€РµРЅРѕ Рє Р·РЅР°С‡РµРЅРёСЏРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.";
    }
 
         private void OnCancelClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             Close();
-     }
+        }
 
-        // ?? Фильтр выбора ?????????????????????????????????????????????????????????
+        private List<FinishingCategory> GetSelectedCategories()
+        {
+            var categories = new List<FinishingCategory>();
+            if (CbFloors.IsChecked == true) categories.Add(FinishingCategory.Floors);
+            if (CbCeilings.IsChecked == true) categories.Add(FinishingCategory.Ceilings);
+            if (CbWalls.IsChecked == true) categories.Add(FinishingCategory.Walls);
+            return categories;
+        }
+
+        private void ApplySelectedCategories(ICollection<FinishingCategory> categories)
+        {
+            if (categories == null) return;
+
+            CbFloors.IsChecked = categories.Contains(FinishingCategory.Floors);
+            CbCeilings.IsChecked = categories.Contains(FinishingCategory.Ceilings);
+            CbWalls.IsChecked = categories.Contains(FinishingCategory.Walls);
+        }
+
+        // ?? Р¤РёР»СЊС‚СЂ РІС‹Р±РѕСЂР° ?????????????????????????????????????????????????????????
 
         private class RoomSelectionFilter : ISelectionFilter
         {
